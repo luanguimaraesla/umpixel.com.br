@@ -12,7 +12,8 @@
     "check": "astro check"
   },
   "dependencies": {
-    "@fontsource-variable/shantell-sans": "^5.2.7",
+    "@fontsource/anton": "^5.2.7",
+    "@fontsource/metal-mania": "^5.2.7",
     "astro": "^5.0.0"
   },
   "devDependencies": {

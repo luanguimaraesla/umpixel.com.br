@@ -21,7 +21,8 @@
   --overlay-leve: rgba(0, 0, 0, 0.45);
   --overlay-border: rgba(251, 178, 22, 0.35);
   --prosa: 42rem;
-  --font-display: 'Shantell Sans Variable', system-ui, sans-serif;
+  --font-title: 'Metal Mania', 'Anton', system-ui, sans-serif;
+  --font-display: 'Anton', system-ui, sans-serif;
 }
 
 /* ---- Always-visible scrollbar ---- */
@@ -57,8 +58,9 @@ h1,
 h2,
 h3 {
   font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  /* Anton ships a single heavy weight; asking for 700 would faux-bold it. */
+  font-weight: 400;
+  letter-spacing: 0;
   line-height: 1.02;
 }
 
@@ -138,7 +140,9 @@ strong {
   gap: 1.1rem;
 }
 .hero__title {
+  font-family: var(--font-title);
   font-size: clamp(2.75rem, 13vw, 7rem);
+  letter-spacing: 0.01em;
   color: var(--amarelo);
 }
 .hero__subtitle {
@@ -281,8 +285,8 @@ strong {
   background: var(--amarelo);
   color: var(--preto);
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.1rem;
+  font-weight: 400;
+  font-size: 1.25rem;
   letter-spacing: 0.02em;
   border: none;
   border-radius: 999px;
@@ -514,7 +518,7 @@ strong {
 }
 .footer__recap {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 400;
   color: var(--amarelo);
   font-size: clamp(1.4rem, 4vw, 2.2rem);
   line-height: 1.15;
