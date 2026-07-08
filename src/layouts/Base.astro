@@ -1,0 +1,35 @@
+---
+import '@fontsource/archivo-black';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'UM PIXEL — quanto tempo custa a riqueza?',
+  description =
+    '1 pixel = 1 mês do seu salário. Veja, em escala real, quanto tempo de trabalho custam as maiores fortunas do Brasil.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#a9182c" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content="https://umpixel.com.br" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

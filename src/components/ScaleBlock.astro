@@ -1,0 +1,30 @@
+---
+interface Props {
+  cols: number;
+  rows: number;
+  zoom: number;
+  realLabel: string;
+  zoomLabel?: string;
+}
+
+const { cols, rows, zoom, realLabel, zoomLabel } = Astro.props;
+const cells = Array.from({ length: cols * rows });
+---
+
+<div class="block">
+  <div class="block__col">
+    <div class="block__box">
+      <div class="block__real" style={`width:${cols}px;height:${rows}px`} aria-hidden="true"></div>
+    </div>
+    <span class="block__caption">{realLabel}</span>
+  </div>
+  <div class="block__col">
+    <div class="block__box">
+      <div class="block__zoom" style={`--cols:${cols};--cell:${zoom}px`} aria-hidden="true">
+        {cells.map(() => <div class="px"></div>)}
+      </div>
+    </div>
+    <span class="block__badge">ampliado {zoom}×</span>
+    {zoomLabel && <span class="block__caption">{zoomLabel}</span>}
+  </div>
+</div>

@@ -1,0 +1,69 @@
+---
+const inspirations = [
+  {
+    url: 'https://stanford.edu/~bonica/wealth-to-scale/musk-wealth-to-scale-2026.html',
+    text: 'Wealth, shown to scale (Adam Bonica, Stanford) — o scroll longo em escala real.',
+  },
+  {
+    url: 'https://eattherichtextformat.github.io/1-pixel-wealth/',
+    text: '1 Pixel Wealth (Matt Korostoff) — a ideia de 1 pixel como unidade de dinheiro.',
+  },
+  {
+    url: 'https://howpoorami.org/pt',
+    text: 'How Poor Am I? — a calculadora pessoal e a comparação justa entre patrimônios.',
+  },
+];
+---
+
+<section class="section section--black footer">
+  <div class="wrap">
+    <p class="footer__recap">
+      1 pixel = 1 mês do seu trabalho.<br />
+      A sua vida inteira: 564 pixels.<br />
+      Os 5 mais ricos do Brasil: <span data-dyn="top5-area">…</span> de pixels.
+    </p>
+
+    <p class="footer__note">
+      Metodologia: as fortunas usam a lista anual da Forbes (valores de
+      <span data-dyn="forbes-date">…</span>), convertidas pela PTAX do Banco Central de
+      <span data-dyn="fx-date">…</span> (R$ <span data-dyn="fx-rate">…</span> por dólar). O
+      salário mínimo de <span data-dyn="min-wage">…</span> segue o
+      <span data-dyn="min-wage-law">…</span>. A escala é medida em pixels CSS, com 1 pixel = 1 mês
+      de salário. Uma vida de trabalho equivale a 47 anos (dos 18 aos 65). O "patrimônio de uma
+      vida" assume que você guardaria 100% do salário bruto, sem gastar nada — o que é impossível,
+      e é justamente esse o ponto.
+    </p>
+
+    <div class="footer__block">
+      <h3>Fontes</h3>
+      <div data-sources></div>
+    </div>
+
+    <div class="footer__block">
+      <h3>Referências e inspirações</h3>
+      <ul>
+        {
+          inspirations.map((item) => (
+            <li>
+              <a href={item.url} target="_blank" rel="noopener noreferrer">
+                {item.text}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="footer__license">
+        Nenhum código foi copiado das referências; este site foi escrito do zero.
+      </p>
+    </div>
+
+    <p class="footer__license">
+      Código livre sob AGPL-3.0 ·
+      <a
+        href="https://github.com/luanguimaraesla/umpixel.com.br"
+        target="_blank"
+        rel="noopener noreferrer">código-fonte no GitHub</a
+      >
+    </p>
+  </div>
+</section>

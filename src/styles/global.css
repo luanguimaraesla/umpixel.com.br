@@ -1,0 +1,621 @@
+/* ---- Reset ---- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---- Palette (extracted from bancadaesquerdaradical.com.br) ---- */
+:root {
+  --vermelho: #a9182c;
+  --vermelho-medio: #8f1425;
+  --vermelho-escuro: #770d00;
+  --amarelo: #fbb216;
+  --preto: #000000;
+  --quase-preto: #1a0505;
+  --branco: #ffffff;
+  --overlay: rgba(0, 0, 0, 0.5);
+  --overlay-forte: rgba(0, 0, 0, 0.55);
+  --overlay-leve: rgba(0, 0, 0, 0.45);
+  --overlay-border: rgba(251, 178, 22, 0.35);
+  --prosa: 42rem;
+}
+
+/* ---- Always-visible scrollbar ---- */
+html {
+  overflow-y: scroll;
+  scroll-behavior: auto;
+  scrollbar-width: auto;
+  scrollbar-color: var(--amarelo) var(--quase-preto);
+}
+::-webkit-scrollbar {
+  width: 14px;
+}
+::-webkit-scrollbar-track {
+  background: var(--quase-preto);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--amarelo);
+  border: 3px solid var(--quase-preto);
+  border-radius: 7px;
+}
+
+/* ---- Base typography ---- */
+body {
+  background: var(--preto);
+  color: var(--branco);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Archivo Black', system-ui, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+}
+
+a {
+  color: inherit;
+}
+
+strong {
+  font-weight: 700;
+}
+
+/* ---- Shared translucent panel ---- */
+.panel {
+  background: var(--overlay);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--overlay-border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+}
+
+/* ---- Section bands ---- */
+.section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 6rem 1.5rem;
+}
+.section--black {
+  background: var(--preto);
+  color: var(--branco);
+}
+.section--red {
+  background: var(--vermelho);
+  color: var(--branco);
+}
+.section--yellow {
+  background: var(--amarelo);
+  color: var(--preto);
+}
+.section--dark {
+  background: var(--quase-preto);
+  color: var(--branco);
+}
+.wrap {
+  width: 100%;
+  max-width: var(--prosa);
+}
+.section h2 {
+  font-size: clamp(1.9rem, 5vw, 3rem);
+  margin-bottom: 1.5rem;
+}
+.section p {
+  margin-bottom: 1rem;
+}
+.section p:last-child {
+  margin-bottom: 0;
+}
+.section__beat {
+  margin-top: 2.5rem;
+}
+.accent {
+  color: var(--amarelo);
+}
+/* Punchline sits directly on red; large text keeps the yellow readable at AA. */
+.punchline {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: clamp(1.3rem, 4vw, 1.8rem);
+}
+
+/* ---- Hero ---- */
+.hero {
+  min-height: 100vh;
+  justify-content: center;
+  gap: 1.5rem;
+}
+.hero__title {
+  font-size: clamp(4rem, 15vw, 9rem);
+  color: var(--amarelo);
+}
+.hero__subtitle {
+  font-size: clamp(1.2rem, 3.5vw, 1.9rem);
+  max-width: 34rem;
+}
+.hero__method {
+  max-width: 36rem;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+.hero__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 30rem;
+  margin-top: 0.5rem;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  text-align: left;
+}
+.field__label {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.field__input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--overlay-border);
+  border-radius: 10px;
+  padding: 0.65rem 0.85rem;
+}
+.field__prefix {
+  color: var(--amarelo);
+  font-weight: 700;
+}
+.field input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  color: var(--branco);
+  font-size: 1.15rem;
+  font-family: inherit;
+}
+.field input:focus {
+  outline: 2px solid var(--amarelo);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.badge {
+  align-self: flex-start;
+  background: var(--amarelo);
+  color: var(--preto);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+}
+.badge[hidden] {
+  display: none;
+}
+.calc__out {
+  margin-top: 0.5rem;
+  font-size: 1.05rem;
+}
+.calc__out strong {
+  color: var(--amarelo);
+}
+.hero__start {
+  align-self: center;
+  background: var(--amarelo);
+  color: var(--preto);
+  font-family: 'Archivo Black', system-ui, sans-serif;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  border: none;
+  border-radius: 999px;
+  padding: 0.8rem 1.8rem;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+.hero__start:hover {
+  transform: translateY(-2px);
+  background: #ffc844;
+}
+.footnote {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  max-width: 34rem;
+}
+.load-error {
+  color: var(--amarelo);
+  font-weight: 700;
+  max-width: 30rem;
+}
+.load-error[hidden] {
+  display: none;
+}
+.field input:disabled,
+.hero__start:disabled,
+.controls__play:disabled,
+.controls__speed input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ---- Scale blocks ---- */
+.block {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  justify-content: center;
+  align-items: flex-end;
+  margin: 2rem 0 0.5rem;
+}
+.block__col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+.block__box {
+  display: grid;
+  place-items: center;
+  min-width: 120px;
+  min-height: 120px;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+}
+.section--yellow .block__box {
+  background: rgba(0, 0, 0, 0.35);
+  border-color: rgba(0, 0, 0, 0.3);
+}
+.block__real {
+  background: var(--amarelo);
+}
+.block__zoom {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--cell));
+  grid-auto-rows: var(--cell);
+  gap: 1px;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 1px;
+}
+.px {
+  background: var(--amarelo);
+}
+.block__badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+}
+.block__caption {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  max-width: 18rem;
+}
+
+/* ---- Wealth columns ---- */
+.col {
+  position: relative;
+  padding-bottom: 8rem;
+}
+.col__intro {
+  max-width: 34rem;
+  margin: 0 auto 1rem;
+}
+.col__eyebrow {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--amarelo);
+  margin-bottom: 0.5rem;
+}
+.col__name {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  margin-bottom: 0.5rem;
+}
+.col__figure {
+  font-size: 1.15rem;
+  margin-bottom: 0.35rem;
+}
+.col__source {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  margin-bottom: 0.75rem;
+}
+.col__context {
+  font-size: 1rem;
+}
+.col__skip {
+  display: inline-block;
+  margin: 0.5rem auto 1.5rem;
+  font-size: 0.85rem;
+  color: var(--amarelo);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.col__hud {
+  position: sticky;
+  top: 12px;
+  z-index: 5;
+  width: max-content;
+  max-width: min(90vw, 34rem);
+  margin: 0 auto;
+  font-size: 0.9rem;
+  padding: 0.6rem 1rem;
+}
+.col__hud strong {
+  color: var(--amarelo);
+}
+.wealth-column {
+  position: relative;
+  width: var(--col-w, 120px);
+  margin: 2rem auto;
+  background: var(--vermelho);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 9px,
+    rgba(0, 0, 0, 0.15) 9px 10px
+  );
+  border-radius: 2px;
+}
+.segment {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 9px,
+    rgba(0, 0, 0, 0.15) 9px 10px
+  );
+  content-visibility: auto;
+}
+.segment--0 {
+  background-color: var(--vermelho);
+}
+.segment--1 {
+  background-color: var(--vermelho-medio);
+}
+.segment--2 {
+  background-color: var(--vermelho-escuro);
+}
+.segment--3 {
+  background-color: var(--vermelho);
+}
+.segment--4 {
+  background-color: var(--vermelho-medio);
+}
+.tick,
+.boundary {
+  position: absolute;
+  content-visibility: auto;
+  background: var(--overlay-leve);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid var(--overlay-border);
+  border-radius: 8px;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  width: max-content;
+  max-width: 15rem;
+  pointer-events: none;
+}
+.tick__value {
+  color: var(--amarelo);
+  font-weight: 700;
+}
+.tick--right {
+  left: 100%;
+  margin-left: 10px;
+  text-align: left;
+}
+.tick--left {
+  right: 100%;
+  margin-right: 10px;
+  text-align: right;
+}
+.boundary {
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+  text-align: center;
+  max-width: min(90vw, 22rem);
+  z-index: 2;
+}
+.boundary__pos {
+  color: var(--amarelo);
+  font-weight: 700;
+}
+.col__end {
+  max-width: 30rem;
+  margin: 1rem auto 0;
+}
+.col__end strong {
+  color: var(--amarelo);
+}
+
+/* Below ~1080px there is not enough room beside a 564px column for a 15rem
+   tick, so center the ticks over the column instead of anchoring them outside. */
+@media (max-width: 1080px) {
+  .tick--left,
+  .tick--right {
+    left: 50%;
+    right: auto;
+    margin: 0;
+    transform: translateX(-50%);
+    text-align: center;
+    max-width: min(88vw, 15rem);
+  }
+}
+
+/* ---- Fair-comparison transition ---- */
+.transition h2 {
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  margin-bottom: 1.5rem;
+}
+.transition .panel {
+  max-width: 38rem;
+  font-size: 1.15rem;
+  line-height: 1.7;
+}
+
+/* ---- Footer ---- */
+.footer {
+  padding-bottom: 8rem;
+}
+.footer__recap {
+  font-family: 'Archivo Black', system-ui, sans-serif;
+  text-transform: uppercase;
+  color: var(--amarelo);
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+  line-height: 1.15;
+  margin-bottom: 2rem;
+}
+.footer__note {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  max-width: 40rem;
+  margin: 0 auto 2.5rem;
+  text-align: left;
+}
+.footer__block {
+  text-align: left;
+  max-width: 40rem;
+  margin: 0 auto 2rem;
+}
+.footer__block h3 {
+  font-size: 1.1rem;
+  color: var(--amarelo);
+  margin-bottom: 0.75rem;
+}
+.footer__block ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.footer__block a {
+  color: var(--branco);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  opacity: 0.85;
+  font-size: 0.9rem;
+}
+.footer__block a:hover {
+  opacity: 1;
+  color: var(--amarelo);
+}
+.footer__license {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  margin-top: 1rem;
+}
+
+/* ---- Controls bar ---- */
+.controls {
+  position: fixed;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--overlay-forte);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--overlay-border);
+  border-top: 2px solid var(--amarelo);
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  max-width: calc(100vw - 2rem);
+  color: var(--branco);
+}
+.controls__play {
+  flex: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: none;
+  background: var(--amarelo);
+  color: var(--preto);
+  font-size: 1rem;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.controls__speed {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+.controls__speed input[type='range'] {
+  accent-color: var(--amarelo);
+  width: 8rem;
+  max-width: 30vw;
+}
+.controls__readout {
+  font-size: 0.8rem;
+  white-space: nowrap;
+  color: var(--amarelo);
+}
+.controls__pos {
+  font-size: 0.8rem;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+/* On narrow screens let the bar wrap so the in-column readouts drop to their own
+   line instead of overflowing off the right edge. */
+@media (max-width: 640px) {
+  .controls {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 0.35rem;
+  }
+  .controls__readout,
+  .controls__pos {
+    white-space: normal;
+    text-align: center;
+    flex-basis: 100%;
+  }
+}
+@media (max-width: 480px) {
+  .controls__pos {
+    display: none;
+  }
+  .controls__speed input[type='range'] {
+    width: 5rem;
+  }
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .hero__start:hover {
+    transform: none;
+  }
+  /* Autoscroll never runs here, so the controls bar would be inert. Hide it;
+     the sticky in-column HUD still shows the reading position. */
+  .controls {
+    display: none;
+  }
+}

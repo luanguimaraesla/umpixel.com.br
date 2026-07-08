@@ -1,0 +1,119 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import ScaleBlock from '../components/ScaleBlock.astro';
+import FairComparison from '../components/FairComparison.astro';
+import WealthColumn from '../components/WealthColumn.astro';
+import Controls from '../components/Controls.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Base>
+  <Hero />
+
+  <section class="section section--red">
+    <div class="wrap">
+      <h2>Isto é um PIX de <span class="accent" data-dyn="salary">…</span></h2>
+      <p>Um salário. Um mês da sua vida. <strong>Um pixel.</strong></p>
+      <ScaleBlock
+        cols={1}
+        rows={1}
+        zoom={20}
+        realLabel="tamanho real ↑ (sim, está aí — procure bem)"
+        zoomLabel="1 mês = 1 pixel"
+      />
+    </div>
+  </section>
+
+  <section class="section section--yellow">
+    <div class="wrap">
+      <h2>Um ano de trabalho: 12 pixels</h2>
+      <p><span data-dyn="year-value">…</span> em doze meses. Um retângulo de 3 por 4.</p>
+      <ScaleBlock
+        cols={3}
+        rows={4}
+        zoom={20}
+        realLabel="1 ano = 12 pixels"
+        zoomLabel="12 salários, um por mês"
+      />
+      <p class="section__beat">
+        Dez anos: 120 pixels. <span data-dyn="ten-years-value">…</span>.
+      </p>
+      <ScaleBlock
+        cols={12}
+        rows={10}
+        zoom={12}
+        realLabel="10 anos = 120 pixels"
+        zoomLabel="120 meses de trabalho"
+      />
+    </div>
+  </section>
+
+  <section class="section section--red">
+    <div class="wrap">
+      <h2>Do seu primeiro emprego aos 65 anos: 47 anos. 564 pixels.</h2>
+      <ScaleBlock
+        cols={12}
+        rows={47}
+        zoom={6}
+        realLabel="1 vida = 564 pixels"
+        zoomLabel="12 meses de largura × 47 anos de altura"
+      />
+      <p>
+        Se você guardasse cada centavo — sem aluguel, sem comida, sem imposto — terminaria a
+        vida com <strong data-dyn="life-value">…</strong>.
+      </p>
+      <p>
+        <strong class="accent punchline" data-dyn="life-under-million">Menos de um milhão de reais.</strong>
+      </p>
+    </div>
+  </section>
+
+  <FairComparison />
+
+  <WealthColumn id="richest" endId="fim-mais-rico">
+    <Fragment slot="intro">
+      <p class="col__eyebrow">A pessoa mais rica do Brasil</p>
+      <p class="col__name" data-dyn="richest-name">…</p>
+      <p class="col__figure">
+        <span data-dyn="richest-usd">…</span> (<span data-dyn="richest-brl">…</span>)
+      </p>
+      <p class="col__source" data-dyn="richest-wealth-source">…</p>
+      <p class="col__source" data-dyn="forbes-source">…</p>
+      <p class="col__context">
+        Para acumular isso com o seu salário, você precisaria ter começado a trabalhar há
+        <strong data-dyn="richest-years">…</strong> — antes de existirem os primeiros hominídeos.
+      </p>
+    </Fragment>
+    <Fragment slot="end">
+      Fim da fortuna de <strong data-dyn="richest-name">…</strong>:
+      <strong data-dyn="richest-lives">…</strong> inteiras de trabalho.
+    </Fragment>
+  </WealthColumn>
+
+  <WealthColumn id="top5" endId="fim-top5">
+    <Fragment slot="intro">
+      <p class="col__eyebrow">Os 5 brasileiros mais ricos, juntos</p>
+      <p class="col__figure">
+        <span data-dyn="top5-usd">…</span> (<span data-dyn="top5-brl">…</span>)
+      </p>
+      <p class="col__context">
+        São <strong data-dyn="top5-years">…</strong> de trabalho.
+        <strong data-dyn="top5-lives">…</strong> inteiras, uma atrás da outra.
+      </p>
+      <p class="col__source" data-dyn="forbes-source">…</p>
+    </Fragment>
+    <Fragment slot="end">
+      Fim. Os 5 juntos: <strong data-dyn="top5-lives-2">…</strong> de trabalho.
+    </Fragment>
+  </WealthColumn>
+
+  <Footer />
+
+  <Controls />
+
+  <script>
+    import { boot } from '../lib/render';
+    boot().catch((err) => console.error('Falha ao carregar os dados:', err));
+  </script>
+</Base>

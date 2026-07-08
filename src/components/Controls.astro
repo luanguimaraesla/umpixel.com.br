@@ -1,0 +1,29 @@
+---
+---
+
+<div class="controls" role="group" aria-label="Controles de rolagem automática">
+  <button
+    class="controls__play"
+    id="btn-play"
+    type="button"
+    aria-label="rolar automaticamente"
+    aria-pressed="false"
+    disabled
+  >
+    ▶
+  </button>
+  <label class="controls__speed">
+    <span>velocidade</span>
+    <input
+      id="speed"
+      type="range"
+      min="0"
+      max="100"
+      value="52"
+      aria-label="velocidade da rolagem automática"
+      disabled
+    />
+  </label>
+  <span class="controls__readout" data-speed-readout aria-hidden="true"></span>
+  <span class="controls__pos" data-pos-readout aria-hidden="true"></span>
+</div>

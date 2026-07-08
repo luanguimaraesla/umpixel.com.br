@@ -1,0 +1,62 @@
+---
+---
+
+<section class="section section--black hero">
+  <h1 class="hero__title">UM PIXEL</h1>
+  <p class="hero__subtitle">
+    Quanto <strong>tempo de trabalho</strong> custa a riqueza dos mais ricos do Brasil?
+  </p>
+
+  <div class="panel hero__method">
+    Nesta página, <strong>1 pixel = 1 mês</strong> do seu salário. 12 pixels = 1 ano.
+    564 pixels = uma vida inteira de trabalho, dos 18 aos 65 anos. Tudo o que você vai
+    ver está em escala real.
+  </div>
+
+  <div class="hero__controls">
+    <div class="field">
+      <label class="field__label" for="salario-input">Seu salário mensal</label>
+      <div class="field__input-wrap">
+        <span class="field__prefix" aria-hidden="true">R$</span>
+        <input
+          id="salario-input"
+          inputmode="decimal"
+          autocomplete="off"
+          placeholder="informe seu salário"
+          disabled
+        />
+      </div>
+      <span class="badge" id="salario-badge" hidden>
+        salário mínimo (<span data-dyn="min-wage-year">…</span>)
+      </span>
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="calc-input">Quanto custa aquilo que você quer?</label>
+      <div class="field__input-wrap">
+        <span class="field__prefix" aria-hidden="true">R$</span>
+        <input
+          id="calc-input"
+          inputmode="decimal"
+          autocomplete="off"
+          placeholder="ex.: 3.500,00"
+          disabled
+        />
+      </div>
+      <p class="calc__out" aria-live="polite">
+        Isso custa ≈ <strong data-dyn="calc-time">—</strong> do seu trabalho.
+      </p>
+    </div>
+
+    <button class="hero__start" id="btn-start" type="button" disabled>▶ começar a descer</button>
+  </div>
+
+  <p class="load-error" id="load-error" role="alert" hidden>
+    Não foi possível carregar os dados. Verifique sua conexão e recarregue a página.
+  </p>
+
+  <p class="footnote">
+    Usamos 12 salários por ano para manter a metáfora dos 12 pixels. Sim, existe o 13º —
+    ele só reforçaria o argumento.
+  </p>
+</section>
