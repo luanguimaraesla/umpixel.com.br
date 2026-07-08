@@ -2,8 +2,7 @@
 import Base from '../layouts/Base.astro';
 import ProgressBar from '../components/ProgressBar.astro';
 import Hero from '../components/Hero.astro';
-import ScaleBlock from '../components/ScaleBlock.astro';
-import Milestone from '../components/Milestone.astro';
+import HandArrow from '../components/HandArrow.astro';
 import WealthColumn from '../components/WealthColumn.astro';
 import Controls from '../components/Controls.astro';
 import Footer from '../components/Footer.astro';
@@ -14,63 +13,67 @@ import Footer from '../components/Footer.astro';
 
   <Hero />
 
-  <Milestone id="m-pixel" theme="red">
-    <Fragment slot="card">
-      <h2>1 pixel = 1 mês</h2>
-    </Fragment>
-    <Fragment slot="stage">
-      <ScaleBlock cols={1} rows={1} label="1 mês, em tamanho real" />
-    </Fragment>
-    <Fragment slot="beats">
-      <p data-reveal>
-        Seu salário: <strong data-dyn="salary">…</strong>. Um mês inteiro cabe nesse pixel.
-        Está aí no meio da tela, procura direito.
-      </p>
-    </Fragment>
-  </Milestone>
+  <!-- Compact scale key: the whole metaphor in one static panel, no sticky beats. -->
+  <section class="section section--black key" id="key">
+    <div class="panel key__card" data-reveal>
+      <p class="key__eyebrow">pixels preenchidos, em escala real</p>
+      <h2 class="key__title">Primeiro, a chave: cada pixel é um mês do seu salário.</h2>
 
-  <Milestone id="m-ano" theme="yellow">
-    <Fragment slot="card">
-      <h2>1 ano = 12 pixels</h2>
-    </Fragment>
-    <Fragment slot="stage">
-      <ScaleBlock cols={3} rows={4} label="1 ano (3 × 4), em tamanho real" />
-    </Fragment>
-    <Fragment slot="beats">
-      <p data-reveal>
-        Um ano inteiro: <strong data-dyn="year-value">…</strong>. Doze pixels. Só isso.
-      </p>
-    </Fragment>
-  </Milestone>
-
-  <Milestone id="m-familia" theme="red">
-    <Fragment slot="card">
-      <h2>O que uma família junta na vida inteira</h2>
-    </Fragment>
-    <Fragment slot="stage">
-      <div class="block">
-        <div class="block__stage">
-          <div class="block__real" data-family-block aria-hidden="true"></div>
+      <div class="key__grid">
+        <div class="key__item">
+          <div class="key__swatch">
+            <div class="key__block" style="width:1px;height:1px" aria-hidden="true"></div>
+          </div>
+          <p class="key__value"><strong data-dyn="salary">…</strong></p>
+          <p class="key__caption">um mês</p>
         </div>
-        <span class="block__caption">patrimônio de uma família, em tamanho real</span>
+
+        <div class="key__item">
+          <div class="key__swatch">
+            <div class="key__block" style="width:3px;height:4px" aria-hidden="true"></div>
+          </div>
+          <p class="key__value"><strong data-dyn="year-value">…</strong></p>
+          <p class="key__caption">um ano</p>
+        </div>
+
+        <div class="key__item">
+          <div class="key__swatch">
+            <div class="key__block" data-family-block aria-hidden="true"></div>
+          </div>
+          <p class="key__value"><strong data-dyn="family-worth">…</strong></p>
+          <p class="key__caption">
+            o que uma família típica junta na vida
+            <span class="key__fine">estimativa · <a href="/referencias">/referencias</a></span>
+          </p>
+        </div>
+
+        <div class="key__item">
+          <div class="key__swatch">
+            <div class="key__block" style="width:12px;height:47px" aria-hidden="true"></div>
+          </div>
+          <p class="key__value"><strong data-dyn="life-value">…</strong></p>
+          <p class="key__caption">se você guardasse 100% do salário por 47 anos</p>
+        </div>
       </div>
-    </Fragment>
-    <Fragment slot="beats">
-      <p data-reveal>
-        Uma família brasileira típica chega aos 65 anos com cerca de
-        <strong data-dyn="family-worth">…</strong> de patrimônio. Quase tudo preso na casa própria.
-        <span class="beat__fine">
-          estimativa: entre <span data-dyn="family-range">…</span> · veja como chegamos nesse
-          número em <a href="/referencias">/referencias</a>
-        </span>
+
+      <hr class="key__divider" />
+      <p class="key__outro">
+        Agora afasta o zoom. Lá embaixo, cada coluna continua em escala real. Desce e vê o número
+        subir.
       </p>
-      <p data-reveal>
-        E se você guardasse 100% do salário por 47 anos, com todos os reajustes reais?
-        <strong data-dyn="life-value">…</strong>. Umas <strong data-dyn="life-vs-family">…</strong>
-        a mais. E ainda assim, não chega perto do que vem aí.
-      </p>
-    </Fragment>
-  </Milestone>
+    </div>
+  </section>
+
+  <!-- The descent starts here: the CTA lives where the fortunes begin, not in the hero. -->
+  <section class="section section--dark col-start" id="col-start">
+    <p class="col-start__line">Acabou o aquecimento. As fortunas começam aqui.</p>
+    <div class="col-start__cta">
+      <HandArrow variant="curve" class="col-start__arrow" />
+      <button class="hero__start col-start__btn" id="btn-start" type="button" disabled>
+        ▶ começar a descer
+      </button>
+    </div>
+  </section>
 
   <WealthColumn id="bilhao" endId="fim-bilhao">
     <Fragment slot="intro">
