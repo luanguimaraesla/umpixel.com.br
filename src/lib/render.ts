@@ -120,6 +120,9 @@ interface ColumnGeometry {
   id: string;
   top: number;
   height: number;
+  // The column's actual rendered width, which the D10 guard may have widened past
+  // the module-level colW. Depth-to-BRL math must use this, not colW.
+  width: number;
 }
 
 // --- Module state ---
@@ -224,7 +227,7 @@ function rampMult(): number {
     const steps = RAMP_STEPS[col.id];
     if (!steps || steps.length === 0) return 1;
     const depth = Math.min(Math.max(mid - col.top, 0), col.height);
-    const value = depth * colW * salary;
+    const value = depth * col.width * salary;
     let mult = 1;
     for (const step of steps) {
       if (step.atBRL <= value) mult = step.mult;
@@ -382,7 +385,12 @@ function cacheGeometry(): void {
   const scrollTop = window.scrollY;
   geometry = columns.map((def) => {
     const rect = def.el.getBoundingClientRect();
-    return { id: def.id, top: rect.top + scrollTop, height: def.el.offsetHeight };
+    return {
+      id: def.id,
+      top: rect.top + scrollTop,
+      height: def.el.offsetHeight,
+      width: def.el.offsetWidth,
+    };
   });
 }
 
@@ -400,11 +408,11 @@ function updateScrollUI(): void {
 
   if (active) {
     const depth = Math.min(Math.max(mid - active.top, 0), active.height);
-    const value = depth * colW * salary;
+    const value = depth * active.width * salary;
     const lives = livesOf(value, salary, data.realGrowth);
     posReadout.textContent = `${fmtBRLCompact(value)} · ${fmtLives(lives)}`;
 
-    const yearsPerSecond = Math.round((currentSpeed() * colW) / MONTHS_PER_YEAR);
+    const yearsPerSecond = Math.round((currentSpeed() * active.width) / MONTHS_PER_YEAR);
     speedReadout.textContent = `≈ ${fmtInt(yearsPerSecond)} anos de trabalho por segundo`;
 
     // Announce each hidden speed ramp as its BRL depth is crossed while playing (D5b).
@@ -532,7 +540,13 @@ function validateData(
   ) {
     throw new Error('bilionarios-brasil.json inválido');
   }
-  if (!patrimonio || !(Number(patrimonio.valor_brl) > 0)) {
+  if (
+    !patrimonio ||
+    !(Number(patrimonio.valor_brl) > 0) ||
+    !patrimonio.faixa_brl ||
+    !(Number(patrimonio.faixa_brl.min) > 0) ||
+    !(Number(patrimonio.faixa_brl.max) > 0)
+  ) {
     throw new Error('patrimonio-familia.json inválido');
   }
   if (!mundo || !mundo.pessoa_mais_rica || !(Number(mundo.pessoa_mais_rica.patrimonio_usd_bilhoes) > 0)) {
