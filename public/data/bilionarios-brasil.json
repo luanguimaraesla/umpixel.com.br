@@ -3,7 +3,7 @@
   "data_publicacao": "2026-03-10",
   "data_referencia_valores": "2026-03-01",
   "top5": [
-    {"posicao": 1, "nome": "Eduardo Saverin", "patrimonio_usd_bilhoes": 35.9, "ranking_mundial": 59, "fonte_riqueza": "Facebook/Meta e venture capital (B Capital Group)", "perfil": "https://www.forbes.com/profile/eduardo-saverin/"},
+    {"posicao": 1, "nome": "Eduardo Saverin", "patrimonio_usd_bilhoes": 35.9, "ranking_mundial": 59, "fonte_riqueza": "Facebook/Meta e venture capital (B Capital Group)", "fonte_riqueza_desde": 2004, "perfil": "https://www.forbes.com/profile/eduardo-saverin/"},
     {"posicao": 2, "nome": "André Esteves", "patrimonio_usd_bilhoes": 20.2, "ranking_mundial": 131, "fonte_riqueza": "Setor bancário (BTG Pactual)", "perfil": "https://www.forbes.com/profile/andre-esteves/"},
     {"posicao": 3, "nome": "Jorge Paulo Lemann e família", "patrimonio_usd_bilhoes": 19.8, "ranking_mundial": null, "fonte_riqueza": "Cerveja (AB InBev) e private equity (3G Capital)", "perfil": "https://www.forbes.com/profile/jorge-paulo-lemann/"},
     {"posicao": 4, "nome": "Fernando Roberto Moreira Salles", "patrimonio_usd_bilhoes": 9.9, "ranking_mundial": null, "fonte_riqueza": "Bancos (Itaú Unibanco) e mineração (CBMM, nióbio)", "perfil": "https://www.forbes.com/profile/fernando-roberto-moreira-salles/"},

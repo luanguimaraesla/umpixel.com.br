@@ -34,6 +34,11 @@ ranking brasileiro e a variação de tempo real de André Esteves.
 `total_top5_usd_bilhoes` e as datas. O primeiro item de `top5` é tratado como a pessoa mais rica;
 mantenha a ordem por `posicao`.
 
+O primeiro colocado carrega ainda `fonte_riqueza_desde` (ano em que a fonte de riqueza começou;
+2004 para Eduardo Saverin, ano da fundação do Facebook). O site usa esse ano para estimar em quanto
+tempo a pessoa mais rica juntaria o que você guarda numa vida inteira (ver `/referencias`). Só o 1º
+colocado precisa do campo; preencha os demais apenas quando o ano de origem for inequívoco.
+
 ### `renda-brasil.json`
 Indicadores de renda e desigualdade do Brasil (IBGE PNAD Contínua e OCDE): rendimento médio,
 percentual de trabalhadores que ganham até um salário mínimo e coeficientes de Gini. Hoje só
@@ -71,14 +76,33 @@ tempo real, porque ela é estável e citável; as observações registram a vari
 **Como atualizar:** a lista anual da Forbes sai todo mês de março. Substitua `pessoa_mais_rica`,
 `data_publicacao`, `data_referencia_valores` e `acessado_em`.
 
+### `comparacoes-publicas.json`
+Referências de escala pública para as frases que aparecem no meio das colunas: o PIB de alguns
+países (em dólar, convertido pela PTAX em tempo de execução, como as fortunas) e o custo de algumas
+políticas públicas em reais (hospital, creche, educar todos os alunos por um ano, erradicar o
+analfabetismo, casa média). O front usa esses números para dizer coisas como "você acabou de passar
+o PIB de Portugal" ou "isso construiria N hospitais". Cada `país` traz `pib_usd_bilhoes`,
+`ano_referencia` e a `preposicao` correta da frase ("de", "do" ou "da"). Cada `custo` traz
+`valor_brl` ou, no caso de educar todos os alunos, os dois componentes
+`componentes.{valor_aluno_ano_brl,matriculas}`, multiplicados no site. As estimativas guardam uma
+`nota` explicando a composição.
+
+Este arquivo é **opcional**: o site o busca como o `crescimento-real-salario.json` e, se ele faltar,
+as frases que dependem dele simplesmente não aparecem, sem quebrar a página.
+
+**Como atualizar:** o PIB vem do Banco Mundial (PIB nominal corrente); reveja quando sair um novo
+ano-base. Os custos vêm de fontes setoriais (Novo PAC, FNDE, Todos Pela Educação, FipeZAP);
+atualize `valor_brl` ou os `componentes`, revise as `notas` das estimativas e a `acessado_em`.
+
 ## Contrato
 
 O front-end lê estes campos; mantenha os nomes ao atualizar:
 
 - `salario-minimo.json`: `valor_brl`, `vigencia`, `instrumento_legal`, `fontes[].{nome,url}`, `acessado_em`
 - `cambio-usd-brl.json`: `taxa_venda`, `data_cotacao`, `fontes[].{nome,url}`, `acessado_em`
-- `bilionarios-brasil.json`: `top5[].{posicao,nome,patrimonio_usd_bilhoes,fonte_riqueza}`, `total_top5_usd_bilhoes`, `data_referencia_valores`, `fontes[].{nome,url}`, `acessado_em`
+- `bilionarios-brasil.json`: `top5[].{posicao,nome,patrimonio_usd_bilhoes,fonte_riqueza}`, `top5[0].fonte_riqueza_desde`, `total_top5_usd_bilhoes`, `data_referencia_valores`, `fontes[].{nome,url}`, `acessado_em`
 - `renda-brasil.json`: `fontes[].{nome,url}`, `acessado_em`
 - `crescimento-real-salario.json`: `taxa_real_anual`, `fontes[].{nome,url}`, `acessado_em`
 - `patrimonio-familia.json`: `valor_brl`, `faixa_brl.{min,max}`, `fontes[].{nome,url}`, `acessado_em`
 - `bilionarios-mundo.json`: `pessoa_mais_rica.{nome,patrimonio_usd_bilhoes,ranking_mundial,fonte_riqueza}`, `data_referencia_valores`, `fontes[].{nome,url}`, `acessado_em`
+- `comparacoes-publicas.json` (opcional): `paises[].{nome,preposicao,pib_usd_bilhoes,ano_referencia}`, `custos[].{id,valor_brl}` ou `custos[].componentes.{valor_aluno_ano_brl,matriculas}`, `custos[].nota` nas estimativas, `fontes[].{nome,url}`, `acessado_em`

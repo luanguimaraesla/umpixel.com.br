@@ -1,0 +1,70 @@
+{
+  "paises": [
+    {"id": "honduras", "nome": "Honduras", "preposicao": "de", "pib_usd_bilhoes": 37.0, "ano_referencia": 2024},
+    {"id": "paraguai", "nome": "Paraguai", "preposicao": "do", "pib_usd_bilhoes": 44.7, "ano_referencia": 2024},
+    {"id": "bolivia", "nome": "Bolívia", "preposicao": "da", "pib_usd_bilhoes": 54.9, "ano_referencia": 2024},
+    {"id": "uruguai", "nome": "Uruguai", "preposicao": "do", "pib_usd_bilhoes": 82.3, "ano_referencia": 2024},
+    {"id": "costa-rica", "nome": "Costa Rica", "preposicao": "da", "pib_usd_bilhoes": 96.7, "ano_referencia": 2024},
+    {"id": "portugal", "nome": "Portugal", "preposicao": "de", "pib_usd_bilhoes": 313.7, "ano_referencia": 2024},
+    {"id": "chile", "nome": "Chile", "preposicao": "do", "pib_usd_bilhoes": 329.3, "ano_referencia": 2024},
+    {"id": "argentina", "nome": "Argentina", "preposicao": "da", "pib_usd_bilhoes": 638.4, "ano_referencia": 2024}
+  ],
+  "custos": [
+    {
+      "id": "hospital-publico-grande",
+      "nome": "Hospital público de grande porte (326 leitos)",
+      "valor_brl": 327000000,
+      "periodicidade": "unico",
+      "contexto": "Custo de construção do novo Hospital Universitário da Unifesp, com 326 leitos e recursos do Novo PAC.",
+      "nota": "O edital de 2025 previa R$ 257 milhões; o valor foi atualizado para R$ 327 milhões na divulgação de janeiro de 2026."
+    },
+    {
+      "id": "escola-publica-fnde",
+      "nome": "Creche ou pré-escola pública (padrão FNDE)",
+      "valor_brl": 3500000,
+      "periodicidade": "unico",
+      "contexto": "Valor médio pago por creche ou pré-escola do projeto padrão FNDE no Novo PAC, para até 188 crianças em dois turnos."
+    },
+    {
+      "id": "educar-todos-alunos-um-ano",
+      "nome": "Educar todos os alunos do Brasil por um ano",
+      "componentes": {
+        "valor_aluno_ano_brl": 12500,
+        "matriculas": 46000000
+      },
+      "periodicidade": "anual",
+      "contexto": "Investimento público médio de R$ 12,5 mil por aluno ao ano (2023) vezes as 46 milhões de matrículas da educação básica (Censo Escolar 2025).",
+      "nota": "O produto (~R$ 575 bilhões/ano) combina o valor por aluno de 2023 com as matrículas de 2025; é uma ordem de grandeza, não dotação orçamentária."
+    },
+    {
+      "id": "erradicar-analfabetismo",
+      "nome": "Erradicar o analfabetismo no Brasil",
+      "valor_brl": 9000000000,
+      "periodicidade": "unico",
+      "contexto": "Alfabetizar as 8,4 milhões de pessoas de 15 anos ou mais que não sabem ler e escrever, ao custo por vaga do programa Brasil Alfabetizado (~R$ 1.071).",
+      "nota": "Estimativa: 8,4 milhões (PNAD Contínua 2025) × R$ 964 milhões ÷ 900 mil vagas do Brasil Alfabetizado (2024–2027). O custo real tende a ser maior: parte do público é idosa, dispersa e exige mais de um ciclo."
+    },
+    {
+      "id": "casa-media-brasil",
+      "nome": "Uma casa média no Brasil (60 m²)",
+      "valor_brl": 578520,
+      "periodicidade": "unico",
+      "contexto": "Apartamento de 60 m² ao preço médio anunciado de R$ 9.642 por m² do índice FipeZAP (janeiro de 2026).",
+      "nota": "Estimativa a partir de preço anunciado, não de escritura; não existe mediana oficial de valor de imóvel no Brasil."
+    }
+  ],
+  "fontes": [
+    {"nome": "Banco Mundial — Open Data API, PIB nominal corrente 2024 (NY.GDP.MKTP.CD)", "url": "https://api.worldbank.org/v2/country/hnd;bol;pry;ury;cri;prt;chl;arg;ecu;pan;gtm;dom/indicator/NY.GDP.MKTP.CD?format=json&date=2024&per_page=60"},
+    {"nome": "Saúde Business — Novo HU-Unifesp: R$ 327 milhões, 326 leitos (jan/2026)", "url": "https://www.saudebusiness.com/saude-publica/novo-hu-unifesp-avanca-e-testa-modelo-de-hospital-inteligente-no-sus/"},
+    {"nome": "Medicina S/A — Licitação do novo HU-Unifesp (edital, R$ 257 milhões)", "url": "https://medicinasa.com.br/licitacao-hu-unifesp/"},
+    {"nome": "Undime/MEC — Novo PAC Seleções Educação: R$ 3,5 milhões por unidade escolar (mar/2025)", "url": "https://undime.org.br/noticia/27-03-2025-23-29-novo-pac-selecoes-educacao-inscricoes-vao-ate-31-de-marco"},
+    {"nome": "Agência Brasil (via Apufsc) — investimento de R$ 12,5 mil por aluno/ano em 2023 (Todos Pela Educação)", "url": "https://www.apufsc.org.br/2024/11/13/brasil-aumenta-investimento-publico-em-educacao/"},
+    {"nome": "Todos Pela Educação — Anuário Brasileiro da Educação Básica 2025, cap. 9 (financiamento)", "url": "https://anuario.todospelaeducacao.org.br/2025/capitulo-9-financiamento.html"},
+    {"nome": "CNN Brasil — Censo Escolar 2025 (INEP): 46 milhões de matrículas na educação básica", "url": "https://www.cnnbrasil.com.br/educacao/educacao-basica-tem-queda-recorde-de-matriculas-em-2025-diz-censo-escolar/"},
+    {"nome": "CNN Brasil — PNAD Contínua 2025 (IBGE): 8,4 milhões de analfabetos de 15 anos ou mais (taxa 4,9%)", "url": "https://www.cnnbrasil.com.br/educacao/brasil-atinge-marco-historico-com-queda-da-taxa-de-analfabetismo-em-49/"},
+    {"nome": "Undime/MEC — Brasil Alfabetizado: R$ 964 milhões e 900 mil vagas entre 2024 e 2027", "url": "https://undime.org.br/noticia/11-09-2024-11-04-programa-brasil-alfabetizado-e-retomado-com-bolsas-para-educadores"},
+    {"nome": "Índice FipeZAP — Informe de janeiro de 2026 (venda residencial): R$ 9.642/m²", "url": "https://downloads.fipe.org.br/indices/fipezap/fipezap-202601-residencial-venda.pdf"},
+    {"nome": "CNN Brasil — FipeZap: preço médio anunciado de R$ 9.642/m² em janeiro de 2026", "url": "https://www.cnnbrasil.com.br/economia/macroeconomia/fipezap-preco-pedido-dos-imoveis-residenciais-avanca-020-em-janeiro/"}
+  ],
+  "acessado_em": "2026-07-08"
+}
