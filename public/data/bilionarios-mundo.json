@@ -1,0 +1,21 @@
+{
+  "lista": "Forbes World's Billionaires 2026 (lista anual)",
+  "data_publicacao": "2026-03-10",
+  "data_referencia_valores": "2026-03-01",
+  "pessoa_mais_rica": {
+    "nome": "Elon Musk",
+    "patrimonio_usd_bilhoes": 839,
+    "ranking_mundial": 1,
+    "fonte_riqueza": "Tesla, SpaceX e xAI",
+    "perfil": "https://www.forbes.com/profile/elon-musk/"
+  },
+  "observacoes": [
+    "Pessoa mais rica já registrada na lista anual da Forbes (40ª edição).",
+    "Em tempo real (2026-07-08) o patrimônio era ~US$ 935 bi; em 12/06/2026 chegou a US$ 1,1 tri (primeiro trilionário, IPO da SpaceX) antes de recuar. O site usa a lista anual por ser estável e citável."
+  ],
+  "fontes": [
+    {"nome": "Forbes — 40th Annual World's Billionaires List (press release, 10/03/2026)", "url": "https://www.forbes.com/sites/pr/2026/03/10/forbes-40th-annual-worlds-billionaires-list-elon-musk-is-worlds-richest-person-ever-recorded/"},
+    {"nome": "Forbes — perfil de Elon Musk (tempo real)", "url": "https://www.forbes.com/profile/elon-musk/"}
+  ],
+  "acessado_em": "2026-07-08"
+}

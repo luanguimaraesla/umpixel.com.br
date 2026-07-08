@@ -52,6 +52,25 @@ hoje. Padrão: **2,5% ao ano**, o teto da política de valorização vigente (ar
 **Como atualizar:** revise `taxa_real_anual` se a regra do arcabouço fiscal mudar. Para um
 cenário mais conservador, use a média histórica do rendimento real do trabalho (~0,9% ao ano).
 
+### `patrimonio-familia.json`
+Estimativa do patrimônio líquido mediano de uma família brasileira ao fim da vida de trabalho
+(~65 anos): **R$ 200 mil**, dentro de uma faixa de R$ 150 mil a R$ 250 mil. Não existe estatística
+oficial, então o valor é sintetizado a partir de blocos verificáveis (mediana UBS, casa própria dos
+60+, benefícios do INSS no piso) e sempre apresentado como estimativa. A metodologia completa fica
+em `/referencias`.
+
+**Como atualizar:** este número é revisado manualmente, sem automação, quando a UBS ou a Anbima
+publicam novas edições dos relatórios citados. Atualize `valor_brl`, `faixa_brl`, `metodologia`, as
+`fontes` e `acessado_em`.
+
+### `bilionarios-mundo.json`
+A pessoa mais rica do mundo segundo a lista anual **Forbes World's Billionaires 2026** (divulgada em
+10/03/2026, valores de 01/03/2026): Elon Musk, **US$ 839 bilhões**. Usamos a lista anual, e não a de
+tempo real, porque ela é estável e citável; as observações registram a variação de tempo real.
+
+**Como atualizar:** a lista anual da Forbes sai todo mês de março. Substitua `pessoa_mais_rica`,
+`data_publicacao`, `data_referencia_valores` e `acessado_em`.
+
 ## Contrato
 
 O front-end lê estes campos; mantenha os nomes ao atualizar:
@@ -61,3 +80,5 @@ O front-end lê estes campos; mantenha os nomes ao atualizar:
 - `bilionarios-brasil.json`: `top5[].{posicao,nome,patrimonio_usd_bilhoes,fonte_riqueza}`, `total_top5_usd_bilhoes`, `data_referencia_valores`, `fontes[].{nome,url}`, `acessado_em`
 - `renda-brasil.json`: `fontes[].{nome,url}`, `acessado_em`
 - `crescimento-real-salario.json`: `taxa_real_anual`, `fontes[].{nome,url}`, `acessado_em`
+- `patrimonio-familia.json`: `valor_brl`, `faixa_brl.{min,max}`, `fontes[].{nome,url}`, `acessado_em`
+- `bilionarios-mundo.json`: `pessoa_mais_rica.{nome,patrimonio_usd_bilhoes,fonte_riqueza}`, `data_referencia_valores`, `fontes[].{nome,url}`, `acessado_em`

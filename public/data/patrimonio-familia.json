@@ -1,0 +1,15 @@
+{
+  "valor_brl": 200000,
+  "faixa_brl": { "min": 150000, "max": 250000 },
+  "descricao": "Estimativa do patrimônio líquido mediano de uma família brasileira ao fim da vida de trabalho (~65 anos). Não existe estatística oficial; o valor é composto a partir de blocos verificáveis e deve ser apresentado como estimativa.",
+  "metodologia": "Mediana UBS de US$ 5.702/adulto (fim de 2022) subestima a riqueza no fim da vida; ~84% dos 60+ moram em casa própria e a casa é quase todo o patrimônio (mediana plausível R$ 100–250 mil); a mediana dos benefícios do INSS é exatamente 1 salário mínimo e só 3% dos aposentados têm previdência privada. Síntese: R$ 150–250 mil por família, 80–90% imobilizado na casa; ponto central R$ 200 mil.",
+  "fontes": [
+    {"nome": "UBS Global Wealth Report 2025 (edição em português)", "url": "https://www.ubs.com/global/pt/wealthmanagement/latamaccess/wealth-planning/global-wealth-report/_jcr_content/root/pagehead/button1.0427797452.file/PS9jb250ZW50L2RhbS9hc3NldHMvd20vc3RhdGljL25vaW5kZXgvZ2xvYmFsLXdlYWx0aC1yZXBvcnQtcHQtMjAyNS5wZGY=/global-wealth-report-pt-2025.pdf"},
+    {"nome": "UBS Global Wealth Databook 2023 — mediana Brasil US$ 5.702/adulto (fim de 2022)", "url": "http://web.archive.org/web/20241116145425/https://elements.visualcapitalist.com/wp-content/uploads/2024/08/global-wealth-databook-2023-ubs.pdf"},
+    {"nome": "Anbima — Raio-X do Investidor: 90% dos aposentados dependem da previdência pública", "url": "https://www.anbima.com.br/pt_br/noticias/raio-x-do-investidor-90-dos-aposentados-brasileiros-dependem-da-previdencia-publica.htm"},
+    {"nome": "Boletins Estatísticos da Previdência Social (INSS) — maioria dos benefícios no piso", "url": "https://www.gov.br/previdencia/pt-br/assuntos/previdencia-social/Dados-estatisticos-previdencia-social-e-inss/boletins-da-previdencia-social"},
+    {"nome": "gov.br/MDH — Idosos e família no Brasil (84% dos 60+ em casa própria)", "url": "https://www.gov.br/mdh/pt-br/navegue-por-temas/observatorio-nacional-da-familia/fatos-e-numeros/idosos-e-familia-no-brasil.pdf"},
+    {"nome": "FipeZap — índice residencial de venda (dez/2025)", "url": "https://downloads.fipe.org.br/indices/fipezap/fipezap-202512-residencial-venda-pub.pdf"}
+  ],
+  "acessado_em": "2026-07-08"
+}
