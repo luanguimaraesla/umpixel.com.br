@@ -77,12 +77,14 @@ import Footer from '../components/Footer.astro';
 
   <WealthColumn id="bilhao" endId="fim-bilhao">
     <Fragment slot="intro">
-      <p class="col__eyebrow">primeiro marco</p>
-      <p class="col__name">R$ 1 bilhão</p>
-      <p class="col__context">
-        São <strong data-dyn="billion-years">…</strong> de trabalho. A coluna aí embaixo está em
-        escala real. Desce.
-      </p>
+      <div data-intro-step>
+        <p class="col__eyebrow">primeiro marco</p>
+        <p class="col__name">R$ 1 bilhão</p>
+        <p class="col__context">
+          São <strong data-dyn="billion-years">…</strong> de trabalho. A coluna aí embaixo está em
+          escala real. Desce.
+        </p>
+      </div>
     </Fragment>
     <Fragment slot="end">
       Isso foi só 1 bilhão. Tá só aquecendo.
@@ -91,17 +93,21 @@ import Footer from '../components/Footer.astro';
 
   <WealthColumn id="richest" endId="fim-mais-rico">
     <Fragment slot="intro">
-      <p class="col__eyebrow">a pessoa mais rica do Brasil</p>
-      <p class="col__name" data-dyn="richest-name">…</p>
-      <p class="col__figure">
-        <span data-dyn="richest-usd">…</span> (<span data-dyn="richest-brl">…</span>)
-      </p>
-      <p class="col__source" data-dyn="richest-wealth-source">…</p>
-      <p class="col__source" data-dyn="forbes-source">…</p>
-      <p class="col__context">
-        Para juntar isso você teria de trabalhar <strong data-dyn="richest-years">…</strong>.
-        Antes dos primeiros hominídeos.
-      </p>
+      <div data-intro-step>
+        <p class="col__eyebrow">a pessoa mais rica do Brasil</p>
+        <p class="col__name" data-dyn="richest-name">…</p>
+        <p class="col__figure">
+          <span data-dyn="richest-usd">…</span> (<span data-dyn="richest-brl">…</span>)
+        </p>
+      </div>
+      <div data-intro-step>
+        <p class="col__source" data-dyn="richest-wealth-source">…</p>
+        <p class="col__source" data-dyn="forbes-source">…</p>
+        <p class="col__context">
+          Para juntar isso você teria de trabalhar <strong data-dyn="richest-years">…</strong>.
+          Antes dos primeiros hominídeos.
+        </p>
+      </div>
     </Fragment>
     <Fragment slot="end">
       Fim da fortuna de <strong data-dyn="richest-name">…</strong>:
@@ -111,16 +117,22 @@ import Footer from '../components/Footer.astro';
 
   <WealthColumn id="musk" endId="fim-musk">
     <Fragment slot="intro">
-      <p class="col__eyebrow">a pessoa mais rica do mundo</p>
-      <p class="col__name" data-dyn="musk-name">…</p>
-      <p class="col__figure">
-        <span data-dyn="musk-usd">…</span> (<span data-dyn="musk-brl">…</span>)
-      </p>
-      <p class="col__source" data-dyn="musk-wealth-source">…</p>
-      <p class="col__source" data-dyn="world-forbes-source">…</p>
-      <p class="col__context">
-        São <strong data-dyn="musk-years">…</strong> de trabalho. Boa sorte.
-      </p>
+      <div data-intro-step>
+        <p class="col__eyebrow">a pessoa mais rica do mundo</p>
+        <p class="col__name" data-dyn="musk-name">…</p>
+        <p class="col__figure">
+          <span data-dyn="musk-usd">…</span> (<span data-dyn="musk-brl">…</span>)
+        </p>
+      </div>
+      <div data-intro-step>
+        <p class="col__source" data-dyn="musk-wealth-source">…</p>
+        <p class="col__source" data-dyn="world-forbes-source">…</p>
+      </div>
+      <div data-intro-step>
+        <p class="col__context">
+          São <strong data-dyn="musk-years">…</strong> de trabalho. Boa sorte.
+        </p>
+      </div>
     </Fragment>
     <Fragment slot="end">
       Fim. <strong data-dyn="musk-lives">…</strong> inteiras de trabalho. Agora você sabe o

@@ -239,6 +239,10 @@ function rampMult(): number {
   return 1;
 }
 
+// Vertical gap between staged intro cards inside a column, in px (D-V2-6). Each
+// intro step holds for this many px before the next one takes over.
+const INTRO_STEP_GAP = 900;
+
 // --- Column building (metric view: solid area + CSS ruler + sticky beats; D6/D7/D9) ---
 function buildWealthColumn(def: ColumnDef, salary: number, baseWidth: number): void {
   const months = monthsOf(def.valueBRL, salary);
@@ -265,8 +269,36 @@ function buildWealthColumn(def: ColumnDef, salary: number, baseWidth: number): v
     ` · ${fmtYears((RULER_STEP * w) / MONTHS_PER_YEAR)} de trabalho`;
   rulerKey.append(bracket, keyLabel);
 
-  // Sticky in-column milestone cards positioned by BRL depth.
   const px = (v: number): number => Math.round(monthsOf(v, salary) / w);
+
+  // Staged intro cards from the column's <template data-col-intro> (D-V2-6). They
+  // are positioned by px depth (not BRL) and end before the first milestone so no
+  // intro card holds under a beat.
+  const introWrappers: HTMLElement[] = [];
+  const section = def.el.closest('[data-col-section]');
+  const tpl = section?.querySelector<HTMLTemplateElement>('template[data-col-intro]');
+  if (tpl) {
+    const steps = tpl.content.querySelectorAll<HTMLElement>('[data-intro-step]');
+    const firstMilestonePx = def.milestones.length ? px(def.milestones[0].atBRL) : height;
+    const introEnd = Math.min(firstMilestonePx, height);
+    steps.forEach((step, i) => {
+      const top = i * INTRO_STEP_GAP;
+      const wrapperHeight = Math.min(top + INTRO_STEP_GAP, introEnd) - top;
+      if (top >= introEnd || wrapperHeight < 800) return; // no room to hold this step
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'col-note col-note--intro';
+      wrapper.style.top = `${top}px`;
+      wrapper.style.height = `${wrapperHeight}px`;
+      const card = document.createElement('div');
+      card.className = 'col-note__card col-note__card--intro panel';
+      card.innerHTML = step.innerHTML; // authored here only; never user input
+      wrapper.appendChild(card);
+      introWrappers.push(wrapper);
+    });
+  }
+
+  // Sticky in-column milestone cards positioned by BRL depth.
   const wrappers: HTMLElement[] = [];
   def.milestones.forEach((m, i) => {
     const nextBRL = i + 1 < def.milestones.length ? def.milestones[i + 1].atBRL : def.valueBRL;
@@ -285,7 +317,7 @@ function buildWealthColumn(def: ColumnDef, salary: number, baseWidth: number): v
     wrappers.push(wrapper);
   });
 
-  def.el.replaceChildren(rulerKey, ...wrappers);
+  def.el.replaceChildren(rulerKey, ...introWrappers, ...wrappers);
 }
 
 // The three metric columns, with their in-column beats. Rebuilt on every salary

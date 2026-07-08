@@ -472,10 +472,6 @@ strong {
   position: relative;
   padding-bottom: 8rem;
 }
-.col__intro {
-  max-width: 34rem;
-  margin: 0 auto 1rem;
-}
 .col__eyebrow {
   font-size: 0.8rem;
   font-weight: 700;
@@ -525,37 +521,55 @@ strong {
 }
 
 /* ---- Metric-view columns (solid area + CSS ruler + bracket key; D6/D7) ---- */
+/* Per-column identity: warm to cold as the wealth leaves human scale (D-V2-7).
+   White-on-fill contrast stays well above 4.5:1 for all three (verified). */
+[data-col-section] {
+  --col-fill: var(--vermelho);
+}
+[data-col-section='richest'] {
+  --col-fill: #5e2b8f; /* roxo */
+  background: #120518;
+}
+[data-col-section='musk'] {
+  --col-fill: #14507a; /* azul petróleo */
+  background: #050f18;
+}
 .wealth-column {
   position: relative;
   width: var(--col-w, 120px);
   margin: 2rem auto;
   border-radius: 2px;
 }
-/* Solid fill plus a zero-DOM ruler: a 2px mark every RULER_STEP (100px), hugging
-   the left edge like a physical ruler strip. */
+/* Solid fill plus a zero-DOM two-layer ruler (D-V2-2): a minor 2px mark every
+   RULER_STEP (100px) at 14px wide, plus a same-color major layer every 500px at
+   28px wide. Same rgba so the overlap is invisible; every 5th mark reads twice as
+   wide. Both layers hug the left edge like a physical ruler strip. */
 .wealth-column--metric {
-  background-color: var(--vermelho);
-  background-image: repeating-linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.45) 0 2px,
-    transparent 2px 100px
-  );
-  background-size: 14px 100px;
-  background-repeat: repeat-y;
-  background-position: left top;
+  background-color: var(--col-fill);
+  background-image:
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.45) 0 2px, transparent 2px 100px),
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.45) 0 2px, transparent 2px 500px);
+  background-size: 14px 100px, 28px 500px;
+  background-repeat: repeat-y, repeat-y;
+  background-position: left top, left top;
 }
-/* Bracket key: labels what one ruler mark is worth. Sits beside the column top. */
+/* Bracket key: labels what one ruler mark is worth. Sits inside the column's
+   left edge with a small overhang (D-V2-6), bracketing the 300-400 ruler segment
+   so it clears the pinned step-1 intro card (tallest plaque ~217px, bottom ~284).
+   z-index below the note cards, so as you scroll it tucks behind the plaque
+   instead of painting over it. The bracket opens toward the column (its arms
+   reach right, over one 100px segment). */
 .ruler-key {
   position: absolute;
-  top: 0;
-  left: 100%;
-  margin-left: 12px;
+  top: 300px;
+  left: 0;
+  margin-left: -14px;
   height: 100px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   pointer-events: none;
-  z-index: 4;
+  z-index: 0;
 }
 .ruler-key__bracket {
   align-self: stretch;
@@ -572,14 +586,20 @@ strong {
   max-width: 14rem;
 }
 
-/* In-column milestone cards: absolutely-positioned wrappers whose height IS the
-   hold duration; the child card sticks and hands off to the next (D9). */
+/* In-column cards: absolutely-positioned wrappers whose height IS the hold
+   duration; the child card sticks and hands off to the next (D9). Both the
+   staged intro cards and the milestone beats share this mechanism (D-V2-6).
+   No content-visibility here: its paint containment would clip the plaque's
+   left overhang to the wrapper box (only ~20 notes exist; the hint is not
+   worth losing the 3D overhang). */
 .col-note {
   position: absolute;
   left: 0;
   width: 100%;
-  content-visibility: auto;
 }
+/* Pinned-plaque look: the card overhangs the column's left edge, tilts slightly,
+   and casts a hard offset shadow with an amarelo edge, like a plate nailed to the
+   column (D-V2-6). */
 .col-note__card {
   position: sticky;
   top: 4.5rem;
@@ -588,27 +608,45 @@ strong {
   margin-left: clamp(-6rem, -12vw, -1rem);
   text-align: left;
   font-size: 0.95rem;
+  border-left: 3px solid var(--amarelo);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.55);
+  transform: rotate(-1.5deg);
+}
+.col-note__card--intro {
+  width: min(23rem, 82vw);
 }
 .col-note__card strong {
   color: var(--amarelo);
 }
 
-/* Below ~1080px there is no room beside a 564px column for the bracket label, so
-   drop the bracket and center the key chip over the column top instead. */
+/* On narrow viewports the column's side margin is too small to absorb the desktop
+   overhang, so the plaque would spill past the left edge. Clamp it to a small
+   inset there so no card ever clips against the viewport (D-V2-6). */
+@media (max-width: 760px) {
+  .col-note__card {
+    margin-left: 0.5rem;
+  }
+}
+
+/* Below ~1080px there is no room for the bracket beside the label, so drop the
+   bracket and keep the key as a chip near the column's top left (no offscreen
+   overflow at 390px). */
 @media (max-width: 1080px) {
   .ruler-key {
     left: 0;
-    right: 0;
+    right: auto;
     margin-left: 0;
     height: auto;
     top: 0.5rem;
-    justify-content: center;
+    justify-content: flex-start;
+    max-width: 100%;
   }
   .ruler-key__bracket {
     display: none;
   }
   .ruler-key__label {
     max-width: min(86vw, 15rem);
+    margin-left: 0.5rem;
   }
 }
 
@@ -858,8 +896,5 @@ strong {
   }
   .hero {
     gap: 0.9rem;
-  }
-  .col-note__card {
-    margin-left: 0.5rem;
   }
 }

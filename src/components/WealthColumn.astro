@@ -8,10 +8,14 @@ const { id, endId } = Astro.props;
 ---
 
 <section class="section section--dark col" data-col-section={id}>
+  <!-- Intro copy is authored here but rendered as staged in-column cards by
+       render.ts. The template lives outside [data-column], so it survives the
+       column rebuild that fires on every salary change (D-V2-6). -->
+  <template data-col-intro>
+    <slot name="intro" />
+  </template>
+
   <div class="wrap">
-    <div class="panel col__intro" data-reveal>
-      <slot name="intro" />
-    </div>
     <a class="col__skip" href={`#${endId}`}>pular para o fim da coluna ↓</a>
   </div>
 
