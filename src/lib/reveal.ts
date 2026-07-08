@@ -12,6 +12,11 @@ export function initReveal(): void {
     return;
   }
 
+  // Arm the CSS hide only now that the reveal engine is live. If this module
+  // never runs (bundle fails, JS off), the class is absent and the beats render
+  // as plain visible text instead of blank gaps.
+  document.documentElement.classList.add('reveal-on');
+
   const observer = new IntersectionObserver(
     (entries, obs) => {
       for (const entry of entries) {

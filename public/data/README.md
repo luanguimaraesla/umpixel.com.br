@@ -81,4 +81,4 @@ O front-end lê estes campos; mantenha os nomes ao atualizar:
 - `renda-brasil.json`: `fontes[].{nome,url}`, `acessado_em`
 - `crescimento-real-salario.json`: `taxa_real_anual`, `fontes[].{nome,url}`, `acessado_em`
 - `patrimonio-familia.json`: `valor_brl`, `faixa_brl.{min,max}`, `fontes[].{nome,url}`, `acessado_em`
-- `bilionarios-mundo.json`: `pessoa_mais_rica.{nome,patrimonio_usd_bilhoes,fonte_riqueza}`, `data_referencia_valores`, `fontes[].{nome,url}`, `acessado_em`
+- `bilionarios-mundo.json`: `pessoa_mais_rica.{nome,patrimonio_usd_bilhoes,ranking_mundial,fonte_riqueza}`, `data_referencia_valores`, `fontes[].{nome,url}`, `acessado_em`

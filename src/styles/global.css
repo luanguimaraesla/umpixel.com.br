@@ -72,6 +72,19 @@ strong {
   font-weight: 700;
 }
 
+/* Visually hidden but available to screen readers (e.g. a grouping legend). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ---- Shared translucent panel ---- */
 .panel {
   background: var(--overlay);
@@ -382,14 +395,16 @@ strong {
 }
 
 /* Scroll-reveal: motion only for users who allow it; reduced-motion sees content
-   immediately (no opacity:0 rule outside no-preference). */
+   immediately (no opacity:0 rule outside no-preference). The hide is gated behind
+   .reveal-on, which reveal.ts adds only once the engine is live, so a failed or
+   disabled JS bundle leaves the narrative beats visible instead of blank. */
 @media (prefers-reduced-motion: no-preference) {
-  [data-reveal] {
+  .reveal-on [data-reveal] {
     opacity: 0;
     transform: translateY(14px);
     transition: opacity 0.5s ease, transform 0.5s ease;
   }
-  [data-reveal].is-visible {
+  .reveal-on [data-reveal].is-visible {
     opacity: 1;
     transform: none;
   }
@@ -761,6 +776,12 @@ strong {
 @media (prefers-reduced-motion: no-preference) {
   .toast {
     transition: opacity 0.3s ease;
+  }
+}
+/* The controls bar stacks to two rows on phones, so lift the toast to clear it. */
+@media (max-width: 640px) {
+  .toast {
+    bottom: calc(7.5rem + env(safe-area-inset-bottom, 0px));
   }
 }
 
