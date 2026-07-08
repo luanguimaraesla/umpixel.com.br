@@ -120,18 +120,6 @@ strong {
 .section p:last-child {
   margin-bottom: 0;
 }
-.section__beat {
-  margin-top: 2.5rem;
-}
-.accent {
-  color: var(--amarelo);
-}
-/* Punchline sits directly on red; large text keeps the yellow readable at AA. */
-.punchline {
-  display: block;
-  margin-top: 0.5rem;
-  font-size: clamp(1.3rem, 4vw, 1.8rem);
-}
 
 /* ---- Hero ---- */
 .hero {
@@ -314,7 +302,7 @@ strong {
   cursor: not-allowed;
 }
 
-/* ---- Scale blocks (raw, true CSS-pixel size — no magnification) ---- */
+/* ---- Scale blocks (raw, true CSS-pixel size, no magnification) ---- */
 .block {
   display: flex;
   flex-direction: column;
@@ -573,40 +561,6 @@ strong {
   font-size: 1.1rem;
   text-decoration: underline;
   text-underline-offset: 3px;
-}
-.footer__note {
-  font-size: 0.9rem;
-  opacity: 0.8;
-  max-width: 40rem;
-  margin: 0 auto 2.5rem;
-  text-align: left;
-}
-.footer__block {
-  text-align: left;
-  max-width: 40rem;
-  margin: 0 auto 2rem;
-}
-.footer__block h3 {
-  font-size: 1.1rem;
-  color: var(--amarelo);
-  margin-bottom: 0.75rem;
-}
-.footer__block ul {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-.footer__block a {
-  color: var(--branco);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  opacity: 0.85;
-  font-size: 0.9rem;
-}
-.footer__block a:hover {
-  opacity: 1;
-  color: var(--amarelo);
 }
 .footer__license {
   font-size: 0.85rem;
