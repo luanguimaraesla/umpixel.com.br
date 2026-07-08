@@ -529,15 +529,32 @@ function wireControls(): void {
 }
 
 function wireStart(): void {
-  const reducedMotion =
-    typeof matchMedia === 'function' &&
-    matchMedia('(prefers-reduced-motion: reduce)').matches;
-  btnStart.addEventListener('click', () => {
-    if (reducedMotion) {
-      window.scrollBy({ top: window.innerHeight, behavior: 'auto' });
-    } else {
-      autoscroll.play();
-    }
+  btnStart.addEventListener('click', () => autoscroll.play());
+}
+
+// Wire the methodology info popover independently of the data fetch, so it
+// works immediately. CSS handles hover; this handles tap/click (iOS Safari does
+// not reliably focus buttons on tap, so :focus-within alone is not enough).
+export function wireScaleInfo(): void {
+  const info = document.querySelector<HTMLElement>('.scale-info');
+  const btn = info?.querySelector<HTMLButtonElement>('.scale-info__btn');
+  if (!info || !btn) return;
+
+  const close = (): void => {
+    info.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+  };
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = info.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('click', (e) => {
+    if (!info.contains(e.target as Node)) close();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') close();
   });
 }
 

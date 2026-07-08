@@ -7,10 +7,27 @@
     Quanto <strong>tempo de trabalho</strong> custa a riqueza dos mais ricos do Brasil?
   </p>
 
-  <div class="panel hero__method">
-    Nesta página, <strong>1 pixel = 1 mês</strong> do seu salário. 12 pixels = 1 ano.
-    564 pixels = uma vida inteira de trabalho, dos 18 aos 65 anos. Tudo o que você vai
-    ver está em escala real.
+  <div class="scale-info">
+    <button
+      type="button"
+      class="scale-info__btn"
+      aria-label="Como funciona a escala do site"
+      aria-expanded="false"
+      aria-controls="scale-info-pop"
+    >
+      ⓘ como funciona a escala
+    </button>
+    <div class="scale-info__pop panel" id="scale-info-pop" role="tooltip">
+      <p>
+        Nesta página, <strong>1 pixel = 1 mês</strong> do seu salário. 12 pixels = 1 ano.
+        564 pixels = uma vida inteira de trabalho, dos 18 aos 65 anos. Tudo o que você vai
+        ver está em escala real, sem ampliações.
+      </p>
+      <p>
+        Usamos 12 salários por ano para manter a metáfora dos 12 pixels. Sim, existe o 13º —
+        ele só reforçaria o argumento.
+      </p>
+    </div>
   </div>
 
   <div class="hero__controls">
@@ -53,10 +70,5 @@
 
   <p class="load-error" id="load-error" role="alert" hidden>
     Não foi possível carregar os dados. Verifique sua conexão e recarregue a página.
-  </p>
-
-  <p class="footnote">
-    Usamos 12 salários por ano para manter a metáfora dos 12 pixels. Sim, existe o 13º —
-    ele só reforçaria o argumento.
   </p>
 </section>

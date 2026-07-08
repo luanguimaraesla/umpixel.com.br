@@ -26,10 +26,6 @@ export function createAutoscroll(opts: AutoscrollOptions): Autoscroll {
   let expectedY = 0; // scrollY the engine expects after its own scroll
   let movedThisFrame = false;
 
-  const reducedMotion =
-    typeof matchMedia === 'function' &&
-    matchMedia('(prefers-reduced-motion: reduce)').matches;
-
   function atBottom(): boolean {
     const max = document.documentElement.scrollHeight - window.innerHeight;
     return window.scrollY >= max - 1;
@@ -57,7 +53,7 @@ export function createAutoscroll(opts: AutoscrollOptions): Autoscroll {
   }
 
   function play(): void {
-    if (playing || reducedMotion) return;
+    if (playing) return;
     if (atBottom()) return;
     playing = true;
     carry = 0;

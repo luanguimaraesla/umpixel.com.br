@@ -15,13 +15,7 @@ import Footer from '../components/Footer.astro';
     <div class="wrap">
       <h2>Isto é um PIX de <span class="accent" data-dyn="salary">…</span></h2>
       <p>Um salário. Um mês da sua vida. <strong>Um pixel.</strong></p>
-      <ScaleBlock
-        cols={1}
-        rows={1}
-        zoom={20}
-        realLabel="tamanho real ↑ (sim, está aí — procure bem)"
-        zoomLabel="1 mês = 1 pixel"
-      />
+      <ScaleBlock cols={1} rows={1} label="1 mês = 1 pixel, em tamanho real (sim, está aí — procure bem)" />
     </div>
   </section>
 
@@ -29,36 +23,18 @@ import Footer from '../components/Footer.astro';
     <div class="wrap">
       <h2>Um ano de trabalho: 12 pixels</h2>
       <p><span data-dyn="year-value">…</span> em doze meses. Um retângulo de 3 por 4.</p>
-      <ScaleBlock
-        cols={3}
-        rows={4}
-        zoom={20}
-        realLabel="1 ano = 12 pixels"
-        zoomLabel="12 salários, um por mês"
-      />
+      <ScaleBlock cols={3} rows={4} label="1 ano = 12 pixels (3 × 4), em tamanho real" />
       <p class="section__beat">
         Dez anos: 120 pixels. <span data-dyn="ten-years-value">…</span>.
       </p>
-      <ScaleBlock
-        cols={12}
-        rows={10}
-        zoom={12}
-        realLabel="10 anos = 120 pixels"
-        zoomLabel="120 meses de trabalho"
-      />
+      <ScaleBlock cols={12} rows={10} label="10 anos = 120 pixels (12 × 10), em tamanho real" />
     </div>
   </section>
 
   <section class="section section--red">
     <div class="wrap">
       <h2>Do seu primeiro emprego aos 65 anos: 47 anos. 564 pixels.</h2>
-      <ScaleBlock
-        cols={12}
-        rows={47}
-        zoom={6}
-        realLabel="1 vida = 564 pixels"
-        zoomLabel="12 meses de largura × 47 anos de altura"
-      />
+      <ScaleBlock cols={12} rows={47} label="1 vida = 564 pixels (12 × 47), em tamanho real" />
       <p>
         Se você guardasse cada centavo — sem aluguel, sem comida, sem imposto — terminaria a
         vida com <strong data-dyn="life-value">…</strong>.
@@ -113,7 +89,8 @@ import Footer from '../components/Footer.astro';
   <Controls />
 
   <script>
-    import { boot } from '../lib/render';
+    import { boot, wireScaleInfo } from '../lib/render';
+    wireScaleInfo();
     boot().catch((err) => console.error('Falha ao carregar os dados:', err));
   </script>
 </Base>
