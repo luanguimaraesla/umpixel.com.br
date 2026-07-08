@@ -72,6 +72,45 @@ import Base from '../layouts/Base.astro';
     </section>
 
     <section class="ref">
+      <h2>As frases das colunas</h2>
+      <p>
+        No meio das colunas aparecem comparações de escala pública. Todas usam os números do arquivo
+        <code>comparacoes-publicas.json</code>, convertidos pela mesma PTAX das fortunas, e são
+        recalculadas quando você muda o salário. Vale registrar como cada uma é montada.
+      </p>
+      <p>
+        <strong>PIB de um país é fluxo; a fortuna é estoque.</strong> Quando o site diz que você
+        passou o PIB de um país, está comparando um patrimônio acumulado com tudo o que aquele país
+        produz em um ano. São grandezas diferentes; a comparação serve só para dar escala visual, não
+        para dizer que uma pessoa "vale" um país.
+      </p>
+      <p>
+        <strong>Os 5 centavos.</strong> Pegamos a proporção que 5 centavos (R$ 0,05) representam
+        diante do patrimônio de uma família típica, cerca de <span data-dyn="family-worth">…</span>,
+        e aplicamos essa mesma proporção à fortuna da pessoa mais rica do mundo. O resultado é quanto
+        ela deixaria passar no chão para sentir o mesmo que você sente ao ignorar 5 centavos.
+      </p>
+      <p>
+        <strong>O tempo da pessoa mais rica do Brasil.</strong> Dividimos a fortuna de
+        <span data-dyn="richest-name">…</span> pelo tempo desde que sua fonte de riqueza começou
+        (<span data-dyn="richest-since">…</span>), o que dá uma taxa média de acúmulo por segundo.
+        Depois calculamos quanto tempo, nessa taxa, ela levaria para juntar o que você guardaria numa
+        vida inteira de trabalho. É uma média grosseira, não um retrato do ritmo real, que oscila
+        muito.
+      </p>
+      <p>
+        <strong>Educação e analfabetismo são estimativas compostas.</strong> "Educar todos os alunos
+        por um ano" multiplica o investimento público por aluno ao ano
+        (<span data-dyn="edu-aluno-ano">…</span>) pelas matrículas da educação básica
+        (<span data-dyn="edu-matriculas">…</span>), chegando a <span data-dyn="edu-total">…</span> ao
+        ano. "Erradicar o analfabetismo" (<span data-dyn="analf-cost">…</span>) multiplica o número de
+        pessoas analfabetas pelo custo por vaga do programa Brasil Alfabetizado. As duas misturam anos
+        de referência e usam custo de programa, não custo integral, então são ordens de grandeza.
+        Trate-as como estimativa; os componentes e as ressalvas estão nas notas das fontes abaixo.
+      </p>
+    </section>
+
+    <section class="ref">
       <h2>Fontes</h2>
       <div data-sources></div>
     </section>
