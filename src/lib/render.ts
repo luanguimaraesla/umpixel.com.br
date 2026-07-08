@@ -123,7 +123,6 @@ let colRichest!: HTMLElement;
 let colTop5!: HTMLElement;
 let hudRichest!: HTMLElement;
 let hudTop5!: HTMLElement;
-let sourcesEl!: HTMLElement;
 let errorEl!: HTMLElement;
 
 const decimalFmt = new Intl.NumberFormat('pt-BR', {
@@ -339,33 +338,6 @@ function updateBadge(): void {
   salaryBadge.hidden = Math.abs(getSalary() - data.minWage) > 0.005;
 }
 
-// --- Footer source links, mounted from the fetched data ---
-function mountSources(groups: { label: string; raw: { fontes: Source[]; acessado_em: string } | null }[]): void {
-  const frag = document.createDocumentFragment();
-  for (const group of groups) {
-    if (!group.raw) continue;
-    const wrap = document.createElement('div');
-    const head = document.createElement('p');
-    const strong = document.createElement('strong');
-    strong.textContent = group.label;
-    head.append(strong, document.createTextNode(` · acesso em ${group.raw.acessado_em}`));
-    const ul = document.createElement('ul');
-    for (const source of group.raw.fontes) {
-      const li = document.createElement('li');
-      const a = document.createElement('a');
-      a.href = source.url;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.textContent = source.nome;
-      li.appendChild(a);
-      ul.appendChild(li);
-    }
-    wrap.append(head, ul);
-    frag.appendChild(wrap);
-  }
-  sourcesEl.replaceChildren(frag);
-}
-
 // --- Scroll-driven UI (HUD + readouts) ---
 function cacheGeometry(): void {
   const scrollTop = window.scrollY;
@@ -577,7 +549,6 @@ export async function boot(): Promise<void> {
   colTop5 = must<HTMLElement>('[data-column="top5"]');
   hudRichest = must<HTMLElement>('[data-hud="richest"]');
   hudTop5 = must<HTMLElement>('[data-hud="top5"]');
-  sourcesEl = must<HTMLElement>('[data-sources]');
   errorEl = must<HTMLElement>('#load-error');
 
   try {
@@ -620,13 +591,6 @@ export async function boot(): Promise<void> {
     if (!salaryInput.value.trim()) salaryInput.value = decimalFmt.format(getSalary());
     setHudName(hudRichest, data.richest.nome);
     setHudName(hudTop5, data.people[0].nome);
-    mountSources([
-      { label: `Salário mínimo (${data.minWageYear})`, raw: salario },
-      { label: 'Valorização real do salário (teto do arcabouço fiscal)', raw: growth },
-      { label: 'Câmbio do dólar (PTAX)', raw: cambio },
-      { label: `Bilionários (Forbes ${data.forbesRefDate.slice(0, 4)})`, raw: bilionarios },
-      { label: 'Renda e desigualdade (IBGE, OCDE)', raw: renda },
-    ]);
 
     autoscroll = createAutoscroll({ getSpeed: currentSpeed, onStateChange: updateControlsState });
 

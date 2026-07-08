@@ -1,0 +1,123 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="Referências e metodologia — UM PIXEL"
+  description="Como o um pixel calcula a escala, de onde vêm os números e o que inspirou o site."
+>
+  <main class="ref-page">
+    <h1>Referências e metodologia</h1>
+    <a class="ref-back" href="/">← voltar para o um pixel</a>
+
+    <p class="load-error" id="load-error" role="alert" hidden>
+      Não foi possível carregar os dados. Verifique sua conexão e recarregue a página.
+    </p>
+
+    <section class="ref">
+      <h2>A escala</h2>
+      <p>
+        Aqui, <strong>1 pixel = 1 mês</strong> do seu salário. 12 pixels formam 1 ano.
+        564 pixels são uma vida inteira de trabalho, dos 18 aos 65 anos. Tudo está em escala
+        real, sem ampliações, medido em pixels CSS.
+      </p>
+      <p>
+        Usamos 12 salários por ano para manter a metáfora dos 12 pixels. Sim, existe o 13º; ele
+        só reforçaria o argumento.
+      </p>
+      <p>
+        As fortunas em dólar viram reais pela PTAX do Banco Central de
+        <span data-dyn="fx-date">…</span> (R$ <span data-dyn="fx-rate">…</span> por dólar), com
+        os valores da lista anual da Forbes de <span data-dyn="forbes-date">…</span>. O salário
+        mínimo de <span data-dyn="min-wage">…</span> segue o
+        <span data-dyn="min-wage-law">…</span>.
+      </p>
+      <p>
+        Só o patrimônio acumulado numa vida inteira considera os reajustes reais do salário
+        (ganho de <span data-dyn="real-growth-pct">…</span> ao ano acima da inflação, teto da
+        política de valorização vigente até 2030) e assume que você guardaria 100% do salário
+        bruto, sem gastar nada. É impossível, e esse é justamente o ponto. O resto da página usa
+        o seu salário de hoje.
+      </p>
+    </section>
+
+    <section class="ref">
+      <h2>O patrimônio de uma família</h2>
+      <p>
+        Não existe estatística oficial do patrimônio de uma família brasileira no fim da vida. O
+        número que usamos, cerca de <strong data-dyn="family-worth">…</strong>, é uma
+        <strong>estimativa</strong> montada a partir de blocos verificáveis.
+      </p>
+      <p>
+        A mediana de riqueza por adulto medida pela UBS subestima o fim da vida. Cerca de 84% das
+        pessoas com 60 anos ou mais moram em casa própria, e a casa costuma ser quase todo o
+        patrimônio da família. A mediana dos benefícios do INSS é exatamente 1 salário mínimo, e
+        só uma pequena parte dos aposentados tem previdência privada.
+      </p>
+      <p>
+        Juntando essas peças, chegamos a uma faixa provável entre R$ 150 mil e R$ 250 mil por
+        família, com 80% a 90% imobilizado na casa própria, e adotamos o ponto central de
+        <span data-dyn="family-worth">…</span>. Trate sempre como estimativa, não como dado
+        oficial.
+      </p>
+    </section>
+
+    <section class="ref">
+      <h2>Os 5 mais ricos do Brasil</h2>
+      <p>
+        Somados, os cinco brasileiros mais ricos têm <span data-dyn="top5-usd">…</span>. No fluxo
+        principal do site mostramos só o 1º colocado; a soma dos cinco aparece como um marco
+        dentro da coluna de Elon Musk.
+      </p>
+    </section>
+
+    <section class="ref">
+      <h2>Fontes</h2>
+      <div data-sources></div>
+    </section>
+
+    <section class="ref">
+      <h2>Inspirações</h2>
+      <ul>
+        <li>
+          <a
+            href="https://stanford.edu/~bonica/wealth-to-scale/musk-wealth-to-scale-2026.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Wealth, shown to scale (Adam Bonica, Stanford): o scroll longo em escala real.
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://eattherichtextformat.github.io/1-pixel-wealth/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            1 Pixel Wealth (Matt Korostoff): a ideia de 1 pixel como unidade de dinheiro.
+          </a>
+        </li>
+        <li>
+          <a href="https://howpoorami.org/pt" target="_blank" rel="noopener noreferrer">
+            How Poor Am I?: a calculadora pessoal e a comparação justa entre patrimônios.
+          </a>
+        </li>
+      </ul>
+      <p>Nenhum código foi copiado das referências; este site foi escrito do zero.</p>
+    </section>
+
+    <p class="ref__license">
+      Código livre sob AGPL-3.0 ·
+      <a
+        href="https://github.com/luanguimaraesla/umpixel.com.br"
+        target="_blank"
+        rel="noopener noreferrer">código-fonte no GitHub</a
+      >
+    </p>
+  </main>
+
+  <script>
+    import { bootReferencias } from '../lib/referencias';
+    bootReferencias();
+  </script>
+</Base>
