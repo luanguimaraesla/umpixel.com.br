@@ -6,6 +6,7 @@ import {
   COLUMN_MAX_WIDTH,
   COLUMN_USABLE_CAP,
   COLUMN_SIDE_MARGIN,
+  MAX_COLUMN_HEIGHT_PX,
 } from '../config';
 
 // --- Core scale math (pure; no DOM) ---
@@ -57,6 +58,21 @@ export function columnWidth(viewportWidth: number): number {
   const usable = Math.min(viewportWidth, COLUMN_USABLE_CAP) - COLUMN_SIDE_MARGIN;
   const w = Math.floor(usable / MONTHS_PER_YEAR) * MONTHS_PER_YEAR;
   return Math.max(COLUMN_MIN_WIDTH, Math.min(COLUMN_MAX_WIDTH, w));
+}
+
+/**
+ * The actual rendered width (px) of a metric column. It is `baseWidth` unless the
+ * fortune is so tall that the column would exceed the browser's element-height
+ * limit, in which case the D10 guard widens it (kept a multiple of 12 so a whole
+ * row is a whole number of years). Shared by the renderer and any depth math that
+ * needs the real width, such as the ruler-step comparisons.
+ */
+export function metricColumnWidth(valueBRL: number, salary: number, baseWidth: number): number {
+  const months = monthsOf(valueBRL, salary);
+  if (months / baseWidth > MAX_COLUMN_HEIGHT_PX) {
+    return Math.ceil(months / MAX_COLUMN_HEIGHT_PX / MONTHS_PER_YEAR) * MONTHS_PER_YEAR;
+  }
+  return baseWidth;
 }
 
 // --- pt-BR formatters ---
@@ -119,6 +135,32 @@ export function fmtLives(v: number): string {
   if (v >= 1e6) return `${n1(v / 1e6)} ${n1(v / 1e6) === '1,0' ? 'milhão' : 'milhões'} de vidas`;
   if (v >= 1e5) return `${fmtInt(v / 1e3)} mil vidas`;
   return plural(Math.round(v), 'vida', 'vidas');
+}
+
+// One-unit duration tiers (pt-BR). A year is 365,25 days so the "anos" tier lines
+// up with the calendar-year math used elsewhere.
+const DURATION_TIERS = [
+  { limit: 60, unit: 1, one: 'segundo', many: 'segundos' },
+  { limit: 3600, unit: 60, one: 'minuto', many: 'minutos' },
+  { limit: 86_400, unit: 3600, one: 'hora', many: 'horas' },
+  { limit: 31_557_600, unit: 86_400, one: 'dia', many: 'dias' },
+  { limit: Infinity, unit: 31_557_600, one: 'ano', many: 'anos' },
+] as const;
+
+/**
+ * A duration in seconds spelled out in a single pt-BR unit, e.g. "45 segundos",
+ * "12 minutos", "2 horas", "3 dias", "5 anos". Picks the largest unit whose count
+ * is at least 1 and rounds to a whole number; callers add words like "cerca de".
+ */
+export function fmtDuration(seconds: number): string {
+  const s = Math.max(0, seconds);
+  for (const tier of DURATION_TIERS) {
+    if (s < tier.limit) {
+      const n = Math.max(1, Math.round(s / tier.unit));
+      return `${fmtInt(n)} ${n === 1 ? tier.one : tier.many}`;
+    }
+  }
+  return '';
 }
 
 /**
