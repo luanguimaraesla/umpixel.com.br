@@ -1,0 +1,14 @@
+---
+interface Props {
+  id: string;
+  theme?: 'red' | 'yellow' | 'black' | 'dark';
+}
+
+const { id, theme = 'red' } = Astro.props;
+---
+
+<section class={`journey section--${theme}`} id={id}>
+  <div class="journey__card panel" data-reveal><slot name="card" /></div>
+  <div class="journey__stage"><slot name="stage" /></div>
+  <div class="journey__beats"><slot name="beats" /></div>
+</section>

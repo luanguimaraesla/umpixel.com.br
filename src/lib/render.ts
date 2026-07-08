@@ -1,7 +1,10 @@
 import {
   MONTHS_PER_YEAR,
-  MILESTONE_STEP,
   SPEED_BASE,
+  BILLION_BRL,
+  RULER_STEP,
+  MAX_COLUMN_HEIGHT_PX,
+  RAMP_STEPS,
 } from '../config';
 import {
   monthsOf,
@@ -53,13 +56,25 @@ interface RawBilionarios {
   fontes: Source[];
   acessado_em: string;
 }
-interface RawRenda {
+interface RawGrowth {
+  taxa_real_anual: number;
   fontes: Source[];
   acessado_em: string;
 }
-
-interface RawGrowth {
-  taxa_real_anual: number;
+interface RawPatrimonio {
+  valor_brl: number;
+  faixa_brl: { min: number; max: number };
+  fontes: Source[];
+  acessado_em: string;
+}
+interface RawMundo {
+  pessoa_mais_rica: {
+    nome: string;
+    patrimonio_usd_bilhoes: number;
+    ranking_mundial: number;
+    fonte_riqueza: string;
+  };
+  data_referencia_valores: string;
   fontes: Source[];
   acessado_em: string;
 }
@@ -82,19 +97,29 @@ interface PageData {
   totalUsd: number;
   forbesRefDate: string;
   realGrowth: number;
+  family: number;
+  familyRange: { min: number; max: number };
+  musk: Person;
+  muskRefDate: string;
 }
 
-interface Segment {
-  name: string;
-  top: number;
-  bottom: number;
+// A sticky beat that holds inside a column at a given BRL depth (D9).
+interface ColMilestone {
+  atBRL: number;
+  html: string;
 }
+// One metric-view column: a solid pixel area plus its in-column milestones.
+interface ColumnDef {
+  id: string;
+  el: HTMLElement;
+  valueBRL: number;
+  milestones: ColMilestone[];
+}
+// Cached scroll geometry for a rendered column.
 interface ColumnGeometry {
+  id: string;
   top: number;
   height: number;
-  name: string;
-  hud: HTMLElement;
-  segments: Segment[] | null;
 }
 
 // --- Module state ---
@@ -102,11 +127,12 @@ let data!: PageData;
 let fx = 0;
 let colW = 120;
 let userMult = 1;
+let lastRamp = 1;
 let toastTimer = 0;
 let scrollTicking = false;
 let autoscroll: Autoscroll;
+let columns: ColumnDef[] = [];
 let geometry: ColumnGeometry[] = [];
-let top5Segments: { name: string; topLocal: number; height: number }[] = [];
 
 // --- Element references (assigned in boot) ---
 let salaryInput!: HTMLInputElement;
@@ -120,10 +146,10 @@ let speedReadout!: HTMLElement;
 let posReadout!: HTMLElement;
 let progressEl!: HTMLElement;
 let toastEl!: HTMLElement;
+let familyBlock!: HTMLElement;
+let colBilhao!: HTMLElement;
 let colRichest!: HTMLElement;
-let colTop5!: HTMLElement;
-let hudRichest!: HTMLElement;
-let hudTop5!: HTMLElement;
+let colMusk!: HTMLElement;
 let errorEl!: HTMLElement;
 
 const decimalFmt = new Intl.NumberFormat('pt-BR', {
@@ -132,13 +158,6 @@ const decimalFmt = new Intl.NumberFormat('pt-BR', {
 });
 const usdFmt = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 1,
-  maximumFractionDigits: 1,
-});
-const fxFmt = new Intl.NumberFormat('pt-BR', {
-  minimumFractionDigits: 4,
-  maximumFractionDigits: 4,
-});
-const pctFmt = new Intl.NumberFormat('pt-BR', {
   maximumFractionDigits: 1,
 });
 
@@ -161,11 +180,6 @@ function monthYearPt(iso: string): string {
   const [y, m] = iso.split('-');
   return `${MONTHS_PT[Number(m) - 1]} de ${y}`;
 }
-function fullDatePt(iso: string): string {
-  const [y, m, d] = iso.split('-').map(Number);
-  const day = d === 1 ? '1º' : String(d);
-  return `${day} de ${MONTHS_PT[m - 1]} de ${y}`;
-}
 
 function must<T extends Element>(selector: string): T {
   const el = document.querySelector(selector);
@@ -181,9 +195,6 @@ function debounce(fn: () => void, ms: number): () => void {
   };
 }
 
-function usdShort(v: number): string {
-  return `US$ ${usdFmt.format(v)} bi`;
-}
 function usdLong(v: number): string {
   return `US$ ${usdFmt.format(v)} bilhões`;
 }
@@ -198,127 +209,158 @@ function dataUrl(name: string): string {
   return `${import.meta.env.BASE_URL}data/${name}`;
 }
 
-// --- Autoscroll speed (base pixels per second scaled by the chosen multiplier; D5) ---
-// The progressive ramps (D5b) multiply this in step 7; today it is base × user.
+// --- Autoscroll speed (base pixels per second × user multiplier × hidden ramp; D5/D5b) ---
 function currentSpeed(): number {
-  return SPEED_BASE * userMult;
+  return SPEED_BASE * userMult * rampMult();
 }
 
-// --- Column building ---
-function addTicks(frag: DocumentFragment, height: number, w: number, salary: number): void {
-  let i = 0;
-  for (let y = MILESTONE_STEP; y < height; y += MILESTONE_STEP) {
-    const months = y * w;
-    const value = months * salary;
-    const years = months / MONTHS_PER_YEAR;
-
-    const tick = document.createElement('div');
-    tick.className = `tick ${i % 2 === 0 ? 'tick--right' : 'tick--left'}`;
-    tick.style.top = `${y}px`;
-    tick.setAttribute('aria-hidden', 'true'); // decorative scale marker, not content
-
-    const valueEl = document.createElement('span');
-    valueEl.className = 'tick__value';
-    valueEl.textContent = fmtBRLCompact(value);
-    // Ticks show the flat time scale (today's salary); "vidas" is reserved for
-    // the fortune/patrimônio comparison, which uses real wage growth.
-    tick.append(
-      valueEl,
-      document.createTextNode(` · ${fmtYears(years)} de trabalho`),
-    );
-    frag.appendChild(tick);
-    i++;
+// The hidden progressive ramp factor for the current scroll depth (D5b). Returns 1
+// outside a ramped column; inside, the largest step whose BRL depth has been passed.
+function rampMult(): number {
+  const salary = getSalary();
+  const mid = window.scrollY + window.innerHeight / 2;
+  for (const col of geometry) {
+    if (mid < col.top || mid > col.top + col.height) continue;
+    const steps = RAMP_STEPS[col.id];
+    if (!steps || steps.length === 0) return 1;
+    const depth = Math.min(Math.max(mid - col.top, 0), col.height);
+    const value = depth * colW * salary;
+    let mult = 1;
+    for (const step of steps) {
+      if (step.atBRL <= value) mult = step.mult;
+    }
+    return mult;
   }
+  return 1;
 }
 
-function buildSingleColumn(el: HTMLElement, valueBRL: number, salary: number, w: number): void {
-  const height = Math.max(1, Math.ceil(monthsOf(valueBRL, salary) / w));
-  el.style.setProperty('--col-w', `${w}px`);
-  el.style.height = `${height}px`;
-  const frag = document.createDocumentFragment();
-  addTicks(frag, height, w, salary);
-  el.replaceChildren(frag);
-}
+// --- Column building (metric view: solid area + CSS ruler + sticky beats; D6/D7/D9) ---
+function buildWealthColumn(def: ColumnDef, salary: number, baseWidth: number): void {
+  const months = monthsOf(def.valueBRL, salary);
+  // D10: widen the column (kept a multiple of 12) if it would otherwise be taller
+  // than the browser's element-height limit.
+  let w = baseWidth;
+  if (months / w > MAX_COLUMN_HEIGHT_PX) {
+    w = Math.ceil(months / MAX_COLUMN_HEIGHT_PX / MONTHS_PER_YEAR) * MONTHS_PER_YEAR;
+  }
+  const height = Math.max(1, Math.ceil(months / w));
+  def.el.style.setProperty('--col-w', `${w}px`);
+  def.el.style.height = `${height}px`;
 
-function buildTop5Column(el: HTMLElement, salary: number, w: number): void {
-  const totalBRL = brlOf(data.totalUsd, fx);
-  const totalHeight = Math.max(1, Math.ceil(monthsOf(totalBRL, salary) / w));
-  el.style.setProperty('--col-w', `${w}px`);
-  el.style.height = `${totalHeight}px`;
+  // Bracket key: what one ruler mark is worth, in money and in work-time.
+  const rulerKey = document.createElement('div');
+  rulerKey.className = 'ruler-key';
+  rulerKey.setAttribute('aria-hidden', 'true'); // decorative scale annotation
+  const bracket = document.createElement('span');
+  bracket.className = 'ruler-key__bracket';
+  const keyLabel = document.createElement('span');
+  keyLabel.className = 'ruler-key__label panel';
+  keyLabel.textContent =
+    `cada traço = ${fmtBRLCompact(RULER_STEP * w * salary)}` +
+    ` · ${fmtYears((RULER_STEP * w) / MONTHS_PER_YEAR)} de trabalho`;
+  rulerKey.append(bracket, keyLabel);
 
-  const frag = document.createDocumentFragment();
-  const people = data.people;
-  top5Segments = [];
-  let top = 0;
+  // Sticky in-column milestone cards positioned by BRL depth.
+  const px = (v: number): number => Math.round(monthsOf(v, salary) / w);
+  const wrappers: HTMLElement[] = [];
+  def.milestones.forEach((m, i) => {
+    const nextBRL = i + 1 < def.milestones.length ? def.milestones[i + 1].atBRL : def.valueBRL;
+    const top = px(m.atBRL);
+    const wrapperHeight = px(nextBRL) - top;
+    if (wrapperHeight < 800) return; // no room to hold this card, skip it
 
-  people.forEach((person, index) => {
-    let h = Math.round(monthsOf(brlOf(person.usd, fx), salary) / w);
-    // Absorb rounding drift into the last segment so the parts fill the whole.
-    if (index === people.length - 1) h = Math.max(1, totalHeight - top);
-
-    const segment = document.createElement('div');
-    segment.className = `segment segment--${index}`;
-    segment.style.top = `${top}px`;
-    segment.style.height = `${h}px`;
-    frag.appendChild(segment);
-
-    const boundary = document.createElement('div');
-    boundary.className = 'boundary';
-    boundary.style.top = `${top}px`;
-    const pos = document.createElement('span');
-    pos.className = 'boundary__pos';
-    pos.textContent = `${person.posicao}º`;
-    boundary.append(
-      pos,
-      document.createTextNode(` · ${person.nome} — ${usdShort(person.usd)} · ${person.fonte}`),
-    );
-    frag.appendChild(boundary);
-
-    top5Segments.push({ name: person.nome, topLocal: top, height: h });
-    top += h;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'col-note';
+    wrapper.style.top = `${top}px`;
+    wrapper.style.height = `${wrapperHeight}px`;
+    const card = document.createElement('div');
+    card.className = 'col-note__card panel';
+    card.innerHTML = m.html; // authored here only; never user input
+    wrapper.appendChild(card);
+    wrappers.push(wrapper);
   });
 
-  addTicks(frag, totalHeight, w, salary);
-  el.replaceChildren(frag);
+  def.el.replaceChildren(rulerKey, ...wrappers);
+}
+
+// The three metric columns, with their in-column beats. Rebuilt on every salary
+// change so all depths track the current reference salary.
+function buildColumnDefs(salary: number): ColumnDef[] {
+  const richestBRL = brlOf(data.richest.usd, fx);
+  const muskBRL = brlOf(data.musk.usd, fx);
+  // Sum of the five richest Brazilians, reused as one narrative beat inside Musk (D3).
+  const richBrazilSumBRL = brlOf(data.totalUsd, fx);
+
+  return [
+    { id: 'bilhao', el: colBilhao, valueBRL: BILLION_BRL, milestones: [] },
+    {
+      id: 'richest',
+      el: colRichest,
+      valueBRL: richestBRL,
+      milestones: [
+        {
+          atBRL: richestBRL / 2,
+          html:
+            `Metade da fortuna de ${data.richest.nome}. Você já rolou ` +
+            `${fmtYears(yearsOf(richestBRL / 2, salary))} de trabalho.`,
+        },
+      ],
+    },
+    {
+      id: 'musk',
+      el: colMusk,
+      valueBRL: muskBRL,
+      milestones: [
+        {
+          atBRL: richestBRL,
+          html:
+            `Você acabou de passar TODA a fortuna de ${data.richest.nome}, a pessoa mais rica ` +
+            'do Brasil. Continua.',
+        },
+        { atBRL: richBrazilSumBRL, html: 'Os 5 brasileiros mais ricos, somados, terminam aqui.' },
+        { atBRL: 1e12, html: 'R$ 1 trilhão. Um milhão de milhões.' },
+        { atBRL: muskBRL / 2, html: 'Metade. Respira.' },
+        { atBRL: 3e12, html: 'R$ 3 trilhões. Última acelerada.' },
+      ],
+    },
+  ];
 }
 
 // --- Dynamic text registry (data-driven + salary-driven, all keyed by data-dyn) ---
 function applyDynamic(): void {
   const salary = getSalary();
   const richestBRL = brlOf(data.richest.usd, fx);
-  const top5BRL = brlOf(data.totalUsd, fx);
+  const muskBRL = brlOf(data.musk.usd, fx);
   const life = lifeSavings(salary, data.realGrowth);
-  const yearsPerRow = colW / MONTHS_PER_YEAR;
   const forbesSource = `Forbes · lista anual, valores de ${monthYearPt(data.forbesRefDate)}`;
+  const worldForbesSource = `Forbes · lista anual, valores de ${monthYearPt(data.muskRefDate)}`;
 
   const values: Record<string, string> = {
     // salary-dependent
     salary: fmtBRL(salary),
     'year-value': fmtBRL(salary * 12),
-    'ten-years-value': fmtBRL(salary * 120),
+    'family-worth': fmtBRLCompact(data.family),
+    'family-range': `${fmtBRLCompact(data.familyRange.min)} e ${fmtBRLCompact(data.familyRange.max)}`,
     'life-value': fmtBRL(life),
-    'life-value-2': fmtBRL(life),
-    'years-per-row': `${fmtInt(yearsPerRow)} ${Math.round(yearsPerRow) === 1 ? 'ano' : 'anos'}`,
+    'life-vs-family': `${fmtInt(life / data.family)} vezes`,
+    'billion-years': fmtYears(yearsOf(BILLION_BRL, salary)),
     'richest-years': fmtYears(yearsOf(richestBRL, salary)),
     'richest-lives': fmtLives(livesOf(richestBRL, salary, data.realGrowth)),
-    'top5-years': fmtYears(yearsOf(top5BRL, salary)),
-    'top5-lives-2': fmtLives(livesOf(top5BRL, salary, data.realGrowth)),
-    'top5-area': fmtCountShort(monthsOf(top5BRL, salary)),
+    'musk-years': fmtYears(yearsOf(muskBRL, salary)),
+    'musk-lives': fmtLives(livesOf(muskBRL, salary, data.realGrowth)),
+    'musk-area': fmtCountShort(monthsOf(muskBRL, salary)),
     // data-derived (independent of the visitor's salary)
+    'min-wage': fmtBRL(data.minWage),
     'richest-name': data.richest.nome,
     'richest-usd': usdLong(data.richest.usd),
-    'richest-wealth-source': data.richest.fonte,
     'richest-brl': fmtBRLCompact(richestBRL),
-    'top5-usd': usdLong(data.totalUsd),
-    'top5-brl': fmtBRLCompact(top5BRL),
+    'richest-wealth-source': data.richest.fonte,
     'forbes-source': forbesSource,
-    'forbes-date': fullDatePt(data.forbesRefDate),
-    'fx-rate': fxFmt.format(data.fx),
-    'fx-date': fullDatePt(data.fxDate),
-    'min-wage': fmtBRL(data.minWage),
-    'min-wage-law': data.minWageLaw,
-    'min-wage-year': data.minWageYear,
-    'real-growth-pct': `${pctFmt.format(data.realGrowth * 100)}%`,
+    'musk-name': data.musk.nome,
+    'musk-usd': usdLong(data.musk.usd),
+    'musk-brl': fmtBRLCompact(muskBRL),
+    'musk-wealth-source': data.musk.fonte,
+    'world-forbes-source': worldForbesSource,
   };
 
   document.querySelectorAll<HTMLElement>('[data-dyn]').forEach((el) => {
@@ -327,78 +369,59 @@ function applyDynamic(): void {
     const text = values[key];
     if (text !== undefined) el.textContent = text;
   });
+
+  // The family patrimônio block is shown in true CSS-pixel size (~12 × 10 px at
+  // minimum wage): 12px wide (one year per row) by one row per year of savings.
+  const rows = Math.max(1, Math.round(monthsOf(data.family, salary) / MONTHS_PER_YEAR));
+  familyBlock.style.width = '12px';
+  familyBlock.style.height = `${rows}px`;
 }
 
-// --- Scroll-driven UI (HUD + readouts) ---
+// --- Scroll-driven UI (readouts + progress bar + hidden ramps) ---
 function cacheGeometry(): void {
   const scrollTop = window.scrollY;
-  const richestRect = colRichest.getBoundingClientRect();
-  const top5Rect = colTop5.getBoundingClientRect();
-  const top5Top = top5Rect.top + scrollTop;
-
-  geometry = [
-    {
-      top: richestRect.top + scrollTop,
-      height: colRichest.offsetHeight,
-      name: data.richest.nome,
-      hud: hudRichest,
-      segments: null,
-    },
-    {
-      top: top5Top,
-      height: colTop5.offsetHeight,
-      name: data.people[0].nome,
-      hud: hudTop5,
-      segments: top5Segments.map((s) => ({
-        name: s.name,
-        top: top5Top + s.topLocal,
-        bottom: top5Top + s.topLocal + s.height,
-      })),
-    },
-  ];
-}
-
-function setHudName(hud: HTMLElement, name: string): void {
-  const nameEl = hud.querySelector('[data-hud-name]');
-  if (nameEl) nameEl.textContent = name;
-}
-
-function setHud(hud: HTMLElement, name: string, value: number, lives: number): void {
-  const valueEl = hud.querySelector('[data-hud-value]');
-  const livesEl = hud.querySelector('[data-hud-lives]');
-  setHudName(hud, name);
-  if (valueEl) valueEl.textContent = fmtBRLCompact(value);
-  if (livesEl) livesEl.textContent = fmtLives(lives);
+  geometry = columns.map((def) => {
+    const rect = def.el.getBoundingClientRect();
+    return { id: def.id, top: rect.top + scrollTop, height: def.el.offsetHeight };
+  });
 }
 
 function updateScrollUI(): void {
   const salary = getSalary();
   const mid = window.scrollY + window.innerHeight / 2;
+
   let active: ColumnGeometry | null = null;
-
   for (const col of geometry) {
-    if (mid < col.top || mid > col.top + col.height) continue;
-    active = col;
-    const depth = Math.min(Math.max(mid - col.top, 0), col.height);
-    const months = depth * colW;
-    const value = months * salary;
-    const lives = livesOf(value, salary, data.realGrowth);
-
-    let name = col.name;
-    if (col.segments) {
-      const seg = col.segments.find((s) => mid >= s.top && mid < s.bottom);
-      if (seg) name = seg.name;
+    if (mid >= col.top && mid <= col.top + col.height) {
+      active = col;
+      break;
     }
-    setHud(col.hud, name, value, lives);
-    posReadout.textContent = `${fmtBRLCompact(value)} · ${fmtLives(lives)}`;
   }
 
   if (active) {
+    const depth = Math.min(Math.max(mid - active.top, 0), active.height);
+    const value = depth * colW * salary;
+    const lives = livesOf(value, salary, data.realGrowth);
+    posReadout.textContent = `${fmtBRLCompact(value)} · ${fmtLives(lives)}`;
+
     const yearsPerSecond = Math.round((currentSpeed() * colW) / MONTHS_PER_YEAR);
     speedReadout.textContent = `≈ ${fmtInt(yearsPerSecond)} anos de trabalho por segundo`;
+
+    // Announce each hidden speed ramp as its BRL depth is crossed while playing (D5b).
+    const steps = RAMP_STEPS[active.id] || [];
+    let crossed: { atBRL: number; mult: number } | null = null;
+    for (const step of steps) {
+      if (step.atBRL <= value) crossed = step;
+    }
+    const mult = crossed ? crossed.mult : 1;
+    if (crossed && mult > lastRamp && autoscroll.isPlaying()) {
+      showToast(`Acelerando: ${mult}× · você passou ${fmtBRLCompact(crossed.atBRL)}`);
+    }
+    lastRamp = mult;
   } else {
-    speedReadout.textContent = '';
     posReadout.textContent = '';
+    speedReadout.textContent = '';
+    lastRamp = 1;
   }
 
   const max = document.documentElement.scrollHeight - window.innerHeight;
@@ -406,8 +429,8 @@ function updateScrollUI(): void {
   progressEl.style.width = `${pct}%`;
 }
 
-// Ephemeral status toast (fired by step 7's speed ramps). Restarts its own
-// auto-hide timer on every call so rapid announcements do not stack.
+// Ephemeral status toast (fired by the speed ramps). Restarts its own auto-hide
+// timer on every call so rapid announcements do not stack.
 function showToast(msg: string): void {
   toastEl.textContent = msg;
   toastEl.hidden = false;
@@ -426,8 +449,8 @@ function recompute(): void {
   const prevMax = docEl.scrollHeight - window.innerHeight;
   const ratio = prevMax > 0 ? window.scrollY / prevMax : 0;
 
-  buildSingleColumn(colRichest, brlOf(data.richest.usd, fx), salary, colW);
-  buildTop5Column(colTop5, salary, colW);
+  columns = buildColumnDefs(salary);
+  for (const def of columns) buildWealthColumn(def, salary, colW);
 
   applyDynamic();
 
@@ -492,6 +515,8 @@ function validateData(
   salario: RawSalario,
   cambio: RawCambio,
   bilionarios: RawBilionarios,
+  patrimonio: RawPatrimonio,
+  mundo: RawMundo,
 ): void {
   if (!salario || !(Number(salario.valor_brl) > 0)) {
     throw new Error('salario-minimo.json inválido');
@@ -506,6 +531,12 @@ function validateData(
     !(Number(bilionarios.total_top5_usd_bilhoes) > 0)
   ) {
     throw new Error('bilionarios-brasil.json inválido');
+  }
+  if (!patrimonio || !(Number(patrimonio.valor_brl) > 0)) {
+    throw new Error('patrimonio-familia.json inválido');
+  }
+  if (!mundo || !mundo.pessoa_mais_rica || !(Number(mundo.pessoa_mais_rica.patrimonio_usd_bilhoes) > 0)) {
+    throw new Error('bilionarios-mundo.json inválido');
   }
 }
 
@@ -575,22 +606,23 @@ export async function boot(): Promise<void> {
   posReadout = must<HTMLElement>('[data-pos-readout]');
   progressEl = must<HTMLElement>('[data-progress]');
   toastEl = must<HTMLElement>('#toast');
+  familyBlock = must<HTMLElement>('[data-family-block]');
+  colBilhao = must<HTMLElement>('[data-column="bilhao"]');
   colRichest = must<HTMLElement>('[data-column="richest"]');
-  colTop5 = must<HTMLElement>('[data-column="top5"]');
-  hudRichest = must<HTMLElement>('[data-hud="richest"]');
-  hudTop5 = must<HTMLElement>('[data-hud="top5"]');
+  colMusk = must<HTMLElement>('[data-column="musk"]');
   errorEl = must<HTMLElement>('#load-error');
 
   try {
-    // Fetch the data that drives the whole page. The three core files are
-    // required; income data only feeds the footer sources, so it is optional.
-    const [salario, cambio, bilionarios] = await Promise.all([
+    // Fetch the data that drives the whole page. All five files are required;
+    // real wage growth only refines the "vidas" comparison, so it stays optional.
+    const [salario, cambio, bilionarios, patrimonio, mundo] = await Promise.all([
       fetchJson<RawSalario>(dataUrl('salario-minimo.json')),
       fetchJson<RawCambio>(dataUrl('cambio-usd-brl.json')),
       fetchJson<RawBilionarios>(dataUrl('bilionarios-brasil.json')),
+      fetchJson<RawPatrimonio>(dataUrl('patrimonio-familia.json')),
+      fetchJson<RawMundo>(dataUrl('bilionarios-mundo.json')),
     ]);
-    validateData(salario, cambio, bilionarios);
-    const renda = await fetchJson<RawRenda>(dataUrl('renda-brasil.json')).catch(() => null);
+    validateData(salario, cambio, bilionarios, patrimonio, mundo);
     const growth = await fetchJson<RawGrowth>(
       dataUrl('crescimento-real-salario.json'),
     ).catch(() => null);
@@ -613,14 +645,21 @@ export async function boot(): Promise<void> {
       totalUsd: bilionarios.total_top5_usd_bilhoes,
       forbesRefDate: bilionarios.data_referencia_valores,
       realGrowth: growth && Number(growth.taxa_real_anual) > 0 ? growth.taxa_real_anual : 0,
+      family: patrimonio.valor_brl,
+      familyRange: patrimonio.faixa_brl,
+      musk: {
+        posicao: mundo.pessoa_mais_rica.ranking_mundial,
+        nome: mundo.pessoa_mais_rica.nome,
+        usd: mundo.pessoa_mais_rica.patrimonio_usd_bilhoes,
+        fonte: mundo.pessoa_mais_rica.fonte_riqueza,
+      },
+      muskRefDate: mundo.data_referencia_valores,
     };
     fx = data.fx;
 
     initSalary(data.minWage);
     // The field ships empty and disabled; fill it once with the resolved salary.
     if (!salaryInput.value.trim()) salaryInput.value = decimalFmt.format(getSalary());
-    setHudName(hudRichest, data.richest.nome);
-    setHudName(hudTop5, data.people[0].nome);
 
     autoscroll = createAutoscroll({ getSpeed: currentSpeed, onStateChange: updateControlsState });
 

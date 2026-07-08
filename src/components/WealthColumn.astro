@@ -9,20 +9,13 @@ const { id, endId } = Astro.props;
 
 <section class="section section--dark col" data-col-section={id}>
   <div class="wrap">
-    <div class="panel col__intro">
+    <div class="panel col__intro" data-reveal>
       <slot name="intro" />
     </div>
     <a class="col__skip" href={`#${endId}`}>pular para o fim da coluna ↓</a>
   </div>
 
-  <div class="panel col__hud" data-hud={id}>
-    Você está dentro da fortuna de
-    <strong data-hud-name>…</strong> —
-    <strong data-hud-value>—</strong> ·
-    <strong data-hud-lives>—</strong>
-  </div>
-
-  <div class="wealth-column" data-column={id}></div>
+  <div class="wealth-column wealth-column--metric" data-column={id}></div>
 
   <div class="wrap">
     <div class="panel col__end" id={endId}>

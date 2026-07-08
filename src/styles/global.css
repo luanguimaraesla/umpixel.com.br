@@ -345,6 +345,68 @@ strong {
   text-align: center;
 }
 
+/* ---- Journey milestones (left-anchored sticky-hold cards; D9) ---- */
+.journey {
+  position: relative;
+  min-height: 220vh;
+  padding: 4rem 1.5rem;
+}
+/* Card holds at the top-left while its section scrolls; the next card replaces it. */
+.journey__card {
+  position: sticky;
+  top: 4.5rem;
+  z-index: 6;
+  width: min(22rem, 85vw);
+  margin-left: max(1.5rem, calc(50vw - 24rem));
+  text-align: left;
+  color: var(--branco);
+}
+.journey__card h2 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  margin: 0;
+}
+.journey__stage {
+  position: sticky;
+  top: 45vh;
+  display: grid;
+  place-items: center;
+}
+/* Beats flow past the sticky card/stage, arriving about one screen apart. */
+.journey__beats {
+  position: relative;
+  z-index: 5;
+  max-width: 34rem;
+  margin: 0 auto;
+}
+.journey__beats > * {
+  margin-top: 55vh;
+}
+.beat__fine {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+.beat__fine a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Scroll-reveal: motion only for users who allow it; reduced-motion sees content
+   immediately (no opacity:0 rule outside no-preference). */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  [data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* ---- Wealth columns ---- */
 .col {
   position: relative;
@@ -386,99 +448,6 @@ strong {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-.col__hud {
-  position: sticky;
-  top: 12px;
-  z-index: 5;
-  width: max-content;
-  max-width: min(90vw, 34rem);
-  margin: 0 auto;
-  font-size: 0.9rem;
-  padding: 0.6rem 1rem;
-}
-.col__hud strong {
-  color: var(--amarelo);
-}
-.wealth-column {
-  position: relative;
-  width: var(--col-w, 120px);
-  margin: 2rem auto;
-  background: var(--vermelho);
-  background-image: repeating-linear-gradient(
-    to bottom,
-    transparent 0 9px,
-    rgba(0, 0, 0, 0.15) 9px 10px
-  );
-  border-radius: 2px;
-}
-.segment {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  background-image: repeating-linear-gradient(
-    to bottom,
-    transparent 0 9px,
-    rgba(0, 0, 0, 0.15) 9px 10px
-  );
-  content-visibility: auto;
-}
-.segment--0 {
-  background-color: var(--vermelho);
-}
-.segment--1 {
-  background-color: var(--vermelho-medio);
-}
-.segment--2 {
-  background-color: var(--vermelho-escuro);
-}
-.segment--3 {
-  background-color: var(--vermelho);
-}
-.segment--4 {
-  background-color: var(--vermelho-medio);
-}
-.tick,
-.boundary {
-  position: absolute;
-  content-visibility: auto;
-  background: var(--overlay-leve);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  border: 1px solid var(--overlay-border);
-  border-radius: 8px;
-  padding: 0.4rem 0.7rem;
-  font-size: 0.8rem;
-  line-height: 1.35;
-  width: max-content;
-  max-width: 15rem;
-  pointer-events: none;
-}
-.tick__value {
-  color: var(--amarelo);
-  font-weight: 700;
-}
-.tick--right {
-  left: 100%;
-  margin-left: 10px;
-  text-align: left;
-}
-.tick--left {
-  right: 100%;
-  margin-right: 10px;
-  text-align: right;
-}
-.boundary {
-  left: 50%;
-  transform: translateX(-50%);
-  top: 0;
-  text-align: center;
-  max-width: min(90vw, 22rem);
-  z-index: 2;
-}
-.boundary__pos {
-  color: var(--amarelo);
-  font-weight: 700;
-}
 .col__end {
   max-width: 30rem;
   margin: 1rem auto 0;
@@ -486,30 +455,101 @@ strong {
 .col__end strong {
   color: var(--amarelo);
 }
+.col__end-link {
+  display: block;
+  margin-top: 1rem;
+  color: var(--amarelo);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-size: 0.95rem;
+}
 
-/* Below ~1080px there is not enough room beside a 564px column for a 15rem
-   tick, so center the ticks over the column instead of anchoring them outside. */
+/* ---- Metric-view columns (solid area + CSS ruler + bracket key; D6/D7) ---- */
+.wealth-column {
+  position: relative;
+  width: var(--col-w, 120px);
+  margin: 2rem auto;
+  border-radius: 2px;
+}
+/* Solid fill plus a zero-DOM ruler: a 2px mark every RULER_STEP (100px), hugging
+   the left edge like a physical ruler strip. */
+.wealth-column--metric {
+  background-color: var(--vermelho);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.45) 0 2px,
+    transparent 2px 100px
+  );
+  background-size: 14px 100px;
+  background-repeat: repeat-y;
+  background-position: left top;
+}
+/* Bracket key: labels what one ruler mark is worth. Sits beside the column top. */
+.ruler-key {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  margin-left: 12px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: none;
+  z-index: 4;
+}
+.ruler-key__bracket {
+  align-self: stretch;
+  width: 8px;
+  border-left: 2px solid var(--amarelo);
+  border-top: 2px solid var(--amarelo);
+  border-bottom: 2px solid var(--amarelo);
+  border-radius: 2px 0 0 2px;
+}
+.ruler-key__label {
+  font-size: 0.8rem;
+  line-height: 1.35;
+  width: max-content;
+  max-width: 14rem;
+}
+
+/* In-column milestone cards: absolutely-positioned wrappers whose height IS the
+   hold duration; the child card sticks and hands off to the next (D9). */
+.col-note {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  content-visibility: auto;
+}
+.col-note__card {
+  position: sticky;
+  top: 4.5rem;
+  z-index: 6;
+  width: min(20rem, 78vw);
+  margin-left: clamp(-6rem, -12vw, -1rem);
+  text-align: left;
+  font-size: 0.95rem;
+}
+.col-note__card strong {
+  color: var(--amarelo);
+}
+
+/* Below ~1080px there is no room beside a 564px column for the bracket label, so
+   drop the bracket and center the key chip over the column top instead. */
 @media (max-width: 1080px) {
-  .tick--left,
-  .tick--right {
-    left: 50%;
-    right: auto;
-    margin: 0;
-    transform: translateX(-50%);
-    text-align: center;
-    max-width: min(88vw, 15rem);
+  .ruler-key {
+    left: 0;
+    right: 0;
+    margin-left: 0;
+    height: auto;
+    top: 0.5rem;
+    justify-content: center;
   }
-}
-
-/* ---- Fair-comparison transition ---- */
-.transition h2 {
-  font-size: clamp(2rem, 6vw, 3.5rem);
-  margin-bottom: 1.5rem;
-}
-.transition .panel {
-  max-width: 38rem;
-  font-size: 1.15rem;
-  line-height: 1.7;
+  .ruler-key__bracket {
+    display: none;
+  }
+  .ruler-key__label {
+    max-width: min(86vw, 15rem);
+  }
 }
 
 /* ---- Footer ---- */
@@ -784,5 +824,12 @@ strong {
   }
   .hero {
     gap: 0.9rem;
+  }
+  .journey__card {
+    width: min(19rem, 88vw);
+    margin-left: 1rem;
+  }
+  .col-note__card {
+    margin-left: 0.5rem;
   }
 }

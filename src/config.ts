@@ -10,7 +10,22 @@ export const COLUMN_MIN_WIDTH = 120;
 export const COLUMN_USABLE_CAP = 720; // cap usable viewport width so columns stay tall
 export const COLUMN_SIDE_MARGIN = 48; // 24px on each side
 
-export const MILESTONE_STEP = 1200; // px between cumulative tick labels inside columns
-
 export const SPEED_BASE = 600; // pixels per second at 1x (D5); one working life per second on the desktop column
 export const SPEED_MULTIPLIERS = [0.5, 1, 2, 3] as const;
+
+export const BILLION_BRL = 1_000_000_000; // D1: definitional milestone, not sourced data
+export const RULER_STEP = 100; // px between ruler marks on the metric columns
+export const MAX_COLUMN_HEIGHT_PX = 16_000_000; // D10 guard (below Firefox's ~17.9M limit)
+
+// Hidden progressive speed ramps by BRL depth inside each column (D5b). Empty for
+// columns short enough that ramping never triggers (R$ 1 bi is ~1.100 px tall).
+export const RAMP_STEPS: Record<string, { atBRL: number; mult: number }[]> = {
+  bilhao: [],
+  richest: [{ atBRL: 100e9, mult: 2 }],
+  musk: [
+    { atBRL: 100e9, mult: 2 },
+    { atBRL: 500e9, mult: 4 },
+    { atBRL: 1_500e9, mult: 8 },
+    { atBRL: 3_000e9, mult: 16 },
+  ],
+};
