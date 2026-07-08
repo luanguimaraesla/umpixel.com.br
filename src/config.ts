@@ -12,6 +12,5 @@ export const COLUMN_SIDE_MARGIN = 48; // 24px on each side
 
 export const MILESTONE_STEP = 1200; // px between cumulative tick labels inside columns
 
-export const SPEED_MIN = 50; // autoscroll px/s
-export const SPEED_MAX = 6000;
-export const SPEED_DEFAULT = 600;
+export const SPEED_BASE = 600; // pixels per second at 1x (D5); one working life per second on the desktop column
+export const SPEED_MULTIPLIERS = [0.5, 1, 2, 3] as const;

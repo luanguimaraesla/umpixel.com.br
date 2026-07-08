@@ -12,18 +12,13 @@
   >
     ▶
   </button>
-  <label class="controls__speed">
-    <span>velocidade</span>
-    <input
-      id="speed"
-      type="range"
-      min="0"
-      max="100"
-      value="52"
-      aria-label="velocidade da rolagem automática"
-      disabled
-    />
-  </label>
+  <div class="controls__speeds" role="group" aria-label="Velocidade da rolagem">
+    <button type="button" class="controls__mult" data-mult="0.5" disabled>0,5×</button>
+    <button type="button" class="controls__mult" data-mult="1" aria-pressed="true" disabled>1×</button>
+    <button type="button" class="controls__mult" data-mult="2" disabled>2×</button>
+    <button type="button" class="controls__mult" data-mult="3" disabled>3×</button>
+  </div>
   <span class="controls__readout" data-speed-readout aria-hidden="true"></span>
   <span class="controls__pos" data-pos-readout aria-hidden="true"></span>
 </div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>

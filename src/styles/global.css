@@ -233,26 +233,48 @@ strong {
   outline-offset: 2px;
   border-radius: 4px;
 }
-.badge {
-  align-self: flex-start;
+/* Segmented salary control: default (salário mínimo) vs a custom value. */
+.seg {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid var(--overlay-border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+}
+.seg__opt {
+  flex: 1;
+  cursor: pointer;
+}
+.seg__opt input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.seg__opt > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  text-align: center;
+  white-space: nowrap;
+}
+.seg__opt input:checked + span {
   background: var(--amarelo);
   color: var(--preto);
-  font-size: 0.75rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 0.2rem 0.55rem;
-  border-radius: 999px;
 }
-.badge[hidden] {
+.seg__opt input:focus-visible + span {
+  outline: 2px solid var(--amarelo);
+  outline-offset: 2px;
+}
+.field--custom-salary[hidden] {
   display: none;
-}
-.calc__out {
-  margin-top: 0.5rem;
-  font-size: 1.05rem;
-}
-.calc__out strong {
-  color: var(--amarelo);
 }
 .hero__start {
   align-self: center;
@@ -283,7 +305,7 @@ strong {
 .field input:disabled,
 .hero__start:disabled,
 .controls__play:disabled,
-.controls__speed input:disabled {
+.controls__mult:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
@@ -608,6 +630,22 @@ strong {
   margin-top: 2rem;
 }
 
+/* ---- Top progress bar (custom, mobile-visible; D8) ---- */
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  z-index: 30;
+}
+.progress__fill {
+  height: 100%;
+  width: 0%;
+  background: var(--amarelo);
+}
+
 /* ---- Controls bar ---- */
 .controls {
   position: fixed;
@@ -641,16 +679,33 @@ strong {
   display: grid;
   place-items: center;
 }
-.controls__speed {
+.controls__speeds {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.8rem;
+  gap: 0.25rem;
 }
-.controls__speed input[type='range'] {
-  accent-color: var(--amarelo);
-  width: 8rem;
-  max-width: 30vw;
+.controls__mult {
+  min-width: 2.6rem;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--overlay-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--branco);
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.controls__mult:hover {
+  background: rgba(251, 178, 22, 0.12);
+}
+.controls__mult[aria-pressed='true'] {
+  background: var(--amarelo);
+  color: var(--preto);
+  font-weight: 700;
+  border-color: var(--amarelo);
+}
+.controls__mult:focus-visible {
+  outline: 2px solid var(--amarelo);
+  outline-offset: 2px;
 }
 .controls__readout {
   font-size: 0.8rem;
@@ -681,8 +736,33 @@ strong {
   .controls__pos {
     display: none;
   }
-  .controls__speed input[type='range'] {
-    width: 5rem;
+}
+
+/* ---- Speed-ramp toast (fired by the in-column ramps in step 7; D5b) ---- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 21;
+  max-width: calc(100vw - 2rem);
+  background: var(--overlay);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--overlay-border);
+  border-top: 2px solid var(--amarelo);
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  color: var(--branco);
+  text-align: center;
+}
+.toast[hidden] {
+  display: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .toast {
+    transition: opacity 0.3s ease;
   }
 }
 

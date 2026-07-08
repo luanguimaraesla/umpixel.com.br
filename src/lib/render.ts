@@ -1,9 +1,7 @@
 import {
   MONTHS_PER_YEAR,
   MILESTONE_STEP,
-  SPEED_MIN,
-  SPEED_MAX,
-  SPEED_DEFAULT,
+  SPEED_BASE,
 } from '../config';
 import {
   monthsOf,
@@ -19,7 +17,6 @@ import {
   fmtLives,
   fmtCountShort,
   parseBRL,
-  calcDuration,
 } from './scale';
 import { initSalary, getSalary, setSalary, subscribe } from './state';
 import { createAutoscroll } from './autoscroll';
@@ -104,7 +101,8 @@ interface ColumnGeometry {
 let data!: PageData;
 let fx = 0;
 let colW = 120;
-let calcValue = NaN;
+let userMult = 1;
+let toastTimer = 0;
 let scrollTicking = false;
 let autoscroll: Autoscroll;
 let geometry: ColumnGeometry[] = [];
@@ -112,13 +110,16 @@ let top5Segments: { name: string; topLocal: number; height: number }[] = [];
 
 // --- Element references (assigned in boot) ---
 let salaryInput!: HTMLInputElement;
-let salaryBadge!: HTMLElement;
-let calcInput!: HTMLInputElement;
+let modeMin!: HTMLInputElement;
+let modeCustom!: HTMLInputElement;
+let customSalaryField!: HTMLElement;
 let btnStart!: HTMLButtonElement;
 let btnPlay!: HTMLButtonElement;
-let speedInput!: HTMLInputElement;
+let multButtons!: HTMLButtonElement[];
 let speedReadout!: HTMLElement;
 let posReadout!: HTMLElement;
+let progressEl!: HTMLElement;
+let toastEl!: HTMLElement;
 let colRichest!: HTMLElement;
 let colTop5!: HTMLElement;
 let hudRichest!: HTMLElement;
@@ -197,15 +198,10 @@ function dataUrl(name: string): string {
   return `${import.meta.env.BASE_URL}data/${name}`;
 }
 
-// --- Autoscroll speed slider (logarithmic 50..6000 px/s) ---
-function sliderToSpeed(slider: number): number {
-  return SPEED_MIN * Math.pow(SPEED_MAX / SPEED_MIN, slider / 100);
-}
-function speedToSlider(speed: number): number {
-  return (100 * Math.log(speed / SPEED_MIN)) / Math.log(SPEED_MAX / SPEED_MIN);
-}
+// --- Autoscroll speed (base pixels per second scaled by the chosen multiplier; D5) ---
+// The progressive ramps (D5b) multiply this in step 7; today it is base × user.
 function currentSpeed(): number {
-  return sliderToSpeed(Number(speedInput.value));
+  return SPEED_BASE * userMult;
 }
 
 // --- Column building ---
@@ -308,7 +304,6 @@ function applyDynamic(): void {
     'top5-years': fmtYears(yearsOf(top5BRL, salary)),
     'top5-lives-2': fmtLives(livesOf(top5BRL, salary, data.realGrowth)),
     'top5-area': fmtCountShort(monthsOf(top5BRL, salary)),
-    'calc-time': isFinite(calcValue) ? calcDuration(calcValue, salary) : '—',
     // data-derived (independent of the visitor's salary)
     'richest-name': data.richest.nome,
     'richest-usd': usdLong(data.richest.usd),
@@ -332,10 +327,6 @@ function applyDynamic(): void {
     const text = values[key];
     if (text !== undefined) el.textContent = text;
   });
-}
-
-function updateBadge(): void {
-  salaryBadge.hidden = Math.abs(getSalary() - data.minWage) > 0.005;
 }
 
 // --- Scroll-driven UI (HUD + readouts) ---
@@ -402,14 +393,28 @@ function updateScrollUI(): void {
     posReadout.textContent = `${fmtBRLCompact(value)} · ${fmtLives(lives)}`;
   }
 
-  const speed = currentSpeed();
   if (active) {
-    const yearsPerSecond = Math.round((speed * colW) / MONTHS_PER_YEAR);
+    const yearsPerSecond = Math.round((currentSpeed() * colW) / MONTHS_PER_YEAR);
     speedReadout.textContent = `≈ ${fmtInt(yearsPerSecond)} anos de trabalho por segundo`;
   } else {
-    speedReadout.textContent = `${Math.round(speed)} px/s`;
+    speedReadout.textContent = '';
     posReadout.textContent = '';
   }
+
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+  progressEl.style.width = `${pct}%`;
+}
+
+// Ephemeral status toast (fired by step 7's speed ramps). Restarts its own
+// auto-hide timer on every call so rapid announcements do not stack.
+function showToast(msg: string): void {
+  toastEl.textContent = msg;
+  toastEl.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = window.setTimeout(() => {
+    toastEl.hidden = true;
+  }, 4000);
 }
 
 // --- Full recompute (load / salary change / resize) ---
@@ -425,7 +430,6 @@ function recompute(): void {
   buildTop5Column(colTop5, salary, colW);
 
   applyDynamic();
-  updateBadge();
 
   const newMax = docEl.scrollHeight - window.innerHeight;
   const target = ratio * newMax;
@@ -454,14 +458,27 @@ function wireSalaryInput(): void {
   });
 }
 
-function wireCalculator(): void {
-  calcInput.addEventListener('input', () => {
-    const parsed = parseBRL(calcInput.value);
-    calcValue = isFinite(parsed) && parsed > 0 ? parsed : NaN;
-    const el = document.querySelector('[data-dyn="calc-time"]');
-    if (el) {
-      el.textContent = isFinite(calcValue) ? calcDuration(calcValue, getSalary()) : '—';
-    }
+function wireSalaryMode(): void {
+  // Restore the mode implied by the persisted salary: a value that differs from
+  // the minimum wage means the visitor previously typed a custom salary.
+  if (Math.abs(getSalary() - data.minWage) > 0.005) {
+    modeCustom.checked = true;
+    customSalaryField.hidden = false;
+    salaryInput.value = decimalFmt.format(getSalary());
+  } else {
+    modeMin.checked = true;
+    customSalaryField.hidden = true;
+  }
+
+  modeMin.addEventListener('change', () => {
+    if (!modeMin.checked) return;
+    customSalaryField.hidden = true;
+    setSalary(data.minWage);
+  });
+  modeCustom.addEventListener('change', () => {
+    if (!modeCustom.checked) return;
+    customSalaryField.hidden = false;
+    salaryInput.focus();
   });
 }
 
@@ -495,14 +512,24 @@ function validateData(
 // The controls ship disabled so they cannot be used (or clobbered) before the
 // data resolves; this enables them once the page is fully mounted.
 function enableControls(): void {
-  for (const el of [salaryInput, calcInput, btnStart, btnPlay, speedInput]) {
+  for (const el of [salaryInput, modeMin, modeCustom, btnStart, btnPlay]) {
     el.disabled = false;
   }
+  for (const btn of multButtons) btn.disabled = false;
 }
 
 function wireControls(): void {
-  speedInput.value = String(Math.round(speedToSlider(SPEED_DEFAULT)));
-  speedInput.addEventListener('input', () => updateScrollUI());
+  for (const btn of multButtons) {
+    btn.addEventListener('click', () => {
+      const mult = Number(btn.dataset.mult);
+      if (!isFinite(mult) || mult <= 0) return;
+      userMult = mult;
+      for (const other of multButtons) {
+        other.setAttribute('aria-pressed', String(other === btn));
+      }
+      updateScrollUI();
+    });
+  }
   btnPlay.addEventListener('click', () => autoscroll.toggle());
 }
 
@@ -538,13 +565,16 @@ export function wireScaleInfo(): void {
 
 export async function boot(): Promise<void> {
   salaryInput = must<HTMLInputElement>('#salario-input');
-  salaryBadge = must<HTMLElement>('#salario-badge');
-  calcInput = must<HTMLInputElement>('#calc-input');
+  modeMin = must<HTMLInputElement>('#mode-min');
+  modeCustom = must<HTMLInputElement>('#mode-custom');
+  customSalaryField = must<HTMLElement>('#custom-salary-field');
   btnStart = must<HTMLButtonElement>('#btn-start');
   btnPlay = must<HTMLButtonElement>('#btn-play');
-  speedInput = must<HTMLInputElement>('#speed');
+  multButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.controls__mult'));
   speedReadout = must<HTMLElement>('[data-speed-readout]');
   posReadout = must<HTMLElement>('[data-pos-readout]');
+  progressEl = must<HTMLElement>('[data-progress]');
+  toastEl = must<HTMLElement>('#toast');
   colRichest = must<HTMLElement>('[data-column="richest"]');
   colTop5 = must<HTMLElement>('[data-column="top5"]');
   hudRichest = must<HTMLElement>('[data-hud="richest"]');
@@ -595,7 +625,7 @@ export async function boot(): Promise<void> {
     autoscroll = createAutoscroll({ getSpeed: currentSpeed, onStateChange: updateControlsState });
 
     wireSalaryInput();
-    wireCalculator();
+    wireSalaryMode();
     wireControls();
     wireStart();
 
