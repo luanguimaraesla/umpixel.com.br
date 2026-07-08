@@ -1,0 +1,14 @@
+---
+// Floating position readout (D-V2-8). Sits fixed on the left at the mid-viewport
+// line that updateScrollUI measures (scrollY + innerHeight/2), with a stretchy
+// brush shaft and a fixed brush head whose tip touches the active column's left
+// edge. render.ts drives its width, accent, label text and visibility; it is
+// aria-hidden because the same numbers are announced elsewhere.
+import HandArrow from './HandArrow.astro';
+---
+
+<div class="pos-indicator" data-pos-indicator aria-hidden="true">
+  <span class="pos-indicator__label" data-pos-readout></span>
+  <HandArrow variant="shaft" class="pos-indicator__shaft" />
+  <HandArrow variant="head" class="pos-indicator__head" />
+</div>

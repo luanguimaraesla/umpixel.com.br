@@ -3,7 +3,6 @@ import {
   SPEED_BASE,
   BILLION_BRL,
   RULER_STEP,
-  MAX_COLUMN_HEIGHT_PX,
   RAMP_STEPS,
 } from '../config';
 import {
@@ -13,12 +12,14 @@ import {
   lifeSavings,
   brlOf,
   columnWidth,
+  metricColumnWidth,
   fmtBRL,
   fmtBRLCompact,
   fmtInt,
   fmtYears,
   fmtLives,
   fmtCountShort,
+  fmtDuration,
   parseBRL,
 } from './scale';
 import { initSalary, getSalary, setSalary, subscribe } from './state';
@@ -48,6 +49,7 @@ interface RawPerson {
   nome: string;
   patrimonio_usd_bilhoes: number;
   fonte_riqueza: string;
+  fonte_riqueza_desde?: number;
 }
 interface RawBilionarios {
   top5: RawPerson[];
@@ -78,6 +80,28 @@ interface RawMundo {
   fontes: Source[];
   acessado_em: string;
 }
+// Public-scale references for the mid-column phrases (D-V2-11). Optional: fetched
+// like crescimento-real-salario, and anything that depends on it is skipped when
+// it fails to load.
+interface RawPais {
+  id: string;
+  nome: string;
+  preposicao: string;
+  pib_usd_bilhoes: number;
+  ano_referencia: number;
+}
+interface RawCusto {
+  id: string;
+  nome: string;
+  valor_brl?: number;
+  componentes?: { valor_aluno_ano_brl: number; matriculas: number };
+}
+interface RawComparacoes {
+  paises: RawPais[];
+  custos: RawCusto[];
+  fontes: Source[];
+  acessado_em: string;
+}
 
 // --- Normalized model the UI renders from ---
 interface Person {
@@ -85,6 +109,22 @@ interface Person {
   nome: string;
   usd: number;
   fonte: string;
+  since?: number; // year the fortune's source began (for the time-rate phrase)
+}
+interface Country {
+  id: string;
+  nome: string;
+  prep: string; // "de" / "do" / "da" for the GDP phrase
+  usd: number;
+}
+interface Comparacoes {
+  countries: Country[];
+  hospitalBRL: number;
+  crecheBRL: number;
+  eduAlunoAno: number;
+  eduMatriculas: number;
+  analfabetismoBRL: number;
+  casaMediaBRL: number;
 }
 interface PageData {
   minWage: number;
@@ -96,17 +136,21 @@ interface PageData {
   people: Person[];
   totalUsd: number;
   forbesRefDate: string;
+  nowYear: number;
   realGrowth: number;
   family: number;
   familyRange: { min: number; max: number };
   musk: Person;
   muskRefDate: string;
+  comparacoes: Comparacoes | null;
 }
 
-// A sticky beat that holds inside a column at a given BRL depth (D9).
+// A sticky beat that holds inside a column at a given BRL depth (D9). Informational
+// beats keep the plaque look; 'phrase' cards are shouted display type (D-V2-9).
 interface ColMilestone {
   atBRL: number;
   html: string;
+  kind?: 'beat' | 'phrase';
 }
 // One metric-view column: a solid pixel area plus its in-column milestones.
 interface ColumnDef {
@@ -136,6 +180,13 @@ let scrollTicking = false;
 let autoscroll: Autoscroll;
 let columns: ColumnDef[] = [];
 let geometry: ColumnGeometry[] = [];
+// Floating position indicator: recompute its width/accent only when the active
+// column (or its rendered width, on resize/salary rebuild) actually changes.
+let lastActiveId: string | null = null;
+let lastPosWidth = '';
+
+// A calendar year in seconds (365,25 days), for the time-rate phrase.
+const SECONDS_PER_YEAR = 365.25 * 24 * 3600;
 
 // --- Element references (assigned in boot) ---
 let salaryInput!: HTMLInputElement;
@@ -149,6 +200,8 @@ let speedReadout!: HTMLElement;
 let progressEl!: HTMLElement;
 let toastEl!: HTMLElement;
 let controlsEl!: HTMLElement;
+let posIndicator!: HTMLElement;
+let posReadout!: HTMLElement;
 let colStartEl!: HTMLElement;
 let colStartTop = 0;
 let familyBlock!: HTMLElement;
@@ -204,6 +257,37 @@ function usdLong(v: number): string {
   return `US$ ${usdFmt.format(v)} bilhões`;
 }
 
+// Normalize the optional comparacoes file, or return null so the phrases that
+// depend on it are simply skipped. If any piece a phrase needs is missing, drop
+// the whole set rather than render a broken number.
+function toComparacoes(raw: RawComparacoes | null): Comparacoes | null {
+  if (!raw || !Array.isArray(raw.paises) || !Array.isArray(raw.custos)) return null;
+  const custo = (id: string): RawCusto | undefined => raw.custos.find((x) => x.id === id);
+  const hospital = custo('hospital-publico-grande');
+  const creche = custo('escola-publica-fnde');
+  const educar = custo('educar-todos-alunos-um-ano');
+  const analf = custo('erradicar-analfabetismo');
+  const casa = custo('casa-media-brasil');
+  const ok = (v: unknown): v is number => typeof v === 'number' && v > 0;
+  if (!ok(hospital?.valor_brl) || !ok(creche?.valor_brl) || !ok(analf?.valor_brl) || !ok(casa?.valor_brl)) {
+    return null;
+  }
+  if (!ok(educar?.componentes?.valor_aluno_ano_brl) || !ok(educar?.componentes?.matriculas)) {
+    return null;
+  }
+  return {
+    countries: raw.paises
+      .filter((p) => ok(p.pib_usd_bilhoes))
+      .map((p) => ({ id: p.id, nome: p.nome, prep: p.preposicao, usd: p.pib_usd_bilhoes })),
+    hospitalBRL: hospital!.valor_brl!,
+    crecheBRL: creche!.valor_brl!,
+    eduAlunoAno: educar!.componentes!.valor_aluno_ano_brl,
+    eduMatriculas: educar!.componentes!.matriculas,
+    analfabetismoBRL: analf!.valor_brl!,
+    casaMediaBRL: casa!.valor_brl!,
+  };
+}
+
 async function fetchJson<T>(url: string): Promise<T> {
   const res = await fetch(url, { cache: 'no-cache' });
   if (!res.ok) throw new Error(`Failed to load ${url}: ${res.status}`);
@@ -246,12 +330,10 @@ const INTRO_STEP_GAP = 900;
 // --- Column building (metric view: solid area + CSS ruler + sticky beats; D6/D7/D9) ---
 function buildWealthColumn(def: ColumnDef, salary: number, baseWidth: number): void {
   const months = monthsOf(def.valueBRL, salary);
-  // D10: widen the column (kept a multiple of 12) if it would otherwise be taller
-  // than the browser's element-height limit.
-  let w = baseWidth;
-  if (months / w > MAX_COLUMN_HEIGHT_PX) {
-    w = Math.ceil(months / MAX_COLUMN_HEIGHT_PX / MONTHS_PER_YEAR) * MONTHS_PER_YEAR;
-  }
+  // D10: the column is widened (kept a multiple of 12) when it would otherwise be
+  // taller than the browser's element-height limit; metricColumnWidth owns that
+  // rule so depth math elsewhere (e.g. the ruler-step phrase) can reuse it.
+  const w = metricColumnWidth(def.valueBRL, salary, baseWidth);
   const height = Math.max(1, Math.ceil(months / w));
   def.el.style.setProperty('--col-w', `${w}px`);
   def.el.style.height = `${height}px`;
@@ -311,7 +393,10 @@ function buildWealthColumn(def: ColumnDef, salary: number, baseWidth: number): v
     wrapper.style.top = `${top}px`;
     wrapper.style.height = `${wrapperHeight}px`;
     const card = document.createElement('div');
-    card.className = 'col-note__card panel';
+    card.className =
+      m.kind === 'phrase'
+        ? 'col-note__card col-note__card--phrase panel'
+        : 'col-note__card panel';
     card.innerHTML = m.html; // authored here only; never user input
     wrapper.appendChild(card);
     wrappers.push(wrapper);
@@ -320,47 +405,125 @@ function buildWealthColumn(def: ColumnDef, salary: number, baseWidth: number): v
   def.el.replaceChildren(rulerKey, ...introWrappers, ...wrappers);
 }
 
-// The three metric columns, with their in-column beats. Rebuilt on every salary
-// change so all depths track the current reference salary.
+// The three metric columns, with their in-column beats and phrases. Rebuilt on
+// every salary change so all depths and derived numbers track the reference
+// salary. Every number comes from live data (fortunes, PTAX, family patrimônio,
+// life savings, comparacoes); nothing is hardcoded in the copy. Milestones are
+// sorted by BRL depth at the end because buildWealthColumn derives each hold
+// length from the next milestone (D-V2-9).
 function buildColumnDefs(salary: number): ColumnDef[] {
   const richestBRL = brlOf(data.richest.usd, fx);
   const muskBRL = brlOf(data.musk.usd, fx);
   // Sum of the five richest Brazilians, reused as one narrative beat inside Musk (D3).
   const richBrazilSumBRL = brlOf(data.totalUsd, fx);
+  const c = data.comparacoes;
+  const country = (id: string): Country | undefined => c?.countries.find((x) => x.id === id);
 
-  return [
-    { id: 'bilhao', el: colBilhao, valueBRL: BILLION_BRL, milestones: [] },
+  // --- Richest column: half-fortune beat, illiteracy beat, Saverin time phrase ---
+  const richestMs: ColMilestone[] = [
     {
-      id: 'richest',
-      el: colRichest,
-      valueBRL: richestBRL,
-      milestones: [
-        {
-          atBRL: richestBRL / 2,
-          html:
-            `Metade da fortuna de ${data.richest.nome}. Você já rolou ` +
-            `${fmtYears(yearsOf(richestBRL / 2, salary))} de trabalho.`,
-        },
-      ],
-    },
-    {
-      id: 'musk',
-      el: colMusk,
-      valueBRL: muskBRL,
-      milestones: [
-        {
-          atBRL: richestBRL,
-          html:
-            `Você acabou de passar TODA a fortuna de ${data.richest.nome}, a pessoa mais rica ` +
-            'do Brasil. Continua.',
-        },
-        { atBRL: richBrazilSumBRL, html: 'Os 5 brasileiros mais ricos, somados, terminam aqui.' },
-        { atBRL: 1e12, html: 'R$ 1 trilhão. Um milhão de milhões.' },
-        { atBRL: muskBRL / 2, html: 'Metade. Respira.' },
-        { atBRL: 3e12, html: 'R$ 3 trilhões. Última acelerada.' },
-      ],
+      atBRL: richestBRL / 2,
+      html:
+        `Metade da fortuna de ${data.richest.nome}. Você já rolou ` +
+        `${fmtYears(yearsOf(richestBRL / 2, salary))} de trabalho.`,
     },
   ];
+  if (c) {
+    richestMs.push({
+      atBRL: c.analfabetismoBRL,
+      html:
+        'Erradicar o analfabetismo no Brasil custaria isto. Você acabou de rolar. ' +
+        '<span class="col-note__fine">estimativa · <a href="/referencias">/referencias</a></span>',
+    });
+  }
+  if (data.richest.since) {
+    // Rate = fortune ÷ seconds since the fortune's source began, using a fixed
+    // "now" of the data's reference year (nowYear) so the number is stable and
+    // citable. Time = how long the richest person would need, at that average
+    // rate, to match a whole visitor lifetime of savings.
+    const secondsSince = (data.nowYear - data.richest.since) * SECONDS_PER_YEAR;
+    const rateBRLPerSec = richestBRL / secondsSince;
+    const lifeSeconds = lifeSavings(salary, data.realGrowth) / rateBRLPerSec;
+    richestMs.push({
+      atBRL: 0.75 * richestBRL,
+      kind: 'phrase',
+      html:
+        `${data.richest.nome} precisaria de cerca de <strong>${fmtDuration(lifeSeconds)}</strong> ` +
+        'para juntar tudo o que você vai juntar na vida inteira.',
+    });
+  }
+
+  // --- Musk column: existing beats interleaved with public-scale phrases ---
+  const muskMs: ColMilestone[] = [
+    {
+      atBRL: richestBRL,
+      html:
+        `Você acabou de passar TODA a fortuna de ${data.richest.nome}, a pessoa mais rica ` +
+        'do Brasil. Continua.',
+    },
+    { atBRL: 4e11, kind: 'phrase', html: 'Continue firme, você não está nem perto.' },
+    { atBRL: richBrazilSumBRL, html: 'Os 5 brasileiros mais ricos, somados, terminam aqui.' },
+    { atBRL: 1e12, html: 'R$ 1 trilhão. Um milhão de milhões.' },
+    {
+      atBRL: 1.3e12,
+      kind: 'phrase',
+      html:
+        'Você se abaixaria para pegar 5 centavos do chão? Para o patrimônio de uma família ' +
+        `típica, é isso que 5 centavos valem. Para ${data.musk.nome}, a mesma proporção seria ` +
+        `<strong>${fmtBRLCompact((0.05 * muskBRL) / data.family)}</strong> no chão.`,
+    },
+    { atBRL: muskBRL / 2, kind: 'phrase', html: 'Estamos apenas na metade. Isso mesmo.' },
+    { atBRL: 2.6e12, kind: 'phrase', html: 'É isso mesmo, está cansado?' },
+    { atBRL: 3e12, html: 'R$ 3 trilhões. Última acelerada.' },
+  ];
+  if (c) {
+    // GDP ladder: each country's PIB in BRL lands inside the column, well spread
+    // (Honduras/Paraguai are skipped: too close to the richest-pass beat).
+    for (const id of ['bolivia', 'portugal', 'chile', 'argentina']) {
+      const co = country(id);
+      if (!co) continue;
+      muskMs.push({
+        atBRL: brlOf(co.usd, fx),
+        html: `Você acabou de passar o PIB ${co.prep} ${co.nome}. Tudo que o país produz num ano.`,
+      });
+    }
+    muskMs.push({
+      atBRL: c.eduAlunoAno * c.eduMatriculas,
+      html:
+        'Isto pagaria um ano de escola pública para todos os ' +
+        `<strong>${fmtCountShort(c.eduMatriculas)}</strong> de alunos do Brasil.`,
+    });
+    muskMs.push({
+      atBRL: 2.9e12,
+      kind: 'phrase',
+      html:
+        `O que você já rolou construiria <strong>${fmtInt(2.9e12 / c.hospitalBRL)}</strong> ` +
+        'hospitais públicos de grande porte.',
+    });
+    muskMs.push({
+      atBRL: 3.4e12,
+      kind: 'phrase',
+      html: `Só o que você rolou até aqui paga <strong>${fmtCountShort(3.4e12 / c.crecheBRL)}</strong> creches novas.`,
+    });
+    // Uses the column's REAL width (D10 may widen it) so one ruler step is priced
+    // at the same scale the ruler is actually drawn.
+    const muskW = metricColumnWidth(muskBRL, salary, colW);
+    muskMs.push({
+      atBRL: 3.8e12,
+      kind: 'phrase',
+      html:
+        'Cada traço da régua ao lado = ' +
+        `<strong>${fmtInt((RULER_STEP * muskW * salary) / c.casaMediaBRL)}</strong> casas médias no Brasil.`,
+    });
+  }
+
+  const defs: ColumnDef[] = [
+    { id: 'bilhao', el: colBilhao, valueBRL: BILLION_BRL, milestones: [] },
+    { id: 'richest', el: colRichest, valueBRL: richestBRL, milestones: richestMs },
+    { id: 'musk', el: colMusk, valueBRL: muskBRL, milestones: muskMs },
+  ];
+  for (const def of defs) def.milestones.sort((a, b) => a.atBRL - b.atBRL);
+  return defs;
 }
 
 // --- Dynamic text registry (data-driven + salary-driven, all keyed by data-dyn) ---
@@ -431,6 +594,14 @@ function cacheGeometry(): void {
   });
 }
 
+// The active column's fill color, read from its section's --col-fill so the
+// indicator label can adopt it without duplicating the palette (D-V2-8).
+function accentForColumn(id: string): string {
+  const def = columns.find((c) => c.id === id);
+  const section = def?.el.closest('[data-col-section]');
+  return section ? getComputedStyle(section).getPropertyValue('--col-fill').trim() : '';
+}
+
 function updateScrollUI(): void {
   const salary = getSalary();
   const mid = window.scrollY + window.innerHeight / 2;
@@ -451,8 +622,25 @@ function updateScrollUI(): void {
   if (active) {
     const depth = Math.min(Math.max(mid - active.top, 0), active.height);
     const value = depth * active.width * salary;
-    // The BRL/vidas position readout moved out of the bar; the floating position
-    // indicator (Worker G) replaces it, anchored to the mid-viewport line.
+
+    // Floating position indicator: the readout tracks the mid-viewport line every
+    // frame; the container width and accent change only when the active column (or
+    // its rendered width, on resize/rebuild) changes, so no per-frame layout write.
+    posReadout.textContent = `${fmtBRLCompact(value)} · ${fmtLives(livesOf(value, salary, data.realGrowth))}`;
+    if (active.id !== lastActiveId) {
+      posIndicator.dataset.activeCol = active.id;
+      posIndicator.style.setProperty('--pos-accent', accentForColumn(active.id));
+      lastActiveId = active.id;
+    }
+    // The columns are centered, so their left edge sits at 50vw - width/2; the
+    // indicator spans from the screen's left edge to there (+ a few px so the
+    // brush head's tip touches the fill).
+    const width = `${window.innerWidth / 2 - active.width / 2 + 6}px`;
+    if (width !== lastPosWidth) {
+      posIndicator.style.setProperty('--pos-width', width);
+      lastPosWidth = width;
+    }
+    posIndicator.classList.add('pos-indicator--on');
 
     const yearsPerSecond = Math.round((currentSpeed() * active.width) / MONTHS_PER_YEAR);
     speedReadout.textContent = `≈ ${fmtCountShort(yearsPerSecond)} anos de trabalho/s`;
@@ -471,6 +659,10 @@ function updateScrollUI(): void {
   } else {
     speedReadout.textContent = '';
     lastRamp = 1;
+    // No column under the mid-viewport line: fade the indicator out and force a
+    // fresh accent/width recompute when the next column becomes active.
+    posIndicator.classList.remove('pos-indicator--on');
+    lastActiveId = null;
   }
 
   const max = document.documentElement.scrollHeight - window.innerHeight;
@@ -655,6 +847,8 @@ export async function boot(): Promise<void> {
   progressEl = must<HTMLElement>('[data-progress]');
   toastEl = must<HTMLElement>('#toast');
   controlsEl = must<HTMLElement>('.controls');
+  posIndicator = must<HTMLElement>('[data-pos-indicator]');
+  posReadout = must<HTMLElement>('[data-pos-readout]');
   colStartEl = must<HTMLElement>('#col-start');
   familyBlock = must<HTMLElement>('[data-family-block]');
   colBilhao = must<HTMLElement>('[data-column="bilhao"]');
@@ -673,8 +867,14 @@ export async function boot(): Promise<void> {
       fetchJson<RawMundo>(dataUrl('bilionarios-mundo.json')),
     ]);
     validateData(salario, cambio, bilionarios, patrimonio, mundo);
+    // Optional data: real wage growth refines the "vidas" comparison, and the
+    // public-scale comparisons feed the mid-column phrases. Both are fetched with
+    // a .catch so a missing file degrades gracefully instead of breaking the page.
     const growth = await fetchJson<RawGrowth>(
       dataUrl('crescimento-real-salario.json'),
+    ).catch(() => null);
+    const comparacoesRaw = await fetchJson<RawComparacoes>(
+      dataUrl('comparacoes-publicas.json'),
     ).catch(() => null);
 
     const toPerson = (p: RawPerson): Person => ({
@@ -682,6 +882,7 @@ export async function boot(): Promise<void> {
       nome: p.nome,
       usd: p.patrimonio_usd_bilhoes,
       fonte: p.fonte_riqueza,
+      since: p.fonte_riqueza_desde,
     });
 
     data = {
@@ -694,6 +895,8 @@ export async function boot(): Promise<void> {
       people: bilionarios.top5.map(toPerson),
       totalUsd: bilionarios.total_top5_usd_bilhoes,
       forbesRefDate: bilionarios.data_referencia_valores,
+      // Fixed "now" for the time-rate phrase: the year the data was captured.
+      nowYear: Number((bilionarios.acessado_em || '').slice(0, 4)) || new Date().getFullYear(),
       realGrowth: growth && Number(growth.taxa_real_anual) > 0 ? growth.taxa_real_anual : 0,
       family: patrimonio.valor_brl,
       familyRange: patrimonio.faixa_brl,
@@ -704,6 +907,7 @@ export async function boot(): Promise<void> {
         fonte: mundo.pessoa_mais_rica.fonte_riqueza,
       },
       muskRefDate: mundo.data_referencia_valores,
+      comparacoes: toComparacoes(comparacoesRaw),
     };
     fx = data.fx;
 

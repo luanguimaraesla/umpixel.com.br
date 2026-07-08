@@ -618,6 +618,30 @@ strong {
 .col-note__card strong {
   color: var(--amarelo);
 }
+/* Phrase plaques: shouted display type, a stronger tilt, still on the same pinned
+   plaque as the informational beats so they read like wall-writing (D-V2-9). */
+.col-note__card--phrase {
+  width: min(22rem, 80vw);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.35rem;
+  line-height: 1.12;
+  letter-spacing: 0.01em;
+  border-left-width: 4px;
+  transform: rotate(-2.5deg);
+}
+/* Fine print for the estimate beats (e.g. eradicating illiteracy). */
+.col-note__fine {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.72rem;
+  opacity: 0.75;
+}
+.col-note__fine a {
+  color: var(--amarelo);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 
 /* On narrow viewports the column's side margin is too small to absorb the desktop
    overhang, so the plaque would spill past the left edge. Clamp it to a small
@@ -752,6 +776,86 @@ strong {
   height: 100%;
   width: 0%;
   background: var(--amarelo);
+}
+
+/* ---- Floating position indicator (D-V2-8) ---- */
+/* Fixed on the left at the exact mid-viewport line updateScrollUI measures. A
+   label chip, a stretchy brush shaft, and a fixed brush head whose tip lands on
+   the active column's left edge. render.ts sets --pos-width (screen edge to the
+   column edge) and --pos-accent (the column's fill). Below the controls bar,
+   above the column; aria-hidden and non-interactive (the numbers live elsewhere). */
+.pos-indicator {
+  position: fixed;
+  left: 0;
+  top: 50vh;
+  transform: translateY(-50%);
+  z-index: 15;
+  width: var(--pos-width, 0px);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-left: 1rem;
+  color: var(--amarelo);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s ease;
+}
+.pos-indicator--on {
+  opacity: 1;
+  visibility: visible;
+}
+.pos-indicator__label {
+  flex: none;
+  background: var(--overlay-forte);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--overlay-border);
+  border-left: 4px solid var(--pos-accent, var(--amarelo));
+  border-radius: 8px;
+  padding: 0.3rem 0.6rem;
+  color: var(--branco);
+  font-size: 0.85rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.pos-indicator__shaft {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 0.9rem;
+  display: block;
+}
+.pos-indicator__head {
+  flex: none;
+  height: 1.4rem;
+  width: auto;
+  display: block;
+}
+/* Phones: the centered column leaves almost no room on the left, so drop the
+   fixed width, hug the screen edge, and keep a minimal shaft. The chip overlaps
+   the column fill (readable on it) but stays clear of the plaque cards, which
+   stick near the top (top 4.5rem), well above this 50vh line. */
+@media (max-width: 640px) {
+  .pos-indicator {
+    width: auto;
+    max-width: calc(100vw - 1rem);
+    left: 0.5rem;
+    padding-left: 0;
+    gap: 0.3rem;
+  }
+  .pos-indicator__label {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.45rem;
+  }
+  .pos-indicator__shaft {
+    flex: 0 0 1.5rem;
+    min-width: 1.5rem;
+    height: 0.75rem;
+  }
+  .pos-indicator__head {
+    height: 1.1rem;
+  }
 }
 
 /* ---- Controls bar (fixed geometry so the readout never resizes it; D-V2-3/4) ---- */
