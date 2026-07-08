@@ -144,11 +144,13 @@ let modeCustom!: HTMLInputElement;
 let customSalaryField!: HTMLElement;
 let btnStart!: HTMLButtonElement;
 let btnPlay!: HTMLButtonElement;
-let multButtons!: HTMLButtonElement[];
+let speedSelect!: HTMLSelectElement;
 let speedReadout!: HTMLElement;
-let posReadout!: HTMLElement;
 let progressEl!: HTMLElement;
 let toastEl!: HTMLElement;
+let controlsEl!: HTMLElement;
+let colStartEl!: HTMLElement;
+let colStartTop = 0;
 let familyBlock!: HTMLElement;
 let colBilhao!: HTMLElement;
 let colRichest!: HTMLElement;
@@ -383,6 +385,9 @@ function applyDynamic(): void {
 // --- Scroll-driven UI (readouts + progress bar + hidden ramps) ---
 function cacheGeometry(): void {
   const scrollTop = window.scrollY;
+  // Where the fortunes begin: the controls bar stays idle until the viewport
+  // reaches this band, so the top of the page has no fixed chrome (D-V2-5).
+  colStartTop = colStartEl.getBoundingClientRect().top + scrollTop;
   geometry = columns.map((def) => {
     const rect = def.el.getBoundingClientRect();
     return {
@@ -398,6 +403,11 @@ function updateScrollUI(): void {
   const salary = getSalary();
   const mid = window.scrollY + window.innerHeight / 2;
 
+  // Reveal the controls once the viewport reaches the fortunes (one-way latch).
+  if (window.scrollY + window.innerHeight >= colStartTop) {
+    controlsEl.removeAttribute('data-idle');
+  }
+
   let active: ColumnGeometry | null = null;
   for (const col of geometry) {
     if (mid >= col.top && mid <= col.top + col.height) {
@@ -409,11 +419,11 @@ function updateScrollUI(): void {
   if (active) {
     const depth = Math.min(Math.max(mid - active.top, 0), active.height);
     const value = depth * active.width * salary;
-    const lives = livesOf(value, salary, data.realGrowth);
-    posReadout.textContent = `${fmtBRLCompact(value)} · ${fmtLives(lives)}`;
+    // The BRL/vidas position readout moved out of the bar; the floating position
+    // indicator (Worker G) replaces it, anchored to the mid-viewport line.
 
     const yearsPerSecond = Math.round((currentSpeed() * active.width) / MONTHS_PER_YEAR);
-    speedReadout.textContent = `≈ ${fmtInt(yearsPerSecond)} anos de trabalho por segundo`;
+    speedReadout.textContent = `≈ ${fmtCountShort(yearsPerSecond)} anos de trabalho/s`;
 
     // Announce each hidden speed ramp as its BRL depth is crossed while playing (D5b).
     const steps = RAMP_STEPS[active.id] || [];
@@ -427,7 +437,6 @@ function updateScrollUI(): void {
     }
     lastRamp = mult;
   } else {
-    posReadout.textContent = '';
     speedReadout.textContent = '';
     lastRamp = 1;
   }
@@ -557,24 +566,18 @@ function validateData(
 // The controls ship disabled so they cannot be used (or clobbered) before the
 // data resolves; this enables them once the page is fully mounted.
 function enableControls(): void {
-  for (const el of [salaryInput, modeMin, modeCustom, btnStart, btnPlay]) {
+  for (const el of [salaryInput, modeMin, modeCustom, btnStart, btnPlay, speedSelect]) {
     el.disabled = false;
   }
-  for (const btn of multButtons) btn.disabled = false;
 }
 
 function wireControls(): void {
-  for (const btn of multButtons) {
-    btn.addEventListener('click', () => {
-      const mult = Number(btn.dataset.mult);
-      if (!isFinite(mult) || mult <= 0) return;
-      userMult = mult;
-      for (const other of multButtons) {
-        other.setAttribute('aria-pressed', String(other === btn));
-      }
-      updateScrollUI();
-    });
-  }
+  speedSelect.addEventListener('change', () => {
+    const mult = Number(speedSelect.value);
+    if (!isFinite(mult) || mult <= 0) return;
+    userMult = mult;
+    updateScrollUI();
+  });
   btnPlay.addEventListener('click', () => autoscroll.toggle());
 }
 
@@ -615,11 +618,12 @@ export async function boot(): Promise<void> {
   customSalaryField = must<HTMLElement>('#custom-salary-field');
   btnStart = must<HTMLButtonElement>('#btn-start');
   btnPlay = must<HTMLButtonElement>('#btn-play');
-  multButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.controls__mult'));
+  speedSelect = must<HTMLSelectElement>('#speed-select');
   speedReadout = must<HTMLElement>('[data-speed-readout]');
-  posReadout = must<HTMLElement>('[data-pos-readout]');
   progressEl = must<HTMLElement>('[data-progress]');
   toastEl = must<HTMLElement>('#toast');
+  controlsEl = must<HTMLElement>('.controls');
+  colStartEl = must<HTMLElement>('#col-start');
   familyBlock = must<HTMLElement>('[data-family-block]');
   colBilhao = must<HTMLElement>('[data-column="bilhao"]');
   colRichest = must<HTMLElement>('[data-column="richest"]');
