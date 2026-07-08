@@ -1,0 +1,29 @@
+{
+  "rendimento_medio_mensal_brl": 3726,
+  "rendimento_medio_periodo": "trimestre móvel mar–mai/2026 (PNAD Contínua Mensal, IBGE, divulgada em 26/06/2026)",
+  "rendimento_medio_2025_brl": 3560,
+  "rendimento_domiciliar_per_capita_2025_brl": 2316,
+  "trabalhadores_ate_1_salario_minimo_pct": 35.3,
+  "trabalhadores_ate_1_sm_referencia": "Censo Demográfico 2022 (IBGE, divulgado em out/2025): 3,9% recebem até 1/4 do SM; 6,3% entre 1/4 e 1/2 SM; 24,2% entre 1/2 e 1 SM",
+  "ocde": {
+    "gini_renda_disponivel": 0.451,
+    "gini_renda_bruta": 0.479,
+    "gini_renda_mercado": 0.523,
+    "p90_p10": 8.43,
+    "p90_p50": 2.75,
+    "ano_referencia": 2022,
+    "fonte": "OECD Income Distribution Database",
+    "url": "https://www.oecd.org/en/data/datasets/income-and-wealth-distribution-database.html"
+  },
+  "gini_banco_mundial_2024": 50.3,
+  "fontes": [
+    {"nome": "IBGE — PNAD Contínua, trimestre encerrado em maio/2026", "url": "https://agenciadenoticias.ibge.gov.br/agencia-sala-de-imprensa/2013-agencia-de-noticias/releases/47316-taxa-de-desocupacao-e-de-5-6-e-taxa-de-subutilizacao-e-de-13-3-no-trimestre-encerrado-em-maio"},
+    {"nome": "IBGE — rendimento médio da população em 2025", "url": "https://agenciadenoticias.ibge.gov.br/agencia-noticias/2012-agencia-de-noticias/noticias/46579-rendimento-medio-da-populacao-brasileira-atinge-r-3-367-em-2025"},
+    {"nome": "Agência Gov — salário mínimo remunera 1/3 dos trabalhadores", "url": "https://agenciagov.ebc.com.br/noticias/202510/salario-minimo-renda-media-cidades-e-um-terco-trabalhadores"},
+    {"nome": "IPEA — Carta de Conjuntura, rendimentos do trabalho no 1º tri/2026", "url": "https://www.ipea.gov.br/cartadeconjuntura/index.php/2026/06/retrato-dos-rendimentos-do-trabalho-resultados-da-pnad-continua-do-primeiro-trimestre-de-2026/"},
+    {"nome": "OECD Data Explorer — Income Distribution Database", "url": "https://data-explorer.oecd.org/vis?df%5Bds%5D=DisseminateFinalDMZ&df%5Bid%5D=DSD_WISE_IDD%40DF_IDD&df%5Bag%5D=OECD.WISE.INE"},
+    {"nome": "OECD Economic Outlook Vol. 2026 Issue 1 — nota sobre o Brasil", "url": "https://www.oecd.org/en/publications/2026/06/oecd-economic-outlook-volume-2026-issue-1_8be0dba6/full-report/brazil_f971a312.html"},
+    {"nome": "Banco Mundial — índice de Gini do Brasil", "url": "https://data.worldbank.org/indicator/SI.POV.GINI?locations=BR"}
+  ],
+  "acessado_em": "2026-07-08"
+}

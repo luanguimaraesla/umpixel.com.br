@@ -1,0 +1,24 @@
+{
+  "lista": "Forbes World's Billionaires 2026 (lista anual)",
+  "data_publicacao": "2026-03-10",
+  "data_referencia_valores": "2026-03-01",
+  "top5": [
+    {"posicao": 1, "nome": "Eduardo Saverin", "patrimonio_usd_bilhoes": 35.9, "ranking_mundial": 59, "fonte_riqueza": "Facebook/Meta e venture capital (B Capital Group)", "perfil": "https://www.forbes.com/profile/eduardo-saverin/"},
+    {"posicao": 2, "nome": "André Esteves", "patrimonio_usd_bilhoes": 20.2, "ranking_mundial": 131, "fonte_riqueza": "Setor bancário (BTG Pactual)", "perfil": "https://www.forbes.com/profile/andre-esteves/"},
+    {"posicao": 3, "nome": "Jorge Paulo Lemann e família", "patrimonio_usd_bilhoes": 19.8, "ranking_mundial": null, "fonte_riqueza": "Cerveja (AB InBev) e private equity (3G Capital)", "perfil": "https://www.forbes.com/profile/jorge-paulo-lemann/"},
+    {"posicao": 4, "nome": "Fernando Roberto Moreira Salles", "patrimonio_usd_bilhoes": 9.9, "ranking_mundial": null, "fonte_riqueza": "Bancos (Itaú Unibanco) e mineração (CBMM, nióbio)", "perfil": "https://www.forbes.com/profile/fernando-roberto-moreira-salles/"},
+    {"posicao": 5, "nome": "Pedro Moreira Salles", "patrimonio_usd_bilhoes": 9.1, "ranking_mundial": null, "fonte_riqueza": "Bancos (Itaú Unibanco) e mineração (CBMM, nióbio)", "perfil": "https://www.forbes.com/profile/pedro-moreira-salles/"}
+  ],
+  "total_top5_usd_bilhoes": 94.9,
+  "observacoes": [
+    "Vicky Safra (US$ 27,1 bi na lista anual) não entra no ranking brasileiro: a Forbes a classifica como cidadã da Grécia.",
+    "A lista anual 2026 tem 70 brasileiros (recorde; eram 55 em 2025), com patrimônio conjunto de US$ 291,9 bi.",
+    "Em valores de tempo real (2026-07-08), André Esteves havia caído para ~US$ 11,0 bi com a queda das ações do BTG Pactual, invertendo as posições 2 e 3. O site usa a lista anual por ser estável e citável."
+  ],
+  "fontes": [
+    {"nome": "Forbes Real-Time Billionaires", "url": "https://www.forbes.com/real-time-billionaires/"},
+    {"nome": "B3 Bora Investir — lista da Forbes de 2026 tem 70 brasileiros", "url": "https://borainvestir.b3.com.br/noticias/lista-de-bilionarios-da-forbes-de-2026-tem-70-brasileiros-veja-ranking/"},
+    {"nome": "ISTOÉ Dinheiro — bilionários brasileiros na Forbes 2026", "url": "https://www.istoedinheiro.com.br/lista-de-bilionarios-da-forbes-2026-brasileiros-ranking"}
+  ],
+  "acessado_em": "2026-07-08"
+}

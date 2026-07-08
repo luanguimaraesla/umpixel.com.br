@@ -1,0 +1,11 @@
+{
+  "taxa_venda": 5.1458,
+  "taxa_compra": 5.1452,
+  "data_cotacao": "2026-07-07",
+  "tipo": "PTAX de fechamento, Banco Central do Brasil",
+  "serie_recente": {"2026-07-01": 5.195, "2026-07-02": 5.1945, "2026-07-03": 5.1717, "2026-07-06": 5.167, "2026-07-07": 5.1458},
+  "fontes": [
+    {"nome": "Banco Central do Brasil — API Olinda, série PTAX", "url": "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoDolarPeriodo(dataInicial=@dataInicial,dataFinalCotacao=@dataFinalCotacao)?@dataInicial='07-01-2026'&@dataFinalCotacao='07-08-2026'&$format=json"}
+  ],
+  "acessado_em": "2026-07-08"
+}

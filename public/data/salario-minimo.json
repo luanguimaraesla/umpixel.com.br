@@ -1,0 +1,15 @@
+{
+  "valor_brl": 1621.0,
+  "valor_diario_brl": 54.04,
+  "valor_horario_brl": 7.37,
+  "vigencia": "2026-01-01",
+  "instrumento_legal": "Decreto nº 12.797, de 23 de dezembro de 2025 (DOU 24/12/2025)",
+  "contexto": "Reajuste de 6,79% sobre os R$ 1.518 de 2025 (INPC de 4,18% até nov/2025 + crescimento do PIB de 2024 de 3,4%)",
+  "fontes": [
+    {"nome": "Planalto — decreto que reajusta o salário mínimo para R$ 1.621", "url": "https://www.gov.br/planalto/pt-br/acompanhe-o-planalto/noticias/2025/12/publicado-decreto-que-reajusta-salario-minimo-para-r-1-621-a-partir-de-1o-de-janeiro"},
+    {"nome": "Câmara dos Deputados — Decreto 12.797/2025", "url": "https://www2.camara.leg.br/legin/fed/decret/2025/decreto-12797-23-dezembro-2025-798569-norma-pe.html"},
+    {"nome": "Planalto — texto do Decreto 12.797/2025", "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2025/decreto/D12797.htm"},
+    {"nome": "Agência Brasil — Novo salário mínimo será de R$ 1.621 em 2026", "url": "https://agenciabrasil.ebc.com.br/economia/noticia/2025-12/novo-salario-minimo-sera-de-r-1621-em-2026"}
+  ],
+  "acessado_em": "2026-07-08"
+}

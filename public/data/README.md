@@ -1,0 +1,53 @@
+# Dados
+
+Esta pasta é a **fonte única de verdade** do site e fica em `public/data/`, então cada arquivo
+é servido em `https://umpixel.com.br/data/<arquivo>.json`. O site **não** embute esses números
+no HTML: o JavaScript busca (`fetch`) esses JSON em tempo de execução e monta as views
+dinamicamente. Para atualizar o site, basta um script de ingestão sobrescrever estes arquivos.
+
+Toda a pesquisa inicial foi feita em **08/07/2026**, sempre priorizando fontes oficiais. Cada
+arquivo guarda os links e a data de acesso.
+
+## Arquivos
+
+### `salario-minimo.json`
+Salário mínimo nacional de 2026: **R$ 1.621,00**, fixado pelo Decreto nº 12.797/2025 (Planalto),
+com vigência a partir de 1º de janeiro de 2026. É o valor padrão da calculadora do site.
+
+**Como atualizar:** um novo decreto é publicado todo mês de dezembro. Atualize `valor_brl`,
+`instrumento_legal`, `vigencia`, `contexto` e `acessado_em`.
+
+### `cambio-usd-brl.json`
+Cotação PTAX de fechamento do dólar (Banco Central do Brasil), usada para converter as fortunas
+em dólar para reais. Valor de referência: **R$ 5,1458** por US$ 1,00 em 07/07/2026.
+
+**Como atualizar:** consulte a PTAX mais recente na API Olinda do BCB (a URL está no arquivo) e
+atualize `taxa_venda`, `taxa_compra`, `data_cotacao` e `serie_recente`.
+
+### `bilionarios-brasil.json`
+Os cinco brasileiros mais ricos segundo a lista anual **Forbes World's Billionaires 2026**
+(divulgada em 10/03/2026, valores de 01/03/2026). Usamos a lista anual, e não a de tempo real,
+porque ela é estável e citável. As observações registram por que Vicky Safra não entra no
+ranking brasileiro e a variação de tempo real de André Esteves.
+
+**Como atualizar:** a lista anual da Forbes sai todo ano em março/abril. Substitua o `top5`, o
+`total_top5_usd_bilhoes` e as datas. O primeiro item de `top5` é tratado como a pessoa mais rica;
+mantenha a ordem por `posicao`.
+
+### `renda-brasil.json`
+Indicadores de renda e desigualdade do Brasil (IBGE PNAD Contínua e OCDE): rendimento médio,
+percentual de trabalhadores que ganham até um salário mínimo e coeficientes de Gini. Hoje só
+alimenta a lista de fontes do rodapé; está reservado para a fase futura dos "fatos
+intermediários".
+
+**Como atualizar:** a PNAD Contínua é trimestral (IBGE); a OECD Income Distribution Database é
+atualizada de forma irregular.
+
+## Contrato
+
+O front-end lê estes campos; mantenha os nomes ao atualizar:
+
+- `salario-minimo.json`: `valor_brl`, `vigencia`, `instrumento_legal`, `fontes[].{nome,url}`, `acessado_em`
+- `cambio-usd-brl.json`: `taxa_venda`, `data_cotacao`, `fontes[].{nome,url}`, `acessado_em`
+- `bilionarios-brasil.json`: `top5[].{posicao,nome,patrimonio_usd_bilhoes,fonte_riqueza}`, `total_top5_usd_bilhoes`, `data_referencia_valores`, `fontes[].{nome,url}`, `acessado_em`
+- `renda-brasil.json`: `fontes[].{nome,url}`, `acessado_em`
