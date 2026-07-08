@@ -21,14 +21,26 @@ export function yearsOf(valueBRL: number, salary: number): number {
   return monthsOf(valueBRL, salary) / MONTHS_PER_YEAR;
 }
 
-/** Whole working lives (47 years each) that a BRL amount represents. */
-export function livesOf(valueBRL: number, salary: number): number {
-  return yearsOf(valueBRL, salary) / YEARS_PER_LIFE;
+/**
+ * Patrimônio accumulated by saving 100% of the salary across a whole working
+ * life. With a real annual raise `realGrowth` (net of inflation) each year's
+ * salary rises, so the total in today's reais is a growing annuity; a rate of 0
+ * falls back to a flat salary. This is the ONLY figure that models real growth —
+ * the pixel scale (months, years, columns) stays anchored to today's salary.
+ */
+export function lifeSavings(salary: number, realGrowth = 0): number {
+  if (realGrowth <= 0) return salary * MONTHS_PER_LIFE;
+  const annual = salary * MONTHS_PER_YEAR;
+  return (annual * (Math.pow(1 + realGrowth, YEARS_PER_LIFE) - 1)) / realGrowth;
 }
 
-/** Patrimônio accumulated by saving 100% of the salary for a whole working life. */
-export function lifeSavings(salary: number): number {
-  return salary * MONTHS_PER_LIFE;
+/**
+ * How many whole working lives of accumulated patrimônio a BRL amount equals:
+ * the fortune divided by one full career of savings. Uses the same real growth
+ * as lifeSavings so the fortune/life comparison is fair.
+ */
+export function livesOf(valueBRL: number, salary: number, realGrowth = 0): number {
+  return valueBRL / lifeSavings(salary, realGrowth);
 }
 
 /** Convert a fortune given in USD billions to BRL, using the PTAX rate. */

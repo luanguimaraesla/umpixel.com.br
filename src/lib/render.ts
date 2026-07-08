@@ -1,6 +1,5 @@
 import {
   MONTHS_PER_YEAR,
-  MONTHS_PER_LIFE,
   MILESTONE_STEP,
   SPEED_MIN,
   SPEED_MAX,
@@ -62,6 +61,12 @@ interface RawRenda {
   acessado_em: string;
 }
 
+interface RawGrowth {
+  taxa_real_anual: number;
+  fontes: Source[];
+  acessado_em: string;
+}
+
 // --- Normalized model the UI renders from ---
 interface Person {
   posicao: number;
@@ -79,6 +84,7 @@ interface PageData {
   people: Person[];
   totalUsd: number;
   forbesRefDate: string;
+  realGrowth: number;
 }
 
 interface Segment {
@@ -131,6 +137,9 @@ const usdFmt = new Intl.NumberFormat('pt-BR', {
 const fxFmt = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 4,
   maximumFractionDigits: 4,
+});
+const pctFmt = new Intl.NumberFormat('pt-BR', {
+  maximumFractionDigits: 1,
 });
 
 const MONTHS_PT = [
@@ -207,7 +216,6 @@ function addTicks(frag: DocumentFragment, height: number, w: number, salary: num
     const months = y * w;
     const value = months * salary;
     const years = months / MONTHS_PER_YEAR;
-    const lives = months / MONTHS_PER_LIFE;
 
     const tick = document.createElement('div');
     tick.className = `tick ${i % 2 === 0 ? 'tick--right' : 'tick--left'}`;
@@ -217,9 +225,11 @@ function addTicks(frag: DocumentFragment, height: number, w: number, salary: num
     const valueEl = document.createElement('span');
     valueEl.className = 'tick__value';
     valueEl.textContent = fmtBRLCompact(value);
+    // Ticks show the flat time scale (today's salary); "vidas" is reserved for
+    // the fortune/patrimônio comparison, which uses real wage growth.
     tick.append(
       valueEl,
-      document.createTextNode(` · ${fmtYears(years)} de trabalho · ${fmtLives(lives)}`),
+      document.createTextNode(` · ${fmtYears(years)} de trabalho`),
     );
     frag.appendChild(tick);
     i++;
@@ -282,7 +292,7 @@ function applyDynamic(): void {
   const salary = getSalary();
   const richestBRL = brlOf(data.richest.usd, fx);
   const top5BRL = brlOf(data.totalUsd, fx);
-  const life = lifeSavings(salary);
+  const life = lifeSavings(salary, data.realGrowth);
   const yearsPerRow = colW / MONTHS_PER_YEAR;
   const forbesSource = `Forbes · lista anual, valores de ${monthYearPt(data.forbesRefDate)}`;
 
@@ -295,10 +305,9 @@ function applyDynamic(): void {
     'life-value-2': fmtBRL(life),
     'years-per-row': `${fmtInt(yearsPerRow)} ${Math.round(yearsPerRow) === 1 ? 'ano' : 'anos'}`,
     'richest-years': fmtYears(yearsOf(richestBRL, salary)),
-    'richest-lives': fmtLives(livesOf(richestBRL, salary)),
+    'richest-lives': fmtLives(livesOf(richestBRL, salary, data.realGrowth)),
     'top5-years': fmtYears(yearsOf(top5BRL, salary)),
-    'top5-lives': fmtLives(livesOf(top5BRL, salary)),
-    'top5-lives-2': fmtLives(livesOf(top5BRL, salary)),
+    'top5-lives-2': fmtLives(livesOf(top5BRL, salary, data.realGrowth)),
     'top5-area': fmtCountShort(monthsOf(top5BRL, salary)),
     'calc-time': isFinite(calcValue) ? calcDuration(calcValue, salary) : '—',
     // data-derived (independent of the visitor's salary)
@@ -315,15 +324,12 @@ function applyDynamic(): void {
     'min-wage': fmtBRL(data.minWage),
     'min-wage-law': data.minWageLaw,
     'min-wage-year': data.minWageYear,
+    'real-growth-pct': `${pctFmt.format(data.realGrowth * 100)}%`,
   };
 
   document.querySelectorAll<HTMLElement>('[data-dyn]').forEach((el) => {
     const key = el.dataset.dyn;
     if (!key) return;
-    if (key === 'life-under-million') {
-      el.hidden = life >= 1e6;
-      return;
-    }
     const text = values[key];
     if (text !== undefined) el.textContent = text;
   });
@@ -413,7 +419,7 @@ function updateScrollUI(): void {
     const depth = Math.min(Math.max(mid - col.top, 0), col.height);
     const months = depth * colW;
     const value = months * salary;
-    const lives = months / MONTHS_PER_LIFE;
+    const lives = livesOf(value, salary, data.realGrowth);
 
     let name = col.name;
     if (col.segments) {
@@ -584,6 +590,9 @@ export async function boot(): Promise<void> {
     ]);
     validateData(salario, cambio, bilionarios);
     const renda = await fetchJson<RawRenda>(dataUrl('renda-brasil.json')).catch(() => null);
+    const growth = await fetchJson<RawGrowth>(
+      dataUrl('crescimento-real-salario.json'),
+    ).catch(() => null);
 
     const toPerson = (p: RawPerson): Person => ({
       posicao: p.posicao,
@@ -602,6 +611,7 @@ export async function boot(): Promise<void> {
       people: bilionarios.top5.map(toPerson),
       totalUsd: bilionarios.total_top5_usd_bilhoes,
       forbesRefDate: bilionarios.data_referencia_valores,
+      realGrowth: growth && Number(growth.taxa_real_anual) > 0 ? growth.taxa_real_anual : 0,
     };
     fx = data.fx;
 
@@ -612,6 +622,7 @@ export async function boot(): Promise<void> {
     setHudName(hudTop5, data.people[0].nome);
     mountSources([
       { label: `Salário mínimo (${data.minWageYear})`, raw: salario },
+      { label: 'Valorização real do salário (teto do arcabouço fiscal)', raw: growth },
       { label: 'Câmbio do dólar (PTAX)', raw: cambio },
       { label: `Bilionários (Forbes ${data.forbesRefDate.slice(0, 4)})`, raw: bilionarios },
       { label: 'Renda e desigualdade (IBGE, OCDE)', raw: renda },

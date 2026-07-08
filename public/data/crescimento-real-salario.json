@@ -1,0 +1,15 @@
+{
+  "taxa_real_anual": 0.025,
+  "descricao": "Ganho real anual do salário mínimo, acima da inflação. Usado apenas para projetar o patrimônio acumulado numa vida inteira de trabalho (não afeta a escala de pixels, que segue o salário de hoje).",
+  "instrumento_legal": "Teto de 2,5% ao ano do arcabouço fiscal (LC 200/2023, alterada pela LC 211/2024), aplicado ao salário mínimo pela Lei 15.077/2024, que alterou a política de valorização da Lei 14.663/2023. O reajuste de 2026 (Decreto 12.797/2025) atingiu esse teto.",
+  "vigencia_ate": "2030",
+  "reajuste_2026": "6,79% nominal = INPC de 4,18% (reposição da inflação) composto com 2,5% de ganho real: 1,0418 × 1,025 = 1,0679.",
+  "referencia_historica": "Na média histórica (IBGE, PNAD Contínua 2012–2025), o rendimento médio real do trabalho cresceu cerca de 0,9% ao ano, com forte volatilidade. O teto de 2,5% do salário mínimo é bem acima dessa média — por isso é o cenário mais generoso possível para o trabalhador.",
+  "fontes": [
+    {"nome": "Planalto — Lei 14.663/2023 (política de valorização do salário mínimo)", "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/lei/l14663.htm"},
+    {"nome": "Planalto — LC 200/2023 (arcabouço fiscal, ganho real de 0,6% a 2,5%)", "url": "https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp200.htm"},
+    {"nome": "Câmara dos Deputados — limites do ganho real do salário mínimo (0,6% a 2,5%, até 2030)", "url": "https://www.camara.leg.br/noticias/1117057-projeto-de-lei-traz-novos-limites-aos-ganhos-do-salario-minimo-acima-da-inflacao/"},
+    {"nome": "IBGE — rendimento médio real de 2012 a 2025 (média de ~0,9% ao ano)", "url": "https://agenciadenoticias.ibge.gov.br/agencia-noticias/2012-agencia-de-noticias/noticias/46579-rendimento-medio-da-populacao-brasileira-atinge-r-3-367-em-2025"}
+  ],
+  "acessado_em": "2026-07-08"
+}

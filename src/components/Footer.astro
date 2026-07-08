@@ -29,9 +29,12 @@ const inspirations = [
       <span data-dyn="fx-date">…</span> (R$ <span data-dyn="fx-rate">…</span> por dólar). O
       salário mínimo de <span data-dyn="min-wage">…</span> segue o
       <span data-dyn="min-wage-law">…</span>. A escala é medida em pixels CSS, com 1 pixel = 1 mês
-      de salário. Uma vida de trabalho equivale a 47 anos (dos 18 aos 65). O "patrimônio de uma
-      vida" assume que você guardaria 100% do salário bruto, sem gastar nada — o que é impossível,
-      e é justamente esse o ponto.
+      de salário. Uma vida de trabalho equivale a 47 anos (dos 18 aos 65). O patrimônio de uma
+      vida projeta os reajustes reais do salário mínimo (ganho de
+      <span data-dyn="real-growth-pct">…</span> ao ano acima da inflação, teto da política de
+      valorização vigente até 2030) e assume que você guardaria 100% do salário bruto, sem gastar
+      nada — o que é impossível, e é justamente esse o ponto. A escala de pixels usa só o salário
+      de hoje.
     </p>
 
     <div class="footer__block">

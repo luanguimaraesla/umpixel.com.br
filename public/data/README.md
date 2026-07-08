@@ -43,6 +43,15 @@ intermediários".
 **Como atualizar:** a PNAD Contínua é trimestral (IBGE); a OECD Income Distribution Database é
 atualizada de forma irregular.
 
+### `crescimento-real-salario.json`
+Ganho real anual do salário mínimo (acima da inflação), usado **só** para projetar o patrimônio
+acumulado numa vida inteira de trabalho — não afeta a escala de pixels, que segue o salário de
+hoje. Padrão: **2,5% ao ano**, o teto da política de valorização vigente (arcabouço fiscal, até
+2030); o reajuste de 2026 atingiu esse teto.
+
+**Como atualizar:** revise `taxa_real_anual` se a regra do arcabouço fiscal mudar. Para um
+cenário mais conservador, use a média histórica do rendimento real do trabalho (~0,9% ao ano).
+
 ## Contrato
 
 O front-end lê estes campos; mantenha os nomes ao atualizar:
@@ -51,3 +60,4 @@ O front-end lê estes campos; mantenha os nomes ao atualizar:
 - `cambio-usd-brl.json`: `taxa_venda`, `data_cotacao`, `fontes[].{nome,url}`, `acessado_em`
 - `bilionarios-brasil.json`: `top5[].{posicao,nome,patrimonio_usd_bilhoes,fonte_riqueza}`, `total_top5_usd_bilhoes`, `data_referencia_valores`, `fontes[].{nome,url}`, `acessado_em`
 - `renda-brasil.json`: `fontes[].{nome,url}`, `acessado_em`
+- `crescimento-real-salario.json`: `taxa_real_anual`, `fontes[].{nome,url}`, `acessado_em`
