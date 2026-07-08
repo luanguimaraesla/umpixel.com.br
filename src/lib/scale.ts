@@ -25,7 +25,7 @@ export function yearsOf(valueBRL: number, salary: number): number {
  * Patrimônio accumulated by saving 100% of the salary across a whole working
  * life. With a real annual raise `realGrowth` (net of inflation) each year's
  * salary rises, so the total in today's reais is a growing annuity; a rate of 0
- * falls back to a flat salary. This is the ONLY figure that models real growth —
+ * falls back to a flat salary. This is the ONLY figure that models real growth;
  * the pixel scale (months, years, columns) stays anchored to today's salary.
  */
 export function lifeSavings(salary: number, realGrowth = 0): number {
@@ -92,6 +92,7 @@ export function fmtBRL(v: number): string {
  * Hand-written tiering (not Intl compact, which abbreviates to "bi"/"mi").
  */
 export function fmtBRLCompact(v: number): string {
+  if (v >= 1e12) return `R$ ${n1(v / 1e12)} ${n1(v / 1e12) === '1,0' ? 'trilhão' : 'trilhões'}`;
   if (v >= 1e9) return `R$ ${n1(v / 1e9)} ${n1(v / 1e9) === '1,0' ? 'bilhão' : 'bilhões'}`;
   if (v >= 1e6) return `R$ ${n1(v / 1e6)} ${n1(v / 1e6) === '1,0' ? 'milhão' : 'milhões'}`;
   if (v >= 1e3) return `R$ ${n1(v / 1e3)} mil`;
