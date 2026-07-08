@@ -12,7 +12,7 @@
     "check": "astro check"
   },
   "dependencies": {
-    "@fontsource/archivo-black": "^5.0.0",
+    "@fontsource-variable/shantell-sans": "^5.2.7",
     "astro": "^5.0.0"
   },
   "devDependencies": {
