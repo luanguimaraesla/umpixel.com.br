@@ -19,13 +19,16 @@ export const MAX_COLUMN_HEIGHT_PX = 16_000_000; // D10 guard (below Firefox's ~1
 
 // Hidden progressive speed ramps by BRL depth inside each column (D5b). Empty for
 // columns short enough that ramping never triggers (R$ 1 bi is ~1.100 px tall).
+// Retuned for the 8× top speed (D-V4-12): the deepest step is 6, so the maximum
+// effective speed 8 × 6 ≈ 48× matches the old 3 × 16 ceiling the deep musk cards
+// were sized for, keeping every card ≥ ~4s readable at 8×.
 export const RAMP_STEPS: Record<string, { atBRL: number; mult: number }[]> = {
   bilhao: [],
   richest: [{ atBRL: 100e9, mult: 2 }],
   musk: [
     { atBRL: 100e9, mult: 2 },
-    { atBRL: 500e9, mult: 4 },
-    { atBRL: 1_500e9, mult: 8 },
-    { atBRL: 3_000e9, mult: 16 },
+    { atBRL: 500e9, mult: 3 },
+    { atBRL: 1_500e9, mult: 4 },
+    { atBRL: 3_000e9, mult: 6 },
   ],
 };

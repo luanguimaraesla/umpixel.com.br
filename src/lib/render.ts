@@ -153,6 +153,9 @@ interface ColMilestone {
   atBRL: number;
   html: string;
   kind?: 'beat' | 'phrase';
+  // Big amount headline shown above the body when the beat's point is reaching a
+  // specific value (D-V4-5). Authored here from live data, never user input.
+  heading?: string;
 }
 // One metric-view column: a solid pixel area plus its in-column milestones.
 interface ColumnDef {
@@ -345,17 +348,6 @@ function buildWealthColumn(def: ColumnDef, salary: number, baseWidth: number): v
   def.el.style.setProperty('--col-w', `${w}px`);
   def.el.style.height = `${height}px`;
 
-  // Ruler key chip: what one ruler mark is worth, in money and in work-time.
-  const rulerKey = document.createElement('div');
-  rulerKey.className = 'ruler-key';
-  rulerKey.setAttribute('aria-hidden', 'true'); // decorative scale annotation
-  const keyLabel = document.createElement('span');
-  keyLabel.className = 'ruler-key__label panel';
-  keyLabel.textContent =
-    `cada traço = ${fmtBRLCompact(RULER_STEP * w * salary)}` +
-    ` · ${fmtYears((RULER_STEP * w) / MONTHS_PER_YEAR)} de trabalho`;
-  rulerKey.append(keyLabel);
-
   const px = (v: number): number => Math.round(monthsOf(v, salary) / w);
 
   // Intro cards from the column's <template data-col-intro>. The intro run spans
@@ -406,12 +398,16 @@ function buildWealthColumn(def: ColumnDef, salary: number, baseWidth: number): v
       m.kind === 'phrase'
         ? 'col-note__card col-note__card--phrase panel'
         : 'col-note__card panel';
-    card.innerHTML = m.html; // authored here only; never user input
+    // Amount beats lead with a big money headline above the body; both strings are
+    // authored here from live data, never user input (D-V4-5).
+    card.innerHTML = m.heading
+      ? `<span class="col-note__amount">${m.heading}</span>${m.html}`
+      : m.html;
     wrapper.appendChild(card);
     wrappers.push(wrapper);
   });
 
-  def.el.replaceChildren(rulerKey, ...introWrappers, ...wrappers);
+  def.el.replaceChildren(...introWrappers, ...wrappers);
 }
 
 // The three metric columns, with their in-column beats and phrases. Rebuilt on
@@ -428,18 +424,35 @@ function buildColumnDefs(salary: number): ColumnDef[] {
   const c = data.comparacoes;
   const country = (id: string): Country | undefined => c?.countries.find((x) => x.id === id);
 
+  // Scale-annotation card: what one ruler mark is worth, in money and work-time, at
+  // the column's real width (D10 may widen it). Shown once early in the tall columns
+  // as a regular sticky card so it hands off instead of floating over the intro
+  // (D-V4-2); omitted in the short bilhao column, where the 800px hold guard cannot
+  // fit both the intro and this card.
+  const rulerNote = (valueBRL: number): string => {
+    const w = metricColumnWidth(valueBRL, salary, colW);
+    return (
+      `cada traço = ${fmtBRLCompact(RULER_STEP * w * salary)}` +
+      ` · ${fmtYears((RULER_STEP * w) / MONTHS_PER_YEAR)} de trabalho`
+    );
+  };
+  const RULER_CARD_BRL = 50e9;
+
   // --- Richest column: half-fortune beat, illiteracy beat, Saverin time phrase ---
   const richestMs: ColMilestone[] = [
     {
       atBRL: richestBRL / 2,
+      heading: fmtBRLCompact(richestBRL / 2),
       html:
         `Metade da fortuna de ${data.richest.nome}. Você já rolou ` +
         `${fmtYears(yearsOf(richestBRL / 2, salary))} de trabalho.`,
     },
+    { atBRL: RULER_CARD_BRL, html: rulerNote(richestBRL) },
   ];
   if (c) {
     richestMs.push({
       atBRL: c.analfabetismoBRL,
+      heading: fmtBRLCompact(c.analfabetismoBRL),
       html:
         'Erradicar o analfabetismo no Brasil custaria isto. Você acabou de rolar. ' +
         '<span class="col-note__fine">estimativa · <a href="/referencias">/referencias</a></span>',
@@ -464,15 +477,21 @@ function buildColumnDefs(salary: number): ColumnDef[] {
 
   // --- Musk column: existing beats interleaved with public-scale phrases ---
   const muskMs: ColMilestone[] = [
+    { atBRL: RULER_CARD_BRL, html: rulerNote(muskBRL) },
     {
       atBRL: richestBRL,
+      heading: fmtBRLCompact(richestBRL),
       html:
-        `Você acabou de passar TODA a fortuna de ${data.richest.nome}, a pessoa mais rica ` +
-        'do Brasil. Continua.',
+        `Toda a fortuna de ${data.richest.nome}, a pessoa mais rica do Brasil. ` +
+        'Você acabou de passar. Continua.',
     },
     { atBRL: 4e11, kind: 'phrase', html: 'Continue firme, você não está nem perto.' },
-    { atBRL: richBrazilSumBRL, html: 'Os 5 brasileiros mais ricos, somados, terminam aqui.' },
-    { atBRL: 1e12, html: 'R$ 1 trilhão. Um milhão de milhões.' },
+    {
+      atBRL: richBrazilSumBRL,
+      heading: fmtBRLCompact(richBrazilSumBRL),
+      html: 'Os 5 brasileiros mais ricos, somados, terminam aqui.',
+    },
+    { atBRL: 1e12, heading: 'R$ 1 trilhão', html: 'Um milhão de milhões.' },
     {
       atBRL: 1.3e12,
       kind: 'phrase',
@@ -482,8 +501,11 @@ function buildColumnDefs(salary: number): ColumnDef[] {
         `<strong>${fmtBRLCompact((0.05 * muskBRL) / data.family)}</strong> no chão.`,
     },
     { atBRL: muskBRL / 2, kind: 'phrase', html: 'Estamos apenas na metade. Isso mesmo.' },
-    { atBRL: 2.6e12, kind: 'phrase', html: 'É isso mesmo, está cansado?' },
-    { atBRL: 3e12, html: 'R$ 3 trilhões. Última acelerada.' },
+    // Nudged past the half beat (muskBRL/2 ≈ R$ 2,71 tri) so the narrative reads
+    // "metade" → "cansado"; centered between metade and the hospitais beat so both
+    // holds stay ≥ 4s at 8× (D-V4-12).
+    { atBRL: 2.8e12, kind: 'phrase', html: 'É isso mesmo, está cansado?' },
+    { atBRL: 3e12, heading: 'R$ 3 trilhões', html: 'Última acelerada.' },
   ];
   if (c) {
     // GDP ladder: each country's PIB in BRL lands inside the column, well spread
@@ -493,13 +515,15 @@ function buildColumnDefs(salary: number): ColumnDef[] {
       if (!co) continue;
       muskMs.push({
         atBRL: brlOf(co.usd, fx),
-        html: `Você acabou de passar o PIB ${co.prep} ${co.nome}. Tudo que o país produz num ano.`,
+        heading: fmtBRLCompact(brlOf(co.usd, fx)),
+        html: `PIB ${co.prep} ${co.nome}: tudo o que o país produz num ano. Você acabou de passar.`,
       });
     }
     muskMs.push({
       atBRL: c.eduAlunoAno * c.eduMatriculas,
+      heading: fmtBRLCompact(c.eduAlunoAno * c.eduMatriculas),
       html:
-        'Isto pagaria um ano de escola pública para todos os ' +
+        'Um ano de escola pública para todos os ' +
         `<strong>${fmtCountShort(c.eduMatriculas)}</strong> de alunos do Brasil.`,
     });
     muskMs.push({

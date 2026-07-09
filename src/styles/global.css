@@ -535,32 +535,6 @@ strong {
   background-repeat: repeat-y;
   background-position: left top;
 }
-/* Ruler key: a clean label chip at the column's top-left that says what one ruler
-   mark is worth. No overhang and no negative margin, so it never spills past the
-   viewport at any width (D-V3-5). It sticks to the top of the viewport while the
-   column is in view, sitting above the note cards that pin lower at 4.5rem, so the
-   scale annotation stays readable instead of hiding behind the pinned intro card. */
-.ruler-key {
-  position: sticky;
-  top: 0.5rem;
-  left: 0;
-  width: max-content;
-  max-width: 100%;
-  display: flex;
-  align-items: center;
-  pointer-events: none;
-  z-index: 0;
-}
-/* Compact chip: tighter than a full panel so its two lines clear the 4.5rem card
-   pin line and the card never overlaps it. */
-.ruler-key__label {
-  font-size: 0.8rem;
-  line-height: 1.3;
-  max-width: min(86vw, 15rem);
-  margin-left: 0.5rem;
-  padding: 0.35rem 0.7rem;
-}
-
 /* In-column cards: absolutely-positioned wrappers whose height IS the hold
    duration; the child card sticks and hands off to the next (D9). Both the
    staged intro cards and the milestone beats share this mechanism (D-V2-6).
@@ -593,6 +567,19 @@ strong {
 }
 .col-note__card strong {
   color: var(--amarelo);
+}
+/* Amount headline: cards whose point is reaching a value lead with that value big
+   and white, the body sitting below it (D-V4-5). Shared by the render.ts milestone
+   beats (.col-note__amount) and the bilhão intro authored in index.astro
+   (.col__amount), which renders through the same in-column card mechanism. */
+.col-note__amount,
+.col__amount {
+  display: block;
+  font-size: clamp(1.5rem, 3.2vw, 2rem);
+  line-height: 1.05;
+  font-weight: 700;
+  color: var(--branco);
+  margin-bottom: 0.5rem;
 }
 /* Phrase cards: shouted Anton display type on the same straight modern card as the
    informational beats, so they read like wall-writing without a tilt (D-V3-4). */
