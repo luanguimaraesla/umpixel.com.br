@@ -1,0 +1,21 @@
+{
+  "descricao": "Taxa média de poupança das famílias por faixa de renda familiar per capita, em múltiplos do salário mínimo. Os extremos (0,6% e 8,3%) estão explícitos no Estudo Especial 107 do Banco Central (dados da POF 2017-2018); as faixas intermediárias são aproximações do gráfico do estudo. Usada para estimar o patrimônio acumulado numa vida de trabalho de 47 anos (18 aos 65).",
+  "horizonte_anos": 47,
+  "retorno_real_anual": 0.03,
+  "faixas": [
+    { "ate_sm": 0.5, "taxa": 0.006 },
+    { "ate_sm": 1, "taxa": 0.012 },
+    { "ate_sm": 1.5, "taxa": 0.013 },
+    { "ate_sm": 2.5, "taxa": 0.027 },
+    { "ate_sm": 4, "taxa": 0.036 },
+    { "ate_sm": 6, "taxa": 0.041 },
+    { "ate_sm": null, "taxa": 0.083 }
+  ],
+  "fontes": [
+    { "nome": "Banco Central do Brasil, Estudo Especial 107: Taxa de poupança das famílias, uma análise para Brasil e regiões", "url": "https://www.bcb.gov.br/conteudo/relatorioinflacao/EstudosEspeciais/EE107_Taxa_de_poupanca_das_familias.pdf" },
+    { "nome": "IBGE, rendimento domiciliar per capita 2025 (PNAD Contínua), R$ 2.316 para o Brasil", "url": "https://agenciadenoticias.ibge.gov.br/agencia-sala-de-imprensa/2013-agencia-de-noticias/releases/45942-ibge-divulga-rendimento-domiciliar-per-capita-2025-para-brasil-e-unidades-da-federacao" },
+    { "nome": "Decreto que reajusta o salário mínimo para R$ 1.621 a partir de 1º de janeiro de 2026 (Planalto)", "url": "https://www.gov.br/planalto/pt-br/acompanhe-o-planalto/noticias/2025/12/publicado-decreto-que-reajusta-salario-minimo-para-r-1-621-a-partir-de-1o-de-janeiro" },
+    { "nome": "IBGE, POF 2024-2025 (Pesquisa de Orçamentos Familiares)", "url": "https://www.ibge.gov.br/pof2024/" }
+  ],
+  "acessado_em": "2026-07-09"
+}

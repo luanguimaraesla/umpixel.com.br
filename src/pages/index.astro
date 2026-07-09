@@ -37,13 +37,10 @@ import Footer from '../components/Footer.astro';
 
         <div class="key__item">
           <div class="key__swatch">
-            <div class="key__block" data-family-block aria-hidden="true"></div>
+            <div class="key__block" data-earnings-block aria-hidden="true"></div>
           </div>
-          <p class="key__value"><strong data-dyn="family-worth">…</strong></p>
-          <p class="key__caption">
-            o que uma família típica junta de patrimônio na vida
-            <span class="key__fine">estimativa · <a href="/referencias">/referencias</a></span>
-          </p>
+          <p class="key__value"><strong data-dyn="earnings-value">…</strong></p>
+          <p class="key__caption">tudo o que você ganha trabalhando dos 18 aos 65</p>
         </div>
 
         <div class="key__item">
@@ -51,9 +48,19 @@ import Footer from '../components/Footer.astro';
             <div class="key__block" data-life-block aria-hidden="true"></div>
           </div>
           <p class="key__value"><strong data-dyn="life-value">…</strong></p>
-          <p class="key__caption">se você guardasse 100% do salário por 47 anos</p>
+          <p class="key__caption">o que disso vira patrimônio, poupando como a média da sua faixa de renda</p>
+        </div>
+
+        <div class="key__item">
+          <div class="key__swatch">
+            <div class="key__block" data-family-block aria-hidden="true"></div>
+          </div>
+          <p class="key__value"><strong data-dyn="family-worth">…</strong></p>
+          <p class="key__caption">o que uma família típica junta de patrimônio na vida, casa incluída</p>
         </div>
       </div>
+
+      <p class="key__note">estimativas e fontes → <a href="/referencias">/referencias</a></p>
     </div>
   </section>
 
@@ -134,7 +141,6 @@ import Footer from '../components/Footer.astro';
     <Fragment slot="end">
       Fim. <strong data-dyn="musk-lives">…</strong> inteiras de trabalho. Agora você sabe o
       tamanho da distância.
-      <a class="col__end-link" href="/referencias">ver fontes e metodologia → /referencias</a>
     </Fragment>
   </WealthColumn>
 

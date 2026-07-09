@@ -238,6 +238,24 @@ strong {
   outline-offset: 2px;
   border-radius: 4px;
 }
+/* Salary commit confirmation: a brief amarelo glow on the input pill so a commit via
+   blur or Enter is visibly acknowledged. Reduced motion skips the glow; the
+   reformatted value is the feedback then. */
+@media (prefers-reduced-motion: no-preference) {
+  .field--saved {
+    animation: field-saved-flash 0.6s ease-out;
+  }
+  @keyframes field-saved-flash {
+    0% {
+      border-color: var(--amarelo);
+      box-shadow: 0 0 0 3px rgba(251, 178, 22, 0.45);
+    }
+    100% {
+      border-color: var(--overlay-border);
+      box-shadow: 0 0 0 0 rgba(251, 178, 22, 0);
+    }
+  }
+}
 /* Segmented salary control: default (salário mínimo) vs a custom value. */
 .seg {
   display: flex;
@@ -392,13 +410,12 @@ strong {
   margin-bottom: 1.75rem;
 }
 .key__grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
   gap: 1.5rem;
 }
 .key__item {
-  flex: 1 1 8rem;
-  min-width: 8rem;
+  min-width: 0;
 }
 /* Swatch cell: the true-size block settles at the bottom-left, like ink on a line. */
 .key__swatch {
@@ -430,6 +447,18 @@ strong {
   opacity: 0.85;
 }
 .key__fine a {
+  color: var(--amarelo);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+/* Single methodology pointer under the key grid: small, muted, left-aligned with the card. */
+.key__note {
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+.key__note a {
   color: var(--amarelo);
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -701,6 +730,34 @@ strong {
   margin-top: 2rem;
 }
 
+/* ---- Methodology bracket table ---- */
+.calc-table-wrap {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+.calc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+.calc-table th,
+.calc-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--overlay-border);
+  text-align: left;
+}
+.calc-table th {
+  color: var(--amarelo);
+  font-weight: 400;
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+}
+.calc-table td.num,
+.calc-table th.num {
+  text-align: right;
+  white-space: nowrap;
+}
+
 /* ---- Top progress bar (custom, mobile-visible; D8) ---- */
 .progress {
   position: fixed;
@@ -746,11 +803,12 @@ strong {
 }
 
 /* ---- Left cluster: legend + counter + player (D-V3-2/3/10/14/15) ---- */
-/* Fixed on the left, vertically centered on the measuring line. It reveals at the
-   col-start latch (data-idle removed) and stays; only the counter fades with the
-   line. pointer-events pass through everywhere except the player, so the empty
-   cluster box never blocks the page. render.ts sets --pos-accent (the active
-   column's fill) so the counter keeps its per-column identity. */
+/* Fixed on the left, vertically centered on the measuring line. render.ts toggles
+   data-idle from the same active-column condition as the line and counter, so the
+   whole cluster reveals and hides together with them. pointer-events pass through
+   everywhere except the player, so the empty cluster box never blocks the page.
+   render.ts sets --pos-accent (the active column's fill) so the counter keeps its
+   per-column identity. */
 .cluster {
   position: fixed;
   left: 0.5rem;
@@ -794,7 +852,7 @@ strong {
 }
 .pos-legend__swatch {
   flex: none;
-  width: 33px;
+  width: 24px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -829,7 +887,7 @@ strong {
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
-  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-size: clamp(1.35rem, 3vw, 1.7rem);
   line-height: 1;
   letter-spacing: 0;
   white-space: nowrap;
@@ -843,20 +901,25 @@ strong {
   white-space: nowrap;
 }
 
-/* Autoscroll player: round play button + speed select side by side, readout under.
-   It is the only interactive part of the cluster, so it re-enables pointer events. */
+/* Autoscroll player: the play button and speed select merged into one pill so the
+   player reads as a single compact component. It is the only interactive part of the
+   cluster, so it re-enables pointer events. */
 .pos-player {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  flex-wrap: wrap;
+  display: inline-flex;
+  align-items: stretch;
+  gap: 0;
+  border: 1px solid var(--overlay-border);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  overflow: hidden;
   pointer-events: auto;
 }
+/* Left segment of the pill: the amarelo play button, its own rounding dropped so the
+   pill's outer radius owns the corners. */
 .pos-player__play {
   flex: none;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
+  width: 2.25rem;
+  height: 2.25rem;
   border: none;
   background: var(--amarelo);
   color: var(--preto);
@@ -892,13 +955,21 @@ strong {
   background: var(--quase-preto);
   color: var(--branco);
 }
+/* Inside the player pill the select drops its own border, rounding and fill so it
+   reads as the right segment of one component; its chevron and padding stay. The
+   standalone col-start select (outside .pos-player) keeps the pill look above. */
+.pos-player .speed-select {
+  border: none;
+  border-radius: 0;
+  background-color: transparent;
+}
 
 /* Phones: the cluster becomes a fixed bottom bar so it never overlaps the card
    text. Legend + counter + player sit compactly inside a translucent, blurred bar
    with a top amarelo accent and safe-area padding, so card text never bleeds
    through. The measuring line stays at 50vh; the counter still reads the
-   mid-viewport value. The two-way latch (data-idle) shows/hides this whole bar,
-   and its own transition still fades it cleanly both ways (D-V4-11). */
+   mid-viewport value. data-idle (set from the active-column condition) shows/hides
+   this whole bar, and its own transition still fades it cleanly both ways (D-V4-11). */
 @media (max-width: 640px) {
   .cluster {
     left: 0;
@@ -927,7 +998,7 @@ strong {
     flex: 1 1 auto;
   }
   .pos-counter__full {
-    font-size: clamp(1.2rem, 5.6vw, 1.8rem);
+    font-size: clamp(1rem, 5vw, 1.25rem);
   }
   .pos-player {
     order: 2;

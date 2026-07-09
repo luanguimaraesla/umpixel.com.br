@@ -33,11 +33,70 @@ import Base from '../layouts/Base.astro';
         <span data-dyn="min-wage-law">…</span>.
       </p>
       <p>
-        Só o patrimônio acumulado numa vida inteira considera os reajustes reais do salário
-        (ganho de <span data-dyn="real-growth-pct">…</span> ao ano acima da inflação, teto da
-        política de valorização vigente até 2030) e assume que você guardaria 100% do salário
-        bruto, sem gastar nada. É impossível, e esse é justamente o ponto. O resto da página usa
-        o seu salário de hoje.
+        Tudo aqui usa o seu salário de hoje, sem nenhuma projeção. As contagens de "vidas
+        inteiras de trabalho" dividem a fortuna por 564 salários (47 anos × 12 meses),
+        exatamente o que uma linha de 564 pixels representa na coluna. O patrimônio acumulado
+        numa vida segue outro modelo, explicado logo abaixo.
+      </p>
+    </section>
+
+    <section class="ref">
+      <h2>O patrimônio de uma vida</h2>
+      <p>
+        O patrimônio acumulado numa vida não supõe que você guardaria 100% do salário, e sim a
+        parte da renda que sobra e é poupada, mês após mês, durante décadas. A conta é:
+      </p>
+      <p>
+        <strong>patrimônio estimado = renda mensal × taxa de poupança × fator de acumulação</strong>
+      </p>
+      <p>
+        A taxa vem do Estudo Especial 107 do Banco Central (dados da POF 2017-2018), que define
+        poupança como aplicações financeiras líquidas mais compra líquida de imóveis sobre a
+        renda disponível. Ela cresce com a renda, de 0,6% até meio salário mínimo per capita a
+        8,3% acima de 6. Só 20,2% das famílias pouparam em 2018: 7,8% na faixa mais baixa contra
+        54,4% na mais alta. As famílias acima de 6 salários mínimos per capita eram 3,7% do total
+        e faziam 46% da poupança nacional. Para dar escala, o rendimento domiciliar per capita do
+        Brasil em 2025 foi de R$ 2.316 por mês segundo o IBGE, de R$ 1.219 no Maranhão a R$ 4.538
+        no Distrito Federal.
+      </p>
+      <div class="calc-table-wrap">
+        <table class="calc-table">
+          <thead>
+            <tr>
+              <th>Faixa</th>
+              <th class="num">Renda mensal aproximada</th>
+              <th class="num">Taxa média</th>
+              <th class="num">Patrimônio estimado</th>
+            </tr>
+          </thead>
+          <tbody data-faixas></tbody>
+        </table>
+      </div>
+      <p>
+        Os extremos de 0,6% e 8,3% estão explícitos no estudo; as faixas intermediárias são
+        aproximações do gráfico; as faixas em reais usam o salário mínimo vigente de
+        <span data-dyn="min-wage">…</span>.
+      </p>
+      <p>
+        O fator supõe <span data-dyn="horizon-years">…</span> de aportes mensais constantes, o
+        mesmo período da vida de trabalho do site, com retorno real de
+        <span data-dyn="real-return-pct">…</span> ao ano acima da inflação, em reais de hoje. Dá
+        um fator de aproximadamente <strong data-dyn="factor">…</strong>: cada R$ 1 por mês vira
+        cerca de R$ 1.221 de patrimônio.
+      </p>
+      <p>
+        Com o salário informado na página inicial, <span data-dyn="your-salary">…</span>, você cai
+        na faixa <span data-dyn="your-bracket">…</span>, taxa <span data-dyn="your-rate">…</span>,
+        aporte de <span data-dyn="your-monthly">…</span> por mês, e patrimônio de cerca de
+        <strong data-dyn="your-wealth">…</strong>.
+      </p>
+      <p>
+        A faixa acima de 6 salários mínimos é larga demais e a média de 8,3% subestima rendas
+        muito altas, onde o decisivo é o gasto recorrente: ali o patrimônio vira (renda líquida -
+        gasto mensal) × fator, uma extrapolação comportamental, não do Banco Central. As taxas são
+        por renda familiar per capita, aplicadas ao salário individual como aproximação. A POF
+        2024-2025 ainda não tem recorte equivalente, então a conta segue a POF 2017-2018. O modelo
+        ignora herança, FGTS, INSS e valorização da casa própria, e assume aportes constantes.
       </p>
     </section>
 
@@ -94,9 +153,9 @@ import Base from '../layouts/Base.astro';
         <strong>O tempo da pessoa mais rica do Brasil.</strong> Dividimos a fortuna de
         <span data-dyn="richest-name">…</span> pelo tempo desde que sua fonte de riqueza começou
         (<span data-dyn="richest-since">…</span>), o que dá uma taxa média de acúmulo por segundo.
-        Depois calculamos quanto tempo, nessa taxa, ela levaria para juntar o que você guardaria numa
-        vida inteira de trabalho. É uma média grosseira, não um retrato do ritmo real, que oscila
-        muito.
+        Depois calculamos quanto tempo, nessa taxa, ela levaria para juntar o patrimônio que você
+        acumularia na vida pelo modelo de poupança descrito acima. É uma média grosseira, não um
+        retrato do ritmo real, que oscila muito.
       </p>
       <p>
         <strong>Educação e analfabetismo são estimativas compostas.</strong> "Educar todos os alunos

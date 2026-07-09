@@ -48,15 +48,6 @@ intermediários".
 **Como atualizar:** a PNAD Contínua é trimestral (IBGE); a OECD Income Distribution Database é
 atualizada de forma irregular.
 
-### `crescimento-real-salario.json`
-Ganho real anual do salário mínimo (acima da inflação), usado **só** para projetar o patrimônio
-acumulado numa vida inteira de trabalho, não afeta a escala de pixels, que segue o salário de
-hoje. Padrão: **2,5% ao ano**, o teto da política de valorização vigente (arcabouço fiscal, até
-2030); o reajuste de 2026 atingiu esse teto.
-
-**Como atualizar:** revise `taxa_real_anual` se a regra do arcabouço fiscal mudar. Para um
-cenário mais conservador, use a média histórica do rendimento real do trabalho (~0,9% ao ano).
-
 ### `patrimonio-familia.json`
 Estimativa do patrimônio líquido mediano de uma família brasileira ao fim da vida de trabalho
 (~65 anos): **R$ 200 mil**, dentro de uma faixa de R$ 150 mil a R$ 250 mil. Não existe estatística
@@ -67,6 +58,19 @@ em `/referencias`.
 **Como atualizar:** este número é revisado manualmente, sem automação, quando a UBS ou a Anbima
 publicam novas edições dos relatórios citados. Atualize `valor_brl`, `faixa_brl`, `metodologia`, as
 `fontes` e `acessado_em`.
+
+### `poupanca-familias.json`
+Taxa média de poupança por faixa de renda familiar per capita, medida em salários mínimos, do
+**Estudo Especial 107 do Banco Central** com dados da POF 2017-2018 do IBGE. Alimenta o modelo
+realista de patrimônio: quanto uma família de cada faixa consegue guardar e capitalizar ao longo da
+vida de trabalho. O campo `horizonte_anos` é **47** (dos 18 aos 65 anos) e o `retorno_real_anual` é
+**0,03** (3% ao ano, real). Cada item de `faixas` traz `ate_sm` (o teto da faixa em salários mínimos,
+`null` na faixa mais alta) e `taxa` (a fração da renda poupada). Consumido por `src/lib/render.ts` e
+`src/lib/referencias.ts`.
+
+**Como atualizar:** revise as `faixas` e o `retorno_real_anual` quando o Banco Central publicar uma
+nova edição do estudo ou quando sair uma nova POF. Atualize `faixas`, `horizonte_anos`,
+`retorno_real_anual`, `fontes` e `acessado_em`.
 
 ### `bilionarios-mundo.json`
 A pessoa mais rica do mundo, agora pelo valor de **tempo real** da Forbes (não mais a lista anual):
@@ -91,10 +95,11 @@ o PIB de Portugal" ou "isso construiria N hospitais". Cada `país` traz `pib_usd
 `ano_referencia` e a `preposicao` correta da frase ("de", "do" ou "da"). Cada `custo` traz
 `valor_brl` ou, no caso de educar todos os alunos, os dois componentes
 `componentes.{valor_aluno_ano_brl,matriculas}`, multiplicados no site. As estimativas guardam uma
-`nota` explicando a composição.
+`nota` explicando a composição. Cada `país` e cada `custo` traz ainda sua própria `fonte`
+(`nome`, `url`), citada direto no card.
 
-Este arquivo é **opcional**: o site o busca como o `crescimento-real-salario.json` e, se ele faltar,
-as frases que dependem dele simplesmente não aparecem, sem quebrar a página.
+Este arquivo é **opcional**: o site o busca com um `.catch` e, se ele faltar, as frases que dependem
+dele simplesmente não aparecem, sem quebrar a página.
 
 **Como atualizar:** o PIB vem do Banco Mundial (PIB nominal corrente); reveja quando sair um novo
 ano-base. Os custos vêm de fontes setoriais (Novo PAC, FNDE, Todos Pela Educação, FipeZAP);
@@ -108,7 +113,7 @@ O front-end lê estes campos; mantenha os nomes ao atualizar:
 - `cambio-usd-brl.json`: `taxa_venda`, `data_cotacao`, `fontes[].{nome,url}`, `acessado_em`
 - `bilionarios-brasil.json`: `top5[].{posicao,nome,patrimonio_usd_bilhoes,fonte_riqueza}`, `top5[0].fonte_riqueza_desde`, `total_top5_usd_bilhoes`, `data_referencia_valores`, `fontes[].{nome,url}`, `acessado_em`
 - `renda-brasil.json`: `fontes[].{nome,url}`, `acessado_em`
-- `crescimento-real-salario.json`: `taxa_real_anual`, `fontes[].{nome,url}`, `acessado_em`
 - `patrimonio-familia.json`: `valor_brl`, `faixa_brl.{min,max}`, `fontes[].{nome,url}`, `acessado_em`
+- `poupanca-familias.json`: `horizonte_anos`, `retorno_real_anual`, `faixas[].{ate_sm,taxa}`, `fontes[].{nome,url}`, `acessado_em`
 - `bilionarios-mundo.json`: `pessoa_mais_rica.{nome,patrimonio_usd_bilhoes,ranking_mundial,fonte_riqueza}`, `data_referencia_valores`, `fontes[].{nome,url}`, `acessado_em`
-- `comparacoes-publicas.json` (opcional): `paises[].{nome,preposicao,pib_usd_bilhoes,ano_referencia}`, `custos[].{id,valor_brl}` ou `custos[].componentes.{valor_aluno_ano_brl,matriculas}`, `custos[].nota` nas estimativas, `fontes[].{nome,url}`, `acessado_em`
+- `comparacoes-publicas.json` (opcional): `paises[].{nome,preposicao,pib_usd_bilhoes,ano_referencia,fonte.{nome,url}}`, `custos[].{id,valor_brl,fonte.{nome,url}}` ou `custos[].componentes.{valor_aluno_ano_brl,matriculas}`, `custos[].nota` nas estimativas, `fontes[].{nome,url}`, `acessado_em`

@@ -3,9 +3,9 @@
 // at exactly 50vh (the depth updateScrollUI measures), fading to transparent at
 // both edges; it sits below the pinned cards so a card passes over it. The cluster
 // stacks a mini scale legend, the live counter (full value + short form), and the
-// autoscroll player. render.ts drives text, accent and visibility. The cluster
-// reveals at the col-start latch and stays; the line and counter fade when no
-// column is under 50vh. The toast lives here too, at the bottom of the viewport.
+// autoscroll player. render.ts drives text, accent and visibility. The cluster,
+// line and counter reveal and hide together, whenever a wealth column sits under
+// 50vh. The toast lives here too, at the bottom of the viewport.
 ---
 
 <div class="measure-line" data-measure-line aria-hidden="true"></div>
@@ -26,7 +26,7 @@
     </div>
     <div class="pos-legend__row">
       <span class="pos-legend__swatch">
-        <span class="pos-legend__block" style="width:33px;height:32px"></span>
+        <span class="pos-legend__block" style="width:24px;height:24px"></span>
       </span>
       <span class="pos-legend__text">1 vida</span>
     </div>
@@ -54,6 +54,10 @@
       <option value="2">2×</option>
       <option value="4">4×</option>
       <option value="8">8×</option>
+      <!-- Synthetic slot render.ts writes the effective (ramped) label into so the
+        closed select can show it. hidden+disabled keeps it out of the open list
+        and unselectable; the user still picks only from the five real speeds. -->
+      <option value="__ramp" hidden disabled></option>
     </select>
   </div>
 </div>

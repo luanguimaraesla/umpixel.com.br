@@ -1,6 +1,8 @@
 import {
   MONTHS_PER_YEAR,
+  MONTHS_PER_LIFE,
   SPEED_BASE,
+  SPEED_MULTIPLIERS,
   BILLION_BRL,
   RULER_STEP,
   RAMP_STEPS,
@@ -9,7 +11,8 @@ import {
   monthsOf,
   yearsOf,
   livesOf,
-  lifeSavings,
+  lifeEarnings,
+  lifeWealth,
   brlOf,
   squareishBlock,
   columnWidth,
@@ -24,6 +27,7 @@ import {
   fmtDuration,
   parseBRL,
 } from './scale';
+import type { PoupancaFaixa, PoupancaParams } from './scale';
 import { initSalary, getSalary, setSalary, subscribe } from './state';
 import { createAutoscroll } from './autoscroll';
 import type { Autoscroll } from './autoscroll';
@@ -60,11 +64,6 @@ interface RawBilionarios {
   fontes: Source[];
   acessado_em: string;
 }
-interface RawGrowth {
-  taxa_real_anual: number;
-  fontes: Source[];
-  acessado_em: string;
-}
 interface RawPatrimonio {
   valor_brl: number;
   faixa_brl: { min: number; max: number };
@@ -83,26 +82,35 @@ interface RawMundo {
   acessado_em: string;
 }
 // Public-scale references for the mid-column phrases (D-V2-11). Optional: fetched
-// like crescimento-real-salario, and anything that depends on it is skipped when
-// it fails to load.
+// with a .catch, and anything that depends on it is skipped when it fails to load.
+// Each item carries its own source so the card can cite it directly.
 interface RawPais {
   id: string;
   nome: string;
   preposicao: string;
   pib_usd_bilhoes: number;
   ano_referencia: number;
+  fonte: Source;
 }
 interface RawCusto {
   id: string;
   nome: string;
   valor_brl?: number;
   componentes?: { valor_aluno_ano_brl: number; matriculas: number };
+  fonte: Source;
 }
 interface RawComparacoes {
   paises: RawPais[];
   custos: RawCusto[];
   fontes: Source[];
   acessado_em: string;
+}
+// Household savings-rate table (Banco Central, POF) that drives the realistic
+// patrimônio model. Required, like the other core files.
+interface RawPoupanca {
+  horizonte_anos: number;
+  retorno_real_anual: number;
+  faixas: { ate_sm: number | null; taxa: number }[];
 }
 
 // --- Normalized model the UI renders from ---
@@ -118,15 +126,21 @@ interface Country {
   nome: string;
   prep: string; // "de" / "do" / "da" for the GDP phrase
   usd: number;
+  fonte: Source;
 }
 interface Comparacoes {
   countries: Country[];
   hospitalBRL: number;
+  hospitalFonte: Source;
   crecheBRL: number;
+  crecheFonte: Source;
   eduAlunoAno: number;
   eduMatriculas: number;
+  eduFonte: Source;
   analfabetismoBRL: number;
+  analfabetismoFonte: Source;
   casaMediaBRL: number;
+  casaFonte: Source;
 }
 interface PageData {
   minWage: number;
@@ -139,12 +153,12 @@ interface PageData {
   totalUsd: number;
   forbesRefDate: string;
   nowYear: number;
-  realGrowth: number;
   family: number;
   familyRange: { min: number; max: number };
   musk: Person;
   muskRefDate: string;
   comparacoes: Comparacoes | null;
+  poupanca: { faixas: PoupancaFaixa[]; years: number; annualReturn: number };
 }
 
 // A sticky beat that holds inside a column at a given BRL depth (D9). Informational
@@ -208,6 +222,7 @@ let measureLine!: HTMLElement;
 let counterEl!: HTMLElement;
 let posFull!: HTMLElement;
 let posShort!: HTMLElement;
+let earningsBlock!: HTMLElement;
 let familyBlock!: HTMLElement;
 let lifeBlock!: HTMLElement;
 let colBilhao!: HTMLElement;
@@ -290,14 +305,28 @@ function toComparacoes(raw: RawComparacoes | null): Comparacoes | null {
   return {
     countries: raw.paises
       .filter((p) => ok(p.pib_usd_bilhoes))
-      .map((p) => ({ id: p.id, nome: p.nome, prep: p.preposicao, usd: p.pib_usd_bilhoes })),
+      .map((p) => ({ id: p.id, nome: p.nome, prep: p.preposicao, usd: p.pib_usd_bilhoes, fonte: p.fonte })),
     hospitalBRL: hospital!.valor_brl!,
+    hospitalFonte: hospital!.fonte,
     crecheBRL: creche!.valor_brl!,
+    crecheFonte: creche!.fonte,
     eduAlunoAno: educar!.componentes!.valor_aluno_ano_brl,
     eduMatriculas: educar!.componentes!.matriculas,
+    eduFonte: educar!.fonte,
     analfabetismoBRL: analf!.valor_brl!,
+    analfabetismoFonte: analf!.fonte,
     casaMediaBRL: casa!.valor_brl!,
+    casaFonte: casa!.fonte,
   };
+}
+
+// Render a source fine-print for a card that shows concrete third-party data. The
+// link opens in a new tab, following the site's external-link convention.
+function fonteFine(f: Source): string {
+  return (
+    '<span class="col-note__fine">fonte: ' +
+    `<a href="${f.url}" target="_blank" rel="noopener noreferrer">${f.nome}</a></span>`
+  );
 }
 
 async function fetchJson<T>(url: string): Promise<T> {
@@ -310,9 +339,54 @@ function dataUrl(name: string): string {
   return `${import.meta.env.BASE_URL}data/${name}`;
 }
 
-// --- Autoscroll speed (base pixels per second × user multiplier × hidden ramp; D5/D5b) ---
+// The top user-selectable speed. The hidden ramps may lift a slower user toward it
+// but never past it, so autoscroll never exceeds the fastest setting (D5b cap).
+const MAX_USER_MULT = Math.max(...SPEED_MULTIPLIERS);
+
+// The effective multiplier is the user speed times the hidden ramp, capped at the
+// top selectable speed. When the user already sits at the max, ramps do nothing.
+function effectiveMult(ramp: number): number {
+  return Math.min(userMult * ramp, MAX_USER_MULT);
+}
+
+// Speed labels mirror the five real <option> texts: an integer like "2×" or a
+// decimal with a comma like "1,5×", always closed with the multiplication sign.
+const speedFmt = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 });
+function speedLabel(mult: number): string {
+  return `${speedFmt.format(mult)}×`;
+}
+
+// Keep the cluster select honest about the real speed. It is still the user's input
+// for the BASE speed; while a hidden ramp is active and autoscroll is playing, the
+// closed select shows the effective (capped) multiplier through a synthetic hidden
+// option. Opening it still lists only the five real options, and choosing one sets
+// the base speed. Pausing, leaving the column or the ramp ending restores the
+// configured value. Runs every frame via updateScrollUI, so it writes to the DOM
+// only when the shown state actually changes; assigning .value never fires a change
+// event, so the two selects stay mirrored without a feedback loop.
+let lastSpeedShown = '';
+function updateSpeedDisplay(): void {
+  const eff = effectiveMult(lastRamp);
+  const playing = !!autoscroll && autoscroll.isPlaying();
+  if (playing && eff !== userMult) {
+    const label = speedLabel(eff);
+    const shown = `__ramp:${label}`;
+    if (shown === lastSpeedShown) return;
+    const opt = speedSelect.querySelector<HTMLOptionElement>('option[value="__ramp"]');
+    if (opt) opt.textContent = label;
+    speedSelect.value = '__ramp';
+    lastSpeedShown = shown;
+  } else {
+    const shown = String(userMult);
+    if (shown === lastSpeedShown) return;
+    speedSelect.value = shown;
+    lastSpeedShown = shown;
+  }
+}
+
+// --- Autoscroll speed (base pixels per second × capped effective multiplier; D5/D5b) ---
 function currentSpeed(): number {
-  return SPEED_BASE * userMult * rampMult();
+  return SPEED_BASE * effectiveMult(rampMult());
 }
 
 // The hidden progressive ramp factor for the current scroll depth (D5b). Returns 1
@@ -408,6 +482,18 @@ function buildWealthColumn(def: ColumnDef, salary: number, baseWidth: number): v
   def.el.replaceChildren(...introWrappers, ...wrappers);
 }
 
+// Build the realistic-patrimônio params from live data. The brackets key on
+// multiples of the statutory minimum wage, so minWage is data.minWage (NOT the
+// visitor's salary, which is what lifeWealth measures against the brackets).
+function poupancaParams(): PoupancaParams {
+  return {
+    minWage: data.minWage,
+    faixas: data.poupanca.faixas,
+    years: data.poupanca.years,
+    annualReturn: data.poupanca.annualReturn,
+  };
+}
+
 // The three metric columns, with their in-column beats and phrases. Rebuilt on
 // every salary change so all depths and derived numbers track the reference
 // salary. Every number comes from live data (fortunes, PTAX, family patrimônio,
@@ -453,17 +539,18 @@ function buildColumnDefs(salary: number): ColumnDef[] {
       heading: fmtBRLCompact(c.analfabetismoBRL),
       html:
         'Erradicar o analfabetismo no Brasil custaria isto. Você acabou de rolar. ' +
-        '<span class="col-note__fine">estimativa · <a href="/referencias">/referencias</a></span>',
+        fonteFine(c.analfabetismoFonte),
     });
   }
   if (data.richest.since) {
     // Rate = fortune ÷ seconds since the fortune's source began, using a fixed
     // "now" of the data's reference year (nowYear) so the number is stable and
     // citable. Time = how long the richest person would need, at that average
-    // rate, to match a whole visitor lifetime of savings.
+    // rate, to match the realistic patrimônio the visitor would accumulate in a
+    // working life (lifeWealth), not 100% of the salary.
     const secondsSince = (data.nowYear - data.richest.since) * SECONDS_PER_YEAR;
     const rateBRLPerSec = richestBRL / secondsSince;
-    const lifeSeconds = lifeSavings(salary, data.realGrowth) / rateBRLPerSec;
+    const lifeSeconds = lifeWealth(salary, poupancaParams()) / rateBRLPerSec;
     richestMs.push({
       atBRL: 0.75 * richestBRL,
       kind: 'phrase',
@@ -514,7 +601,9 @@ function buildColumnDefs(salary: number): ColumnDef[] {
       muskMs.push({
         atBRL: brlOf(co.usd, fx),
         heading: fmtBRLCompact(brlOf(co.usd, fx)),
-        html: `PIB ${co.prep} ${co.nome}: tudo o que o país produz num ano. Você acabou de passar.`,
+        html:
+          `PIB ${co.prep} ${co.nome}: tudo o que o país produz num ano. Você acabou de passar. ` +
+          fonteFine(co.fonte),
       });
     }
     muskMs.push({
@@ -522,19 +611,23 @@ function buildColumnDefs(salary: number): ColumnDef[] {
       heading: fmtBRLCompact(c.eduAlunoAno * c.eduMatriculas),
       html:
         'Um ano de escola pública para todos os ' +
-        `<strong>${fmtCountShort(c.eduMatriculas)}</strong> de alunos do Brasil.`,
+        `<strong>${fmtCountShort(c.eduMatriculas)}</strong> de alunos do Brasil. ` +
+        fonteFine(c.eduFonte),
     });
     muskMs.push({
       atBRL: 2.9e12,
       kind: 'phrase',
       html:
         `O que você já rolou construiria <strong>${fmtInt(2.9e12 / c.hospitalBRL)}</strong> ` +
-        'hospitais públicos de grande porte.',
+        'hospitais públicos de grande porte. ' +
+        fonteFine(c.hospitalFonte),
     });
     muskMs.push({
       atBRL: 3.4e12,
       kind: 'phrase',
-      html: `Só o que você rolou até aqui paga <strong>${fmtCountShort(3.4e12 / c.crecheBRL)}</strong> creches novas.`,
+      html:
+        `Só o que você rolou até aqui paga <strong>${fmtCountShort(3.4e12 / c.crecheBRL)}</strong> creches novas. ` +
+        fonteFine(c.crecheFonte),
     });
     // Uses the column's REAL width (D10 may widen it) so one ruler step is priced
     // at the same scale the ruler is actually drawn.
@@ -544,7 +637,8 @@ function buildColumnDefs(salary: number): ColumnDef[] {
       kind: 'phrase',
       html:
         'Cada traço da régua ao lado = ' +
-        `<strong>${fmtInt((RULER_STEP * muskW * salary) / c.casaMediaBRL)}</strong> casas médias no Brasil.`,
+        `<strong>${fmtInt((RULER_STEP * muskW * salary) / c.casaMediaBRL)}</strong> casas médias no Brasil. ` +
+        fonteFine(c.casaFonte),
     });
   }
 
@@ -562,7 +656,7 @@ function applyDynamic(): void {
   const salary = getSalary();
   const richestBRL = brlOf(data.richest.usd, fx);
   const muskBRL = brlOf(data.musk.usd, fx);
-  const life = lifeSavings(salary, data.realGrowth);
+  const life = lifeWealth(salary, poupancaParams());
   const forbesSource = `Forbes · lista anual, valores de ${monthYearPt(data.forbesRefDate)}`;
   const worldForbesSource = `Forbes · valores de tempo real, ${monthYearPt(data.muskRefDate)}`;
 
@@ -570,15 +664,15 @@ function applyDynamic(): void {
     // salary-dependent
     salary: fmtBRL(salary),
     'year-value': fmtBRL(salary * 12),
+    'earnings-value': fmtBRLCompact(lifeEarnings(salary)),
     'family-worth': fmtBRLCompact(data.family),
     'family-range': `${fmtBRLCompact(data.familyRange.min)} e ${fmtBRLCompact(data.familyRange.max)}`,
-    'life-value': fmtBRL(life),
-    'life-vs-family': `${fmtInt(life / data.family)} vezes`,
+    'life-value': fmtBRLCompact(life),
     'billion-years': fmtYears(yearsOf(BILLION_BRL, salary)),
     'richest-years': fmtYears(yearsOf(richestBRL, salary)),
-    'richest-lives': fmtLives(livesOf(richestBRL, salary, data.realGrowth)),
+    'richest-lives': fmtLives(livesOf(richestBRL, salary)),
     'musk-years': fmtYears(yearsOf(muskBRL, salary)),
-    'musk-lives': fmtLives(livesOf(muskBRL, salary, data.realGrowth)),
+    'musk-lives': fmtLives(livesOf(muskBRL, salary)),
     'musk-area': fmtCountShort(monthsOf(muskBRL, salary)),
     // data-derived (independent of the visitor's salary)
     'min-wage': fmtBRL(data.minWage),
@@ -601,14 +695,20 @@ function applyDynamic(): void {
     if (text !== undefined) el.textContent = text;
   });
 
-  // Family and life blocks in true pixel area: w × h px² = months of salary, the
-  // page's core proportion. squareishBlock renders each as its near-square integer
-  // rectangle (família ≈ 11×11 at min wage; vida ≈ 33×32, salary-invariant because
-  // both the patrimônio and the salary scale together).
+  // The three key blocks in true pixel area: w × h px² = months of salary, the
+  // page's core proportion, rendered by squareishBlock as near-square integer
+  // rectangles. earnings is one whole working life of salary: MONTHS_PER_LIFE = 564
+  // months → a fixed 24×24, salary-invariant. vida is lifeWealth ÷ salary = taxa ×
+  // fator months-equivalents, so it is bracket-dependent, not salary-invariant:
+  // ≈ 4×4 at the minimum wage and ≈ 10×10 in the top savings bracket. família is
+  // the fixed R$ 200 mil patrimônio in months of salary (≈ 11×11 at the minimum wage).
+  const earningsSize = squareishBlock(MONTHS_PER_LIFE);
+  earningsBlock.style.width = `${earningsSize.w}px`;
+  earningsBlock.style.height = `${earningsSize.h}px`;
   const familySize = squareishBlock(monthsOf(data.family, salary));
   familyBlock.style.width = `${familySize.w}px`;
   familyBlock.style.height = `${familySize.h}px`;
-  const lifeSize = squareishBlock(lifeSavings(salary, data.realGrowth) / salary);
+  const lifeSize = squareishBlock(lifeWealth(salary, poupancaParams()) / salary);
   lifeBlock.style.width = `${lifeSize.w}px`;
   lifeBlock.style.height = `${lifeSize.h}px`;
 }
@@ -639,16 +739,6 @@ function updateScrollUI(): void {
   const salary = getSalary();
   const mid = window.scrollY + window.innerHeight / 2;
 
-  // Show the cluster (and, on mobile, the whole bottom bar) once the first wealth
-  // column enters the viewport; hide it again when scrolling back up to the intro
-  // sections. Two-way latch, re-evaluated every frame (D-V4-1).
-  const firstCol = geometry[0];
-  if (firstCol && window.scrollY + window.innerHeight >= firstCol.top) {
-    controlsEl.removeAttribute('data-idle');
-  } else {
-    controlsEl.setAttribute('data-idle', '');
-  }
-
   let active: ColumnGeometry | null = null;
   for (const col of geometry) {
     if (mid >= col.top && mid <= col.top + col.height) {
@@ -663,9 +753,10 @@ function updateScrollUI(): void {
 
     // Counter: the full value and the short form both track the mid-viewport line
     // every frame; the per-column accent changes only when the active column
-    // changes, so no per-frame style write. The line and counter reveal together.
+    // changes, so no per-frame style write. The line, counter and cluster reveal
+    // together, driven by the same active-column condition.
     posFull.textContent = fmtBRLFull(value);
-    posShort.textContent = `${fmtCountShort(value)} · ${fmtLives(livesOf(value, salary, data.realGrowth))}`;
+    posShort.textContent = `${fmtCountShort(value)} · ${fmtLives(livesOf(value, salary))}`;
     if (active.id !== lastActiveId) {
       controlsEl.dataset.activeCol = active.id;
       controlsEl.style.setProperty('--pos-accent', accentForColumn(active.id));
@@ -673,26 +764,32 @@ function updateScrollUI(): void {
     }
     measureLine.classList.add('measure-line--on');
     counterEl.classList.add('pos-counter--on');
+    controlsEl.removeAttribute('data-idle');
 
-    // Announce each hidden speed ramp as its BRL depth is crossed while playing (D5b).
+    // Announce each hidden ramp as its BRL depth is crossed while playing, but only
+    // when the capped effective speed actually rises (D5b cap): if the user already
+    // sits at the top selectable speed the ramp changes nothing, so it stays silent.
+    // The message shows the effective multiplier, not the raw ramp.
     const steps = RAMP_STEPS[active.id] || [];
     let crossed: { atBRL: number; mult: number } | null = null;
     for (const step of steps) {
       if (step.atBRL <= value) crossed = step;
     }
     const mult = crossed ? crossed.mult : 1;
-    if (crossed && mult > lastRamp && autoscroll.isPlaying()) {
-      showToast(`Acelerando: ${mult}× · você passou ${fmtBRLCompact(crossed.atBRL)}`);
+    if (crossed && effectiveMult(mult) > effectiveMult(lastRamp) && autoscroll.isPlaying()) {
+      showToast(`Acelerando: ${speedLabel(effectiveMult(mult))} · você passou ${fmtBRLCompact(crossed.atBRL)}`);
     }
     lastRamp = mult;
+    updateSpeedDisplay();
   } else {
     lastRamp = 1;
-    // No column under the mid-viewport line: fade the line and counter out and
-    // force a fresh accent recompute when the next column becomes active. The
-    // legend and player do not fade with the line; the whole cluster's show/hide
-    // is driven by the two-way latch above.
+    updateSpeedDisplay();
+    // No column under the mid-viewport line: fade the line and counter out, hide the
+    // whole cluster, and force a fresh accent recompute when the next column becomes
+    // active. The line, counter and cluster now appear and disappear together.
     measureLine.classList.remove('measure-line--on');
     counterEl.classList.remove('pos-counter--on');
+    controlsEl.setAttribute('data-idle', '');
     lastActiveId = null;
   }
 
@@ -743,17 +840,40 @@ function recompute(): void {
 
 // --- Wiring ---
 function wireSalaryInput(): void {
-  const commit = debounce(() => {
-    const parsed = parseBRL(salaryInput.value);
-    if (isFinite(parsed) && parsed > 0) setSalary(parsed);
-  }, 300);
-  salaryInput.addEventListener('input', commit);
-  salaryInput.addEventListener('blur', () => {
+  let savedTimer = 0;
+  // Flash the input pill amarelo so a commit is visibly acknowledged, even when the
+  // typed value equals the current one. Remove then re-add the class (forcing a
+  // reflow) so the animation restarts on every commit; a timeout clears it as a
+  // fallback for prefers-reduced-motion, where no animationend ever fires.
+  const flashSaved = (): void => {
+    const pill = salaryInput.closest<HTMLElement>('.field__input-wrap');
+    if (!pill) return;
+    pill.classList.remove('field--saved');
+    void pill.offsetWidth;
+    pill.classList.add('field--saved');
+    clearTimeout(savedTimer);
+    savedTimer = window.setTimeout(() => pill.classList.remove('field--saved'), 700);
+  };
+  const commitAndFormat = (): void => {
     // Commit the current text before reformatting, so tabbing away within the
     // debounce window does not discard what the user just typed.
     const parsed = parseBRL(salaryInput.value);
     if (isFinite(parsed) && parsed > 0) setSalary(parsed);
     salaryInput.value = decimalFmt.format(getSalary());
+    flashSaved();
+  };
+  const commit = debounce(() => {
+    const parsed = parseBRL(salaryInput.value);
+    if (isFinite(parsed) && parsed > 0) setSalary(parsed);
+  }, 300);
+  salaryInput.addEventListener('input', commit);
+  salaryInput.addEventListener('blur', commitAndFormat);
+  salaryInput.addEventListener('keydown', (e) => {
+    // Enter commits and reformats via blur, which also dismisses the mobile keyboard.
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      salaryInput.blur();
+    }
   });
 }
 
@@ -785,6 +905,7 @@ function updateControlsState(playing: boolean): void {
   btnPlay.textContent = playing ? '⏸' : '▶';
   btnPlay.setAttribute('aria-pressed', String(playing));
   btnPlay.setAttribute('aria-label', playing ? 'pausar rolagem' : 'rolar automaticamente');
+  updateSpeedDisplay();
 }
 
 function validateData(
@@ -793,6 +914,7 @@ function validateData(
   bilionarios: RawBilionarios,
   patrimonio: RawPatrimonio,
   mundo: RawMundo,
+  poupanca: RawPoupanca,
 ): void {
   if (!salario || !(Number(salario.valor_brl) > 0)) {
     throw new Error('salario-minimo.json inválido');
@@ -820,6 +942,16 @@ function validateData(
   if (!mundo || !mundo.pessoa_mais_rica || !(Number(mundo.pessoa_mais_rica.patrimonio_usd_bilhoes) > 0)) {
     throw new Error('bilionarios-mundo.json inválido');
   }
+  if (
+    !poupanca ||
+    !Array.isArray(poupanca.faixas) ||
+    poupanca.faixas.length === 0 ||
+    !poupanca.faixas.every((f) => Number.isFinite(f.taxa) && f.taxa > 0 && f.taxa < 1) ||
+    !(Number(poupanca.horizonte_anos) > 0) ||
+    !(Number(poupanca.retorno_real_anual) >= 0)
+  ) {
+    throw new Error('poupanca-familias.json inválido');
+  }
 }
 
 // The controls ship disabled so they cannot be used (or clobbered) before the
@@ -841,6 +973,7 @@ function wireControls(): void {
     for (const other of selects) {
       if (other !== source) other.value = source.value;
     }
+    updateSpeedDisplay();
     updateScrollUI();
   };
   for (const select of selects) {
@@ -895,6 +1028,7 @@ export async function boot(): Promise<void> {
   counterEl = must<HTMLElement>('[data-pos-counter]');
   posFull = must<HTMLElement>('[data-pos-full]');
   posShort = must<HTMLElement>('[data-pos-short]');
+  earningsBlock = must<HTMLElement>('[data-earnings-block]');
   familyBlock = must<HTMLElement>('[data-family-block]');
   lifeBlock = must<HTMLElement>('[data-life-block]');
   colBilhao = must<HTMLElement>('[data-column="bilhao"]');
@@ -903,22 +1037,20 @@ export async function boot(): Promise<void> {
   errorEl = must<HTMLElement>('#load-error');
 
   try {
-    // Fetch the data that drives the whole page. All five files are required;
-    // real wage growth only refines the "vidas" comparison, so it stays optional.
-    const [salario, cambio, bilionarios, patrimonio, mundo] = await Promise.all([
+    // Fetch the data that drives the whole page. All six files are required; the
+    // public-scale comparisons stay optional.
+    const [salario, cambio, bilionarios, patrimonio, mundo, poupanca] = await Promise.all([
       fetchJson<RawSalario>(dataUrl('salario-minimo.json')),
       fetchJson<RawCambio>(dataUrl('cambio-usd-brl.json')),
       fetchJson<RawBilionarios>(dataUrl('bilionarios-brasil.json')),
       fetchJson<RawPatrimonio>(dataUrl('patrimonio-familia.json')),
       fetchJson<RawMundo>(dataUrl('bilionarios-mundo.json')),
+      fetchJson<RawPoupanca>(dataUrl('poupanca-familias.json')),
     ]);
-    validateData(salario, cambio, bilionarios, patrimonio, mundo);
-    // Optional data: real wage growth refines the "vidas" comparison, and the
-    // public-scale comparisons feed the mid-column phrases. Both are fetched with
-    // a .catch so a missing file degrades gracefully instead of breaking the page.
-    const growth = await fetchJson<RawGrowth>(
-      dataUrl('crescimento-real-salario.json'),
-    ).catch(() => null);
+    validateData(salario, cambio, bilionarios, patrimonio, mundo, poupanca);
+    // Optional data: the public-scale comparisons feed the mid-column phrases,
+    // fetched with a .catch so a missing file degrades gracefully instead of
+    // breaking the page.
     const comparacoesRaw = await fetchJson<RawComparacoes>(
       dataUrl('comparacoes-publicas.json'),
     ).catch(() => null);
@@ -943,7 +1075,6 @@ export async function boot(): Promise<void> {
       forbesRefDate: bilionarios.data_referencia_valores,
       // Fixed "now" for the time-rate phrase: the year the data was captured.
       nowYear: Number((bilionarios.acessado_em || '').slice(0, 4)) || new Date().getFullYear(),
-      realGrowth: growth && Number(growth.taxa_real_anual) > 0 ? growth.taxa_real_anual : 0,
       family: patrimonio.valor_brl,
       familyRange: patrimonio.faixa_brl,
       musk: {
@@ -954,6 +1085,11 @@ export async function boot(): Promise<void> {
       },
       muskRefDate: mundo.data_referencia_valores,
       comparacoes: toComparacoes(comparacoesRaw),
+      poupanca: {
+        faixas: poupanca.faixas.map((f) => ({ ateSm: f.ate_sm, taxa: f.taxa })),
+        years: poupanca.horizonte_anos,
+        annualReturn: poupanca.retorno_real_anual,
+      },
     };
     fx = data.fx;
 

@@ -20,12 +20,16 @@ tempo de trabalho vira espaço na tela.
 | 1 vida (47 anos) | 564 px²   | dos 18 aos 65 anos                   |
 
 Salário é **fluxo**; fortuna é **estoque**. Não dá para comparar um contracheque com o
-patrimônio de um bilionário, então o site converte o salário em patrimônio: tudo o que você
-acumularia guardando 100% do que ganha ao longo de uma vida inteira de trabalho. Só então
-compara esse total com o que os mais ricos já têm. Uma vida de trabalho equivale a 47 anos, dos
-18 aos 65 (idade de aposentadoria masculina do INSS). Usamos 12 salários por ano para manter a
-metáfora dos 12 pixels; o 13º existe e só reforçaria o argumento. A escala é medida em pixels
-CSS.
+patrimônio de um bilionário, então o site usa duas medidas de uma vida de trabalho. As
+comparações em **vidas inteiras de trabalho** usam a renda de uma carreira, tudo o que você
+ganharia recebendo 100% do salário ao longo da vida, que é o que a geometria dos pixels mede.
+Já o **patrimônio que você realmente juntaria** vem de um modelo mais realista: o salário vezes
+a taxa de poupança média da sua faixa de renda (Banco Central, Estudo Especial 107, dados da POF
+2017-2018) vezes um fator de acumulação de 47 anos a 3% reais ao ano. Não há projeção de
+salário em lugar nenhum: tudo fica congelado no salário de hoje. A metodologia detalhada vive
+em `/referencias`. Uma vida de trabalho equivale a 47 anos, dos 18 aos 65 (idade de
+aposentadoria masculina do INSS). Usamos 12 salários por ano para manter a metáfora dos 12
+pixels; o 13º existe e só reforçaria o argumento. A escala é medida em pixels CSS.
 
 As fortunas em dólar são convertidas para reais pela PTAX do Banco Central. Nas colunas
 gigantes, cada linha de 1 pixel de altura vale, num monitor de desktop, uma vida inteira de
