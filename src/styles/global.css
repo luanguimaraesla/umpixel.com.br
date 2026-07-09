@@ -309,8 +309,8 @@ strong {
 }
 .field input:disabled,
 .hero__start:disabled,
-.controls__play:disabled,
-.controls__select:disabled {
+.pos-player__play:disabled,
+.speed-select:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
@@ -738,114 +738,142 @@ strong {
   background: var(--amarelo);
 }
 
-/* ---- Floating position indicator (D-V2-8) ---- */
-/* Fixed on the left at the exact mid-viewport line updateScrollUI measures. A
-   label chip, a stretchy brush shaft, and a fixed brush head whose tip lands on
-   the active column's left edge. render.ts sets --pos-width (screen edge to the
-   column edge) and --pos-accent (the column's fill). Below the controls bar,
-   above the column; aria-hidden and non-interactive (the numbers live elsewhere). */
-.pos-indicator {
+/* ---- Measuring line (D-V3-2) ---- */
+/* A full-width 2px rule at exactly the 50vh line updateScrollUI measures, solid in
+   the middle and fading to transparent at both viewport edges. z-index 5 keeps it
+   below the pinned cards (z-6) so a card passes over it, and above the column fill.
+   It fades in only while a column sits under the line (same latch as the counter). */
+.measure-line {
   position: fixed;
   left: 0;
+  right: 0;
   top: 50vh;
   transform: translateY(-50%);
-  z-index: 15;
-  width: var(--pos-width, 0px);
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding-left: 1rem;
-  color: var(--amarelo);
+  height: 2px;
+  z-index: 5;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--amarelo) 18%,
+    var(--amarelo) 82%,
+    transparent
+  );
   pointer-events: none;
   opacity: 0;
-  visibility: hidden;
   transition: opacity 0.35s ease;
 }
-.pos-indicator--on {
+.measure-line--on {
   opacity: 1;
-  visibility: visible;
 }
-.pos-indicator__label {
-  flex: none;
-  background: var(--overlay-forte);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--overlay-border);
-  border-left: 4px solid var(--pos-accent, var(--amarelo));
-  border-radius: 8px;
-  padding: 0.3rem 0.6rem;
+
+/* ---- Left cluster: legend + counter + player (D-V3-2/3/10/14/15) ---- */
+/* Fixed on the left, vertically centered on the measuring line. It reveals at the
+   col-start latch (data-idle removed) and stays; only the counter fades with the
+   line. pointer-events pass through everywhere except the player, so the empty
+   cluster box never blocks the page. render.ts sets --pos-accent (the active
+   column's fill) so the counter keeps its per-column identity. */
+.cluster {
+  position: fixed;
+  left: 0.5rem;
+  top: 50vh;
+  transform: translateY(-50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  max-width: min(24rem, calc(100vw - 1rem));
   color: var(--branco);
-  font-size: 0.85rem;
-  line-height: 1.2;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
 }
-.pos-indicator__shaft {
-  flex: 1 1 auto;
-  min-width: 0;
-  height: 0.9rem;
-  display: block;
+.cluster[data-idle] {
+  opacity: 0;
+  visibility: hidden;
 }
-.pos-indicator__head {
-  flex: none;
-  height: 1.4rem;
-  width: auto;
-  display: block;
-}
-/* Phones: the centered column leaves almost no room on the left, so drop the
-   fixed width, hug the screen edge, and keep a minimal shaft. The chip overlaps
-   the column fill (readable on it) but stays clear of the plaque cards, which
-   stick near the top (top 4.5rem), well above this 50vh line. */
-@media (max-width: 640px) {
-  .pos-indicator {
-    width: auto;
-    max-width: calc(100vw - 1rem);
-    left: 0.5rem;
-    padding-left: 0;
-    gap: 0.3rem;
-  }
-  .pos-indicator__label {
-    font-size: 0.7rem;
-    padding: 0.25rem 0.45rem;
-  }
-  .pos-indicator__shaft {
-    flex: 0 0 1.5rem;
-    min-width: 1.5rem;
-    height: 0.75rem;
-  }
-  .pos-indicator__head {
-    height: 1.1rem;
+@media (min-width: 1024px) {
+  .cluster {
+    left: 1rem;
+    gap: 0.8rem;
   }
 }
 
-/* ---- Controls bar (fixed geometry so the readout never resizes it; D-V2-3/4) ---- */
-.controls {
-  position: fixed;
-  left: 50%;
-  bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
-  transform: translateX(-50%);
-  z-index: 20;
+/* Mini scale legend: true-to-scale amarelo blocks so the reader never forgets the
+   proportion. Every block is salary-invariant, so this is static markup. */
+.pos-legend {
+  padding: 0.5rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.68rem;
+  line-height: 1.1;
+}
+.pos-legend__row {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  width: min(29rem, calc(100vw - 2rem));
-  background: var(--overlay-forte);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--overlay-border);
-  border-top: 2px solid var(--amarelo);
-  border-radius: 999px;
-  padding: 0.5rem 1rem;
+  gap: 0.5rem;
+}
+.pos-legend__swatch {
+  flex: none;
+  width: 33px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.pos-legend__block {
+  display: block;
+  background: var(--amarelo);
+}
+.pos-legend__text {
   color: var(--branco);
-  transition: opacity 0.4s ease;
+  opacity: 0.85;
+  white-space: nowrap;
 }
-/* Idle until the visitor reaches the fortunes (D-V2-5); the progress bar stays. */
-.controls[data-idle] {
+
+/* Live counter: the complete value shouted in display type, the short form beneath.
+   A left accent bar carries the active column's fill. Fades with the line. */
+.pos-counter {
+  border-left: 3px solid var(--pos-accent, var(--amarelo));
+  padding-left: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
   opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+  transition: opacity 0.35s ease;
 }
-.controls__play {
+.pos-counter--on {
+  opacity: 1;
+}
+/* Anton is not tabular: its digits jitter ~5px/glyph as the value rolls, so the big
+   line uses a heavy system font with tabular figures instead (D-V3-2 jitter check). */
+.pos-counter__full {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: nowrap;
+  color: var(--branco);
+}
+.pos-counter__short {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--amarelo);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Autoscroll player: round play button + speed select side by side, readout under.
+   It is the only interactive part of the cluster, so it re-enables pointer events. */
+.pos-player {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  pointer-events: auto;
+}
+.pos-player__play {
   flex: none;
   width: 2.5rem;
   height: 2.5rem;
@@ -858,8 +886,16 @@ strong {
   display: grid;
   place-items: center;
 }
-/* Native select styled as a dark pill with a hand-set amarelo chevron. */
-.controls__select {
+.pos-player__readout {
+  flex-basis: 100%;
+  font-size: 0.78rem;
+  color: var(--amarelo);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Shared speed select: dark pill with a hand-set amarelo chevron. Used by the
+   cluster player and the col-start band; the two selects mirror each other (D-V3-3). */
+.speed-select {
   flex: none;
   appearance: none;
   -webkit-appearance: none;
@@ -876,39 +912,30 @@ strong {
   background-position: right 0.7rem center;
   background-size: 0.7rem;
 }
-.controls__select:focus-visible {
+.speed-select:focus-visible {
   outline: 2px solid var(--amarelo);
   outline-offset: 2px;
 }
-.controls__select option {
+.speed-select option {
   background: var(--quase-preto);
   color: var(--branco);
 }
-/* Grows into the fixed leftover space, so its text length can never change the
-   bar's geometry; tabular figures keep the number from shifting between depths. */
-.controls__readout {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-align: right;
-  font-size: 0.8rem;
-  color: var(--amarelo);
-  font-variant-numeric: tabular-nums;
-}
-/* On phones keep a constant two-line shape: controls on top, readout on its own
-   line, both fixed height so the bar geometry stays put. */
+
+/* Phones: hug the left edge, allow the cluster to overlay the column fill (white on
+   the fills is verified 7+:1), and clamp the counter so the 20-glyph trilhões value
+   fits 390px with no horizontal overflow. The legend hides so the counter and the
+   player stay uncrowded at this width. */
 @media (max-width: 640px) {
-  .controls {
-    width: calc(100vw - 2rem);
-    flex-wrap: wrap;
-    justify-content: center;
-    row-gap: 0.4rem;
+  .cluster {
+    left: 0.5rem;
+    max-width: calc(100vw - 1rem);
+    gap: 0.5rem;
   }
-  .controls__readout {
-    flex-basis: 100%;
-    text-align: center;
+  .pos-legend {
+    display: none;
+  }
+  .pos-counter__full {
+    font-size: clamp(1.25rem, 6vw, 1.9rem);
   }
 }
 
@@ -916,7 +943,7 @@ strong {
 .toast {
   position: fixed;
   left: 50%;
-  bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%);
   z-index: 21;
   max-width: calc(100vw - 2rem);
@@ -937,12 +964,6 @@ strong {
 @media (prefers-reduced-motion: no-preference) {
   .toast {
     transition: opacity 0.3s ease;
-  }
-}
-/* The controls bar stacks to two rows on phones, so lift the toast to clear it. */
-@media (max-width: 640px) {
-  .toast {
-    bottom: calc(7.5rem + env(safe-area-inset-bottom, 0px));
   }
 }
 

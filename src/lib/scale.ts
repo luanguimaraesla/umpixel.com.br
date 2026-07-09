@@ -103,6 +103,11 @@ export function fmtBRL(v: number): string {
   return brl.format(v);
 }
 
+/** Full currency as a grouped integer, no cents, e.g. "R$ 2.912.345.678". */
+export function fmtBRLFull(v: number): string {
+  return `R$ ${fmtInt(v)}`;
+}
+
 /**
  * Compact currency with spelled-out magnitude, e.g. "R$ 184,7 bilhões".
  * Hand-written tiering (not Intl compact, which abbreviates to "bi"/"mi").

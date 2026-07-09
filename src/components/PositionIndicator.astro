@@ -1,14 +1,63 @@
 ---
-// Floating position readout (D-V2-8). Sits fixed on the left at the mid-viewport
-// line that updateScrollUI measures (scrollY + innerHeight/2), with a stretchy
-// brush shaft and a fixed brush head whose tip touches the active column's left
-// edge. render.ts drives its width, accent, label text and visibility; it is
-// aria-hidden because the same numbers are announced elsewhere.
-import HandArrow from './HandArrow.astro';
+// Measuring line + fixed left cluster (D-V3-2). The line is a full-width 2px rule
+// at exactly 50vh (the depth updateScrollUI measures), fading to transparent at
+// both edges; it sits below the pinned cards so a card passes over it. The cluster
+// stacks a mini scale legend, the live counter (full value + short form), and the
+// autoscroll player. render.ts drives text, accent and visibility. The cluster
+// reveals at the col-start latch and stays; the line and counter fade when no
+// column is under 50vh. The toast lives here too, at the bottom of the viewport.
 ---
 
-<div class="pos-indicator" data-pos-indicator aria-hidden="true">
-  <span class="pos-indicator__label" data-pos-readout></span>
-  <HandArrow variant="shaft" class="pos-indicator__shaft" />
-  <HandArrow variant="head" class="pos-indicator__head" />
+<div class="measure-line" data-measure-line aria-hidden="true"></div>
+
+<div class="cluster" data-cluster data-idle>
+  <div class="pos-legend panel" aria-hidden="true">
+    <div class="pos-legend__row">
+      <span class="pos-legend__swatch">
+        <span class="pos-legend__block" style="width:1px;height:1px"></span>
+      </span>
+      <span class="pos-legend__text">1 px = 1 mês</span>
+    </div>
+    <div class="pos-legend__row">
+      <span class="pos-legend__swatch">
+        <span class="pos-legend__block" style="width:4px;height:3px"></span>
+      </span>
+      <span class="pos-legend__text">1 ano</span>
+    </div>
+    <div class="pos-legend__row">
+      <span class="pos-legend__swatch">
+        <span class="pos-legend__block" style="width:33px;height:32px"></span>
+      </span>
+      <span class="pos-legend__text">uma vida guardando tudo</span>
+    </div>
+  </div>
+
+  <div class="pos-counter" data-pos-counter aria-hidden="true">
+    <span class="pos-counter__full" data-pos-full></span>
+    <span class="pos-counter__short" data-pos-short></span>
+  </div>
+
+  <div class="pos-player" role="group" aria-label="Controles de rolagem automática">
+    <button
+      class="pos-player__play"
+      id="btn-play"
+      type="button"
+      aria-label="rolar automaticamente"
+      aria-pressed="false"
+      disabled
+    >
+      ▶
+    </button>
+    <select class="speed-select" id="speed-select" aria-label="Velocidade da rolagem" disabled>
+      <option value="0.5">0,5×</option>
+      <option value="1" selected>1×</option>
+      <option value="2">2×</option>
+      <option value="3">3×</option>
+    </select>
+    <span class="pos-player__readout" data-speed-readout aria-hidden="true"></span>
+  </div>
 </div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+</content>
+</invoke>

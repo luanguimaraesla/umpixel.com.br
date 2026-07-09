@@ -3,7 +3,6 @@ import Base from '../layouts/Base.astro';
 import ProgressBar from '../components/ProgressBar.astro';
 import Hero from '../components/Hero.astro';
 import WealthColumn from '../components/WealthColumn.astro';
-import Controls from '../components/Controls.astro';
 import PositionIndicator from '../components/PositionIndicator.astro';
 import Footer from '../components/Footer.astro';
 ---
@@ -70,6 +69,17 @@ import Footer from '../components/Footer.astro';
       <button class="hero__start col-start__btn" id="btn-start" type="button" disabled>
         ▶ começar a descer
       </button>
+      <select
+        class="speed-select"
+        id="speed-select-start"
+        aria-label="Velocidade da rolagem automática"
+        disabled
+      >
+        <option value="0.5">0,5×</option>
+        <option value="1" selected>1×</option>
+        <option value="2">2×</option>
+        <option value="3">3×</option>
+      </select>
     </div>
   </section>
 
@@ -136,7 +146,6 @@ import Footer from '../components/Footer.astro';
   <Footer />
 
   <PositionIndicator />
-  <Controls />
 
   <script>
     import { boot, wireScaleInfo } from '../lib/render';

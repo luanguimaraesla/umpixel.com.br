@@ -15,6 +15,7 @@ import {
   metricColumnWidth,
   fmtBRL,
   fmtBRLCompact,
+  fmtBRLFull,
   fmtInt,
   fmtYears,
   fmtLives,
@@ -180,10 +181,9 @@ let scrollTicking = false;
 let autoscroll: Autoscroll;
 let columns: ColumnDef[] = [];
 let geometry: ColumnGeometry[] = [];
-// Floating position indicator: recompute its width/accent only when the active
-// column (or its rendered width, on resize/salary rebuild) actually changes.
+// Measuring line + counter accent: recompute the accent only when the active
+// column actually changes, so no per-frame style write.
 let lastActiveId: string | null = null;
-let lastPosWidth = '';
 
 // A calendar year in seconds (365,25 days), for the time-rate phrase.
 const SECONDS_PER_YEAR = 365.25 * 24 * 3600;
@@ -196,12 +196,15 @@ let customSalaryField!: HTMLElement;
 let btnStart!: HTMLButtonElement;
 let btnPlay!: HTMLButtonElement;
 let speedSelect!: HTMLSelectElement;
+let speedSelectStart!: HTMLSelectElement;
 let speedReadout!: HTMLElement;
 let progressEl!: HTMLElement;
 let toastEl!: HTMLElement;
 let controlsEl!: HTMLElement;
-let posIndicator!: HTMLElement;
-let posReadout!: HTMLElement;
+let measureLine!: HTMLElement;
+let counterEl!: HTMLElement;
+let posFull!: HTMLElement;
+let posShort!: HTMLElement;
 let colStartEl!: HTMLElement;
 let colStartTop = 0;
 let familyBlock!: HTMLElement;
@@ -578,8 +581,8 @@ function applyDynamic(): void {
 // --- Scroll-driven UI (readouts + progress bar + hidden ramps) ---
 function cacheGeometry(): void {
   const scrollTop = window.scrollY;
-  // Where the fortunes begin: the controls bar stays idle until the viewport
-  // reaches this band, so the top of the page has no fixed chrome (D-V2-5).
+  // Where the fortunes begin: the cluster stays idle until the viewport reaches
+  // this band, so the top of the page has no fixed chrome (D-V2-5).
   colStartTop = colStartEl.getBoundingClientRect().top + scrollTop;
   geometry = columns.map((def) => {
     const rect = def.el.getBoundingClientRect();
@@ -604,7 +607,7 @@ function updateScrollUI(): void {
   const salary = getSalary();
   const mid = window.scrollY + window.innerHeight / 2;
 
-  // Reveal the controls once the viewport reaches the fortunes (one-way latch).
+  // Reveal the cluster once the viewport reaches the fortunes (one-way latch).
   if (window.scrollY + window.innerHeight >= colStartTop) {
     controlsEl.removeAttribute('data-idle');
   }
@@ -621,24 +624,18 @@ function updateScrollUI(): void {
     const depth = Math.min(Math.max(mid - active.top, 0), active.height);
     const value = depth * active.width * salary;
 
-    // Floating position indicator: the readout tracks the mid-viewport line every
-    // frame; the container width and accent change only when the active column (or
-    // its rendered width, on resize/rebuild) changes, so no per-frame layout write.
-    posReadout.textContent = `${fmtBRLCompact(value)} · ${fmtLives(livesOf(value, salary, data.realGrowth))}`;
+    // Counter: the full value and the short form both track the mid-viewport line
+    // every frame; the per-column accent changes only when the active column
+    // changes, so no per-frame style write. The line and counter reveal together.
+    posFull.textContent = fmtBRLFull(value);
+    posShort.textContent = `${fmtCountShort(value)} · ${fmtLives(livesOf(value, salary, data.realGrowth))}`;
     if (active.id !== lastActiveId) {
-      posIndicator.dataset.activeCol = active.id;
-      posIndicator.style.setProperty('--pos-accent', accentForColumn(active.id));
+      controlsEl.dataset.activeCol = active.id;
+      controlsEl.style.setProperty('--pos-accent', accentForColumn(active.id));
       lastActiveId = active.id;
     }
-    // The columns are centered, so their left edge sits at 50vw - width/2; the
-    // indicator spans from the screen's left edge to there (+ a few px so the
-    // brush head's tip touches the fill).
-    const width = `${window.innerWidth / 2 - active.width / 2 + 6}px`;
-    if (width !== lastPosWidth) {
-      posIndicator.style.setProperty('--pos-width', width);
-      lastPosWidth = width;
-    }
-    posIndicator.classList.add('pos-indicator--on');
+    measureLine.classList.add('measure-line--on');
+    counterEl.classList.add('pos-counter--on');
 
     const yearsPerSecond = Math.round((currentSpeed() * active.width) / MONTHS_PER_YEAR);
     speedReadout.textContent = `≈ ${fmtCountShort(yearsPerSecond)} anos de trabalho/s`;
@@ -657,9 +654,11 @@ function updateScrollUI(): void {
   } else {
     speedReadout.textContent = '';
     lastRamp = 1;
-    // No column under the mid-viewport line: fade the indicator out and force a
-    // fresh accent/width recompute when the next column becomes active.
-    posIndicator.classList.remove('pos-indicator--on');
+    // No column under the mid-viewport line: fade the line and counter out and
+    // force a fresh accent recompute when the next column becomes active. The
+    // cluster (legend + player) stays visible once revealed.
+    measureLine.classList.remove('measure-line--on');
+    counterEl.classList.remove('pos-counter--on');
     lastActiveId = null;
   }
 
@@ -788,18 +787,27 @@ function validateData(
 // The controls ship disabled so they cannot be used (or clobbered) before the
 // data resolves; this enables them once the page is fully mounted.
 function enableControls(): void {
-  for (const el of [salaryInput, modeMin, modeCustom, btnStart, btnPlay, speedSelect]) {
+  for (const el of [salaryInput, modeMin, modeCustom, btnStart, btnPlay, speedSelect, speedSelectStart]) {
     el.disabled = false;
   }
 }
 
 function wireControls(): void {
-  speedSelect.addEventListener('change', () => {
-    const mult = Number(speedSelect.value);
+  // Two speed selects (col-start band + cluster). A change on either sets userMult
+  // and mirrors its value into the other so they never disagree (D-V3-3).
+  const selects = [speedSelect, speedSelectStart];
+  const onSelectChange = (source: HTMLSelectElement): void => {
+    const mult = Number(source.value);
     if (!isFinite(mult) || mult <= 0) return;
     userMult = mult;
+    for (const other of selects) {
+      if (other !== source) other.value = source.value;
+    }
     updateScrollUI();
-  });
+  };
+  for (const select of selects) {
+    select.addEventListener('change', () => onSelectChange(select));
+  }
   btnPlay.addEventListener('click', () => autoscroll.toggle());
 }
 
@@ -841,12 +849,15 @@ export async function boot(): Promise<void> {
   btnStart = must<HTMLButtonElement>('#btn-start');
   btnPlay = must<HTMLButtonElement>('#btn-play');
   speedSelect = must<HTMLSelectElement>('#speed-select');
+  speedSelectStart = must<HTMLSelectElement>('#speed-select-start');
   speedReadout = must<HTMLElement>('[data-speed-readout]');
   progressEl = must<HTMLElement>('[data-progress]');
   toastEl = must<HTMLElement>('#toast');
-  controlsEl = must<HTMLElement>('.controls');
-  posIndicator = must<HTMLElement>('[data-pos-indicator]');
-  posReadout = must<HTMLElement>('[data-pos-readout]');
+  controlsEl = must<HTMLElement>('[data-cluster]');
+  measureLine = must<HTMLElement>('[data-measure-line]');
+  counterEl = must<HTMLElement>('[data-pos-counter]');
+  posFull = must<HTMLElement>('[data-pos-full]');
+  posShort = must<HTMLElement>('[data-pos-short]');
   colStartEl = must<HTMLElement>('#col-start');
   familyBlock = must<HTMLElement>('[data-family-block]');
   colBilhao = must<HTMLElement>('[data-column="bilhao"]');
