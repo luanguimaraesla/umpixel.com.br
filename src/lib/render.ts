@@ -198,7 +198,6 @@ let btnStart!: HTMLButtonElement;
 let btnPlay!: HTMLButtonElement;
 let speedSelect!: HTMLSelectElement;
 let speedSelectStart!: HTMLSelectElement;
-let speedReadout!: HTMLElement;
 let progressEl!: HTMLElement;
 let toastEl!: HTMLElement;
 let controlsEl!: HTMLElement;
@@ -259,6 +258,13 @@ function debounce(fn: () => void, ms: number): () => void {
 }
 
 function usdLong(v: number): string {
+  // Once a fortune crosses US$ 1 tri (v is in USD billions) spell out "trilhão".
+  // Singular only when the 2-decimal figure is exactly "1,00", mirroring the
+  // house convention in fmtBRLCompact/fmtCountShort.
+  if (v >= 1000) {
+    const tri = decimalFmt.format(v / 1000);
+    return `US$ ${tri} ${tri === '1,00' ? 'trilhão' : 'trilhões'}`;
+  }
   return `US$ ${usdFmt.format(v)} bilhões`;
 }
 
@@ -536,7 +542,7 @@ function applyDynamic(): void {
   const muskBRL = brlOf(data.musk.usd, fx);
   const life = lifeSavings(salary, data.realGrowth);
   const forbesSource = `Forbes · lista anual, valores de ${monthYearPt(data.forbesRefDate)}`;
-  const worldForbesSource = `Forbes · lista anual, valores de ${monthYearPt(data.muskRefDate)}`;
+  const worldForbesSource = `Forbes · valores de tempo real, ${monthYearPt(data.muskRefDate)}`;
 
   const values: Record<string, string> = {
     // salary-dependent
@@ -644,9 +650,6 @@ function updateScrollUI(): void {
     measureLine.classList.add('measure-line--on');
     counterEl.classList.add('pos-counter--on');
 
-    const yearsPerSecond = Math.round((currentSpeed() * active.width) / MONTHS_PER_YEAR);
-    speedReadout.textContent = `≈ ${fmtCountShort(yearsPerSecond)} anos de trabalho/s`;
-
     // Announce each hidden speed ramp as its BRL depth is crossed while playing (D5b).
     const steps = RAMP_STEPS[active.id] || [];
     let crossed: { atBRL: number; mult: number } | null = null;
@@ -659,7 +662,6 @@ function updateScrollUI(): void {
     }
     lastRamp = mult;
   } else {
-    speedReadout.textContent = '';
     lastRamp = 1;
     // No column under the mid-viewport line: fade the line and counter out and
     // force a fresh accent recompute when the next column becomes active. The
@@ -857,7 +859,6 @@ export async function boot(): Promise<void> {
   btnPlay = must<HTMLButtonElement>('#btn-play');
   speedSelect = must<HTMLSelectElement>('#speed-select');
   speedSelectStart = must<HTMLSelectElement>('#speed-select-start');
-  speedReadout = must<HTMLElement>('[data-speed-readout]');
   progressEl = must<HTMLElement>('[data-progress]');
   toastEl = must<HTMLElement>('#toast');
   controlsEl = must<HTMLElement>('[data-cluster]');

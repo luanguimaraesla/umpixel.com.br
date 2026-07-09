@@ -50,7 +50,7 @@ atualizada de forma irregular.
 
 ### `crescimento-real-salario.json`
 Ganho real anual do salário mínimo (acima da inflação), usado **só** para projetar o patrimônio
-acumulado numa vida inteira de trabalho — não afeta a escala de pixels, que segue o salário de
+acumulado numa vida inteira de trabalho, não afeta a escala de pixels, que segue o salário de
 hoje. Padrão: **2,5% ao ano**, o teto da política de valorização vigente (arcabouço fiscal, até
 2030); o reajuste de 2026 atingiu esse teto.
 
@@ -69,12 +69,18 @@ publicam novas edições dos relatórios citados. Atualize `valor_brl`, `faixa_b
 `fontes` e `acessado_em`.
 
 ### `bilionarios-mundo.json`
-A pessoa mais rica do mundo segundo a lista anual **Forbes World's Billionaires 2026** (divulgada em
-10/03/2026, valores de 01/03/2026): Elon Musk, **US$ 839 bilhões**. Usamos a lista anual, e não a de
-tempo real, porque ela é estável e citável; as observações registram a variação de tempo real.
+A pessoa mais rica do mundo, agora pelo valor de **tempo real** da Forbes (não mais a lista anual):
+Elon Musk, **US$ 1.053 bilhões** (US$ 1,05 trilhão) em 01/07/2026. Em 12/06/2026 ele se tornou o
+primeiro trilionário da história, no IPO da SpaceX, quando a Forbes calculou seu patrimônio em
+~US$ 1,1 tri. O site passou a usar o tempo real (e não mais a lista anual de março de 2026, US$ 839
+bi) justamente para registrar o marco do trilhão. O Brasil segue na lista anual estável
+(`bilionarios-brasil.json`), porque o tempo real do ranking brasileiro é volátil; as duas fontes são
+independentes.
 
-**Como atualizar:** a lista anual da Forbes sai todo mês de março. Substitua `pessoa_mais_rica`,
-`data_publicacao`, `data_referencia_valores` e `acessado_em`.
+**Como atualizar:** consulte o valor de tempo real no perfil da Forbes (a URL está no arquivo) e
+atualize `pessoa_mais_rica.patrimonio_usd_bilhoes`, `data_referencia_valores` (a data do valor) e
+`acessado_em`. O front lê `pessoa_mais_rica.{nome,patrimonio_usd_bilhoes,ranking_mundial,fonte_riqueza}`,
+`data_referencia_valores`, `fontes[].{nome,url}` e `acessado_em`.
 
 ### `comparacoes-publicas.json`
 Referências de escala pública para as frases que aparecem no meio das colunas: o PIB de alguns

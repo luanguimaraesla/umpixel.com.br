@@ -15,10 +15,6 @@ const { id, endId } = Astro.props;
     <slot name="intro" />
   </template>
 
-  <div class="wrap">
-    <a class="col__skip" href={`#${endId}`}>pular para o fim da coluna ↓</a>
-  </div>
-
   <div class="wealth-column wealth-column--metric" data-column={id}></div>
 
   <div class="wrap">

@@ -489,14 +489,6 @@ strong {
 .col__context {
   font-size: 1rem;
 }
-.col__skip {
-  display: inline-block;
-  margin: 0.5rem auto 1.5rem;
-  font-size: 0.85rem;
-  color: var(--amarelo);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
 .col__end {
   max-width: 30rem;
   margin: 1rem auto 0;
@@ -886,13 +878,6 @@ strong {
   display: grid;
   place-items: center;
 }
-.pos-player__readout {
-  flex-basis: 100%;
-  font-size: 0.78rem;
-  color: var(--amarelo);
-  font-variant-numeric: tabular-nums;
-}
-
 /* Shared speed select: dark pill with a hand-set amarelo chevron. Used by the
    cluster player and the col-start band; the two selects mirror each other (D-V3-3). */
 .speed-select {

@@ -1,21 +1,23 @@
 {
-  "lista": "Forbes World's Billionaires 2026 (lista anual)",
-  "data_publicacao": "2026-03-10",
-  "data_referencia_valores": "2026-03-01",
+  "lista": "Forbes Real-Time Billionaires",
+  "data_publicacao": "2026-06-12",
+  "data_referencia_valores": "2026-07-01",
   "pessoa_mais_rica": {
     "nome": "Elon Musk",
-    "patrimonio_usd_bilhoes": 839,
+    "patrimonio_usd_bilhoes": 1053,
     "ranking_mundial": 1,
-    "fonte_riqueza": "Tesla, SpaceX e xAI",
+    "fonte_riqueza": "SpaceX, Tesla e xAI",
     "perfil": "https://www.forbes.com/profile/elon-musk/"
   },
   "observacoes": [
-    "Pessoa mais rica já registrada na lista anual da Forbes (40ª edição).",
-    "Em tempo real (2026-07-08) o patrimônio era ~US$ 935 bi; em 12/06/2026 chegou a US$ 1,1 tri (primeiro trilionário, IPO da SpaceX) antes de recuar. O site usa a lista anual por ser estável e citável."
+    "Em 12/06/2026 Elon Musk se tornou o primeiro trilionário da história, no IPO da SpaceX, quando a Forbes calculou seu patrimônio em US$ 1,1 tri. Em 1º/07/2026 estava em US$ 1,053 tri (tempo real).",
+    "O site passou a usar o valor de tempo real (e não mais a lista anual da Forbes, de março de 2026, US$ 839 bi) para refletir o marco do trilhão."
   ],
   "fontes": [
-    {"nome": "Forbes — 40th Annual World's Billionaires List (press release, 10/03/2026)", "url": "https://www.forbes.com/sites/pr/2026/03/10/forbes-40th-annual-worlds-billionaires-list-elon-musk-is-worlds-richest-person-ever-recorded/"},
-    {"nome": "Forbes — perfil de Elon Musk (tempo real)", "url": "https://www.forbes.com/profile/elon-musk/"}
+    {"nome": "Forbes - Elon Musk é o primeiro trilionário do mundo (12/06/2026)", "url": "https://www.forbes.com/sites/pr/2026/06/12/forbes-declares-elon-musk-as-the-worlds-first-trillionaire/"},
+    {"nome": "Forbes - The Top 10 Richest People In The World (julho de 2026)", "url": "https://www.forbes.com/sites/forbeswealthteam/article/the-top-ten-richest-people-in-the-world/"},
+    {"nome": "Forbes - Real-Time Billionaires", "url": "https://www.forbes.com/real-time-billionaires/"},
+    {"nome": "Forbes - perfil de Elon Musk (tempo real)", "url": "https://www.forbes.com/profile/elon-musk/"}
   ],
-  "acessado_em": "2026-07-08"
+  "acessado_em": "2026-07-09"
 }

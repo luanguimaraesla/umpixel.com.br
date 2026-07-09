@@ -11,7 +11,7 @@ export const COLUMN_USABLE_CAP = 720; // cap usable viewport width so columns st
 export const COLUMN_SIDE_MARGIN = 48; // 24px on each side
 
 export const SPEED_BASE = 600; // pixels per second at 1x (D5); one working life per second on the desktop column
-export const SPEED_MULTIPLIERS = [0.5, 1, 2, 3] as const;
+export const SPEED_MULTIPLIERS = [0.5, 1, 2, 4, 8] as const;
 
 export const BILLION_BRL = 1_000_000_000; // D1: definitional milestone, not sourced data
 export const RULER_STEP = 100; // px between ruler marks on the metric columns
