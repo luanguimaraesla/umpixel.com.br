@@ -2,7 +2,6 @@
 import Base from '../layouts/Base.astro';
 import ProgressBar from '../components/ProgressBar.astro';
 import Hero from '../components/Hero.astro';
-import HandArrow from '../components/HandArrow.astro';
 import WealthColumn from '../components/WealthColumn.astro';
 import Controls from '../components/Controls.astro';
 import PositionIndicator from '../components/PositionIndicator.astro';
@@ -59,17 +58,15 @@ import Footer from '../components/Footer.astro';
 
       <hr class="key__divider" />
       <p class="key__outro">
-        Agora afasta o zoom. Lá embaixo, cada coluna continua em escala real. Desce e vê o número
-        subir.
+        Agora afasta o zoom: lá embaixo, cada coluna continua em escala real.
       </p>
     </div>
   </section>
 
   <!-- The descent starts here: the CTA lives where the fortunes begin, not in the hero. -->
   <section class="section section--dark col-start" id="col-start">
-    <p class="col-start__line">Acabou o aquecimento. As fortunas começam aqui.</p>
+    <p class="col-start__line">Você sabe quanto os verdadeiros ricos são mais ricos do que você?</p>
     <div class="col-start__cta">
-      <HandArrow variant="curve" class="col-start__arrow" />
       <button class="hero__start col-start__btn" id="btn-start" type="button" disabled>
         ▶ começar a descer
       </button>
@@ -83,7 +80,7 @@ import Footer from '../components/Footer.astro';
         <p class="col__name">R$ 1 bilhão</p>
         <p class="col__context">
           São <strong data-dyn="billion-years">…</strong> de trabalho. A coluna aí embaixo está em
-          escala real. Desce.
+          escala real.
         </p>
       </div>
     </Fragment>
@@ -100,8 +97,6 @@ import Footer from '../components/Footer.astro';
         <p class="col__figure">
           <span data-dyn="richest-usd">…</span> (<span data-dyn="richest-brl">…</span>)
         </p>
-      </div>
-      <div data-intro-step>
         <p class="col__source" data-dyn="richest-wealth-source">…</p>
         <p class="col__source" data-dyn="forbes-source">…</p>
         <p class="col__context">
@@ -124,12 +119,8 @@ import Footer from '../components/Footer.astro';
         <p class="col__figure">
           <span data-dyn="musk-usd">…</span> (<span data-dyn="musk-brl">…</span>)
         </p>
-      </div>
-      <div data-intro-step>
         <p class="col__source" data-dyn="musk-wealth-source">…</p>
         <p class="col__source" data-dyn="world-forbes-source">…</p>
-      </div>
-      <div data-intro-step>
         <p class="col__context">
           São <strong data-dyn="musk-years">…</strong> de trabalho. Boa sorte.
         </p>

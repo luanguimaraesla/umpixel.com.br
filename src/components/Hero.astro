@@ -1,11 +1,10 @@
 ---
-import HandArrow from './HandArrow.astro';
 ---
 
 <section class="section section--black hero">
   <h1 class="hero__title">UM PIXEL</h1>
   <p class="hero__subtitle">
-    Isto aqui é <strong>1 pixel</strong>: um mês do seu salário. Desça a tela e sinta, em
+    Isto aqui é <strong>1 pixel</strong>: um mês do seu salário. Role a página e sinta, em
     escala real, o tamanho das fortunas.
   </p>
 
@@ -65,8 +64,19 @@ import HandArrow from './HandArrow.astro';
   </p>
 
   <div class="scroll-cue" aria-hidden="true">
-    <HandArrow variant="down" class="scroll-cue__arrow" />
-    <span class="scroll-cue__word">desce</span>
+    <svg
+      class="scroll-cue__arrow"
+      viewBox="0 0 24 36"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M12 3 L12 30 M6 24 L12 30 L18 24" />
+    </svg>
+    <span class="scroll-cue__word">vamos começar, role a página</span>
   </div>
   <span class="sr-only">Role a página para baixo para começar a descer pelas fortunas.</span>
 </section>

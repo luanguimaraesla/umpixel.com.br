@@ -323,10 +323,6 @@ function rampMult(): number {
   return 1;
 }
 
-// Vertical gap between staged intro cards inside a column, in px (D-V2-6). Each
-// intro step holds for this many px before the next one takes over.
-const INTRO_STEP_GAP = 900;
-
 // --- Column building (metric view: solid area + CSS ruler + sticky beats; D6/D7/D9) ---
 function buildWealthColumn(def: ColumnDef, salary: number, baseWidth: number): void {
   const months = monthsOf(def.valueBRL, salary);
@@ -338,24 +334,24 @@ function buildWealthColumn(def: ColumnDef, salary: number, baseWidth: number): v
   def.el.style.setProperty('--col-w', `${w}px`);
   def.el.style.height = `${height}px`;
 
-  // Bracket key: what one ruler mark is worth, in money and in work-time.
+  // Ruler key chip: what one ruler mark is worth, in money and in work-time.
   const rulerKey = document.createElement('div');
   rulerKey.className = 'ruler-key';
   rulerKey.setAttribute('aria-hidden', 'true'); // decorative scale annotation
-  const bracket = document.createElement('span');
-  bracket.className = 'ruler-key__bracket';
   const keyLabel = document.createElement('span');
   keyLabel.className = 'ruler-key__label panel';
   keyLabel.textContent =
     `cada traço = ${fmtBRLCompact(RULER_STEP * w * salary)}` +
     ` · ${fmtYears((RULER_STEP * w) / MONTHS_PER_YEAR)} de trabalho`;
-  rulerKey.append(bracket, keyLabel);
+  rulerKey.append(keyLabel);
 
   const px = (v: number): number => Math.round(monthsOf(v, salary) / w);
 
-  // Staged intro cards from the column's <template data-col-intro> (D-V2-6). They
-  // are positioned by px depth (not BRL) and end before the first milestone so no
-  // intro card holds under a beat.
+  // Intro cards from the column's <template data-col-intro>. The intro run spans
+  // [0, introEnd), where introEnd is the first milestone (or the column bottom).
+  // That run is split evenly among the template's steps; after the D-V3-4 merge
+  // there is one step per column, so its single card holds the whole run. A step
+  // gets no card if its share is under 800px (D-V3-9).
   const introWrappers: HTMLElement[] = [];
   const section = def.el.closest('[data-col-section]');
   const tpl = section?.querySelector<HTMLTemplateElement>('template[data-col-intro]');
@@ -363,10 +359,12 @@ function buildWealthColumn(def: ColumnDef, salary: number, baseWidth: number): v
     const steps = tpl.content.querySelectorAll<HTMLElement>('[data-intro-step]');
     const firstMilestonePx = def.milestones.length ? px(def.milestones[0].atBRL) : height;
     const introEnd = Math.min(firstMilestonePx, height);
+    const slot = steps.length ? introEnd / steps.length : 0;
     steps.forEach((step, i) => {
-      const top = i * INTRO_STEP_GAP;
-      const wrapperHeight = Math.min(top + INTRO_STEP_GAP, introEnd) - top;
-      if (top >= introEnd || wrapperHeight < 800) return; // no room to hold this step
+      const top = Math.round(i * slot);
+      const bottom = i + 1 < steps.length ? Math.round((i + 1) * slot) : introEnd;
+      const wrapperHeight = bottom - top;
+      if (wrapperHeight < 800) return; // no room to hold this step
 
       const wrapper = document.createElement('div');
       wrapper.className = 'col-note col-note--intro';

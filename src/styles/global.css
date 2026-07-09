@@ -326,14 +326,15 @@ strong {
 }
 .scroll-cue__arrow {
   display: block;
-  height: 5rem;
+  height: 2.25rem;
   width: auto;
 }
 .scroll-cue__word {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 1rem;
-  letter-spacing: 0.08em;
+  font-size: clamp(0.85rem, 3vw, 1rem);
+  letter-spacing: 0.04em;
+  text-align: center;
 }
 @media (prefers-reduced-motion: no-preference) {
   .scroll-cue {
@@ -366,14 +367,6 @@ strong {
   align-items: center;
   gap: 0.5rem;
   margin-top: 1.25rem;
-}
-.col-start__arrow {
-  display: block;
-  flex: none;
-  height: 2.75rem;
-  width: auto;
-  color: var(--amarelo);
-  transform: rotate(4deg);
 }
 
 /* ---- Scale key: the whole metaphor in one compact static panel (D-V2-1) ---- */
@@ -540,50 +533,40 @@ strong {
   margin: 2rem auto;
   border-radius: 2px;
 }
-/* Solid fill plus a zero-DOM two-layer ruler (D-V2-2): a minor 2px mark every
-   RULER_STEP (100px) at 14px wide, plus a same-color major layer every 500px at
-   28px wide. Same rgba so the overlap is invisible; every 5th mark reads twice as
-   wide. Both layers hug the left edge like a physical ruler strip. */
+/* Solid fill plus a single-layer ruler (D-V3-6): one 500px-tall SVG tile repeats
+   down the left edge. Minor 2px marks (10px wide) sit every RULER_STEP (100px);
+   the major mark at each tile's top (every 5th, 20px wide) reads twice as long.
+   crispEdges keeps every mark sharp and nothing overlaps. */
 .wealth-column--metric {
   background-color: var(--col-fill);
-  background-image:
-    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.45) 0 2px, transparent 2px 100px),
-    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.45) 0 2px, transparent 2px 500px);
-  background-size: 14px 100px, 28px 500px;
-  background-repeat: repeat-y, repeat-y;
-  background-position: left top, left top;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='500' shape-rendering='crispEdges'%3E%3Cg fill='rgba(0,0,0,0.45)'%3E%3Crect x='0' y='0' width='20' height='2'/%3E%3Crect x='0' y='100' width='10' height='2'/%3E%3Crect x='0' y='200' width='10' height='2'/%3E%3Crect x='0' y='300' width='10' height='2'/%3E%3Crect x='0' y='400' width='10' height='2'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat-y;
+  background-position: left top;
 }
-/* Bracket key: labels what one ruler mark is worth. Sits inside the column's
-   left edge with a small overhang (D-V2-6), bracketing the 300-400 ruler segment
-   so it clears the pinned step-1 intro card (tallest plaque ~217px, bottom ~284).
-   z-index below the note cards, so as you scroll it tucks behind the plaque
-   instead of painting over it. The bracket opens toward the column (its arms
-   reach right, over one 100px segment). */
+/* Ruler key: a clean label chip at the column's top-left that says what one ruler
+   mark is worth. No overhang and no negative margin, so it never spills past the
+   viewport at any width (D-V3-5). It sticks to the top of the viewport while the
+   column is in view, sitting above the note cards that pin lower at 4.5rem, so the
+   scale annotation stays readable instead of hiding behind the pinned intro card. */
 .ruler-key {
-  position: absolute;
-  top: 300px;
+  position: sticky;
+  top: 0.5rem;
   left: 0;
-  margin-left: -14px;
-  height: 100px;
+  width: max-content;
+  max-width: 100%;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
   pointer-events: none;
   z-index: 0;
 }
-.ruler-key__bracket {
-  align-self: stretch;
-  width: 8px;
-  border-left: 2px solid var(--amarelo);
-  border-top: 2px solid var(--amarelo);
-  border-bottom: 2px solid var(--amarelo);
-  border-radius: 2px 0 0 2px;
-}
+/* Compact chip: tighter than a full panel so its two lines clear the 4.5rem card
+   pin line and the card never overlaps it. */
 .ruler-key__label {
   font-size: 0.8rem;
-  line-height: 1.35;
-  width: max-content;
-  max-width: 14rem;
+  line-height: 1.3;
+  max-width: min(86vw, 15rem);
+  margin-left: 0.5rem;
+  padding: 0.35rem 0.7rem;
 }
 
 /* In-column cards: absolutely-positioned wrappers whose height IS the hold
@@ -597,9 +580,10 @@ strong {
   left: 0;
   width: 100%;
 }
-/* Pinned-plaque look: the card overhangs the column's left edge, tilts slightly,
-   and casts a hard offset shadow with an amarelo edge, like a plate nailed to the
-   column (D-V2-6). */
+/* Modern pinned card: sits straight, keeps the panel's translucency and blur, and
+   overhangs the column's left edge. The accent lives in the type (amarelo eyebrow
+   and strong), not in a painted edge; a soft elevation shadow lifts it off the
+   fill (D-V3-4). */
 .col-note__card {
   position: sticky;
   top: 4.5rem;
@@ -608,9 +592,9 @@ strong {
   margin-left: clamp(-6rem, -12vw, -1rem);
   text-align: left;
   font-size: 0.95rem;
-  border-left: 3px solid var(--amarelo);
-  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.55);
-  transform: rotate(-1.5deg);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 .col-note__card--intro {
   width: min(23rem, 82vw);
@@ -618,8 +602,8 @@ strong {
 .col-note__card strong {
   color: var(--amarelo);
 }
-/* Phrase plaques: shouted display type, a stronger tilt, still on the same pinned
-   plaque as the informational beats so they read like wall-writing (D-V2-9). */
+/* Phrase cards: shouted Anton display type on the same straight modern card as the
+   informational beats, so they read like wall-writing without a tilt (D-V3-4). */
 .col-note__card--phrase {
   width: min(22rem, 80vw);
   font-family: var(--font-display);
@@ -627,8 +611,6 @@ strong {
   font-size: 1.35rem;
   line-height: 1.12;
   letter-spacing: 0.01em;
-  border-left-width: 4px;
-  transform: rotate(-2.5deg);
 }
 /* Fine print for the estimate beats (e.g. eradicating illiteracy). */
 .col-note__fine {
@@ -648,28 +630,6 @@ strong {
    inset there so no card ever clips against the viewport (D-V2-6). */
 @media (max-width: 760px) {
   .col-note__card {
-    margin-left: 0.5rem;
-  }
-}
-
-/* Below ~1080px there is no room for the bracket beside the label, so drop the
-   bracket and keep the key as a chip near the column's top left (no offscreen
-   overflow at 390px). */
-@media (max-width: 1080px) {
-  .ruler-key {
-    left: 0;
-    right: auto;
-    margin-left: 0;
-    height: auto;
-    top: 0.5rem;
-    justify-content: flex-start;
-    max-width: 100%;
-  }
-  .ruler-key__bracket {
-    display: none;
-  }
-  .ruler-key__label {
-    max-width: min(86vw, 15rem);
     margin-left: 0.5rem;
   }
 }
