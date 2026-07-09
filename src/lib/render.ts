@@ -208,8 +208,6 @@ let measureLine!: HTMLElement;
 let counterEl!: HTMLElement;
 let posFull!: HTMLElement;
 let posShort!: HTMLElement;
-let colStartEl!: HTMLElement;
-let colStartTop = 0;
 let familyBlock!: HTMLElement;
 let lifeBlock!: HTMLElement;
 let colBilhao!: HTMLElement;
@@ -618,9 +616,6 @@ function applyDynamic(): void {
 // --- Scroll-driven UI (readouts + progress bar + hidden ramps) ---
 function cacheGeometry(): void {
   const scrollTop = window.scrollY;
-  // Where the fortunes begin: the cluster stays idle until the viewport reaches
-  // this band, so the top of the page has no fixed chrome (D-V2-5).
-  colStartTop = colStartEl.getBoundingClientRect().top + scrollTop;
   geometry = columns.map((def) => {
     const rect = def.el.getBoundingClientRect();
     return {
@@ -644,9 +639,14 @@ function updateScrollUI(): void {
   const salary = getSalary();
   const mid = window.scrollY + window.innerHeight / 2;
 
-  // Reveal the cluster once the viewport reaches the fortunes (one-way latch).
-  if (window.scrollY + window.innerHeight >= colStartTop) {
+  // Show the cluster (and, on mobile, the whole bottom bar) once the first wealth
+  // column enters the viewport; hide it again when scrolling back up to the intro
+  // sections. Two-way latch, re-evaluated every frame (D-V4-1).
+  const firstCol = geometry[0];
+  if (firstCol && window.scrollY + window.innerHeight >= firstCol.top) {
     controlsEl.removeAttribute('data-idle');
+  } else {
+    controlsEl.setAttribute('data-idle', '');
   }
 
   let active: ColumnGeometry | null = null;
@@ -689,7 +689,8 @@ function updateScrollUI(): void {
     lastRamp = 1;
     // No column under the mid-viewport line: fade the line and counter out and
     // force a fresh accent recompute when the next column becomes active. The
-    // cluster (legend + player) stays visible once revealed.
+    // legend and player do not fade with the line; the whole cluster's show/hide
+    // is driven by the two-way latch above.
     measureLine.classList.remove('measure-line--on');
     counterEl.classList.remove('pos-counter--on');
     lastActiveId = null;
@@ -714,7 +715,11 @@ function showToast(msg: string): void {
 // --- Full recompute (load / salary change / resize) ---
 function recompute(): void {
   const salary = getSalary();
-  colW = columnWidth(window.innerWidth);
+  // Size the columns against the content width, not innerWidth: the page always
+  // shows a scrollbar (html { overflow-y: scroll }), so innerWidth is wider than
+  // the laid-out content box and the centered fill loses its right gutter to the
+  // scrollbar. clientWidth excludes the scrollbar, keeping the gutters equal (D-V4-9).
+  colW = columnWidth(document.documentElement.clientWidth);
 
   const docEl = document.documentElement;
   const prevMax = docEl.scrollHeight - window.innerHeight;
@@ -890,7 +895,6 @@ export async function boot(): Promise<void> {
   counterEl = must<HTMLElement>('[data-pos-counter]');
   posFull = must<HTMLElement>('[data-pos-full]');
   posShort = must<HTMLElement>('[data-pos-short]');
-  colStartEl = must<HTMLElement>('#col-start');
   familyBlock = must<HTMLElement>('[data-family-block]');
   lifeBlock = must<HTMLElement>('[data-life-block]');
   colBilhao = must<HTMLElement>('[data-column="bilhao"]');

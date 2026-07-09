@@ -893,21 +893,71 @@ strong {
   color: var(--branco);
 }
 
-/* Phones: hug the left edge, allow the cluster to overlay the column fill (white on
-   the fills is verified 7+:1), and clamp the counter so the 20-glyph trilhões value
-   fits 390px with no horizontal overflow. The legend hides so the counter and the
-   player stay uncrowded at this width. */
+/* Phones: the cluster becomes a fixed bottom bar so it never overlaps the card
+   text. Legend + counter + player sit compactly inside a translucent, blurred bar
+   with a top amarelo accent and safe-area padding, so card text never bleeds
+   through. The measuring line stays at 50vh; the counter still reads the
+   mid-viewport value. The two-way latch (data-idle) shows/hides this whole bar,
+   and its own transition still fades it cleanly both ways (D-V4-11). */
 @media (max-width: 640px) {
   .cluster {
-    left: 0.5rem;
-    max-width: calc(100vw - 1rem);
-    gap: 0.5rem;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    transform: none;
+    width: 100%;
+    max-width: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.35rem 0.6rem;
+    padding: 0.55rem 0.9rem calc(0.55rem + env(safe-area-inset-bottom, 0px));
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 2px solid var(--amarelo);
   }
-  .pos-legend {
-    display: none;
+  /* Counter leads on the first row; the player sits to its right. Its nowrap
+     min-content width keeps it under 390px, so the player just wraps if needed and
+     the bar never overflows horizontally. */
+  .pos-counter {
+    order: 1;
+    flex: 1 1 auto;
   }
   .pos-counter__full {
-    font-size: clamp(1.25rem, 6vw, 1.9rem);
+    font-size: clamp(1.2rem, 5.6vw, 1.8rem);
+  }
+  .pos-player {
+    order: 2;
+    flex: 0 0 auto;
+  }
+  /* Legend returns as a compact single strip across the full width, below the
+     counter/player row. The panel chrome is stripped so it reads as inline ink,
+     and the true-scale blocks stay inline. */
+  .pos-legend {
+    display: flex;
+    order: 3;
+    flex: 1 1 100%;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 0;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    font-size: 0.6rem;
+  }
+  .pos-legend__swatch {
+    width: auto;
+  }
+  .pos-legend__row {
+    gap: 0.3rem;
   }
 }
 
@@ -953,5 +1003,10 @@ strong {
   }
   .hero {
     gap: 0.9rem;
+  }
+  /* Lift the toast above the fixed cluster bottom bar so it is never hidden
+     behind it (D-V4-11). */
+  .toast {
+    bottom: calc(7.5rem + env(safe-area-inset-bottom, 0px));
   }
 }
