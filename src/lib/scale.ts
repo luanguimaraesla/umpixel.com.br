@@ -61,6 +61,20 @@ export function columnWidth(viewportWidth: number): number {
 }
 
 /**
+ * A near-square integer block whose AREA (w × h px²) equals `months`: the site's
+ * core proportion, one px² per month of salary. Height is the rounded square root
+ * and width fills the rest, so the block reads a touch wider than tall when the
+ * count is not a perfect square: 12 → 4×3, 132 → 12×11, ~1052 → 33×32. The double
+ * rounding keeps the area within ~1% of the month count at these sizes, so the
+ * pixel area still IS the number of months.
+ */
+export function squareishBlock(months: number): { w: number; h: number } {
+  const h = Math.max(1, Math.round(Math.sqrt(months)));
+  const w = Math.max(1, Math.round(months / h));
+  return { w, h };
+}
+
+/**
  * The actual rendered width (px) of a metric column. It is `baseWidth` unless the
  * fortune is so tall that the column would exceed the browser's element-height
  * limit, in which case the D10 guard widens it (kept a multiple of 12 so a whole
@@ -120,8 +134,9 @@ export function fmtBRLCompact(v: number): string {
   return fmtBRL(v);
 }
 
-/** Spelled-out large count, e.g. 301256891 -> "301,3 milhões". */
+/** Spelled-out large count, e.g. 301256891 -> "301,3 milhões", 3.9e12 -> "3,9 trilhões". */
 export function fmtCountShort(v: number): string {
+  if (v >= 1e12) return `${n1(v / 1e12)} ${n1(v / 1e12) === '1,0' ? 'trilhão' : 'trilhões'}`;
   if (v >= 1e9) return `${n1(v / 1e9)} ${n1(v / 1e9) === '1,0' ? 'bilhão' : 'bilhões'}`;
   if (v >= 1e6) return `${n1(v / 1e6)} ${n1(v / 1e6) === '1,0' ? 'milhão' : 'milhões'}`;
   if (v >= 1e5) return `${fmtInt(v / 1e3)} mil`;

@@ -11,6 +11,7 @@ import {
   livesOf,
   lifeSavings,
   brlOf,
+  squareishBlock,
   columnWidth,
   metricColumnWidth,
   fmtBRL,
@@ -208,6 +209,7 @@ let posShort!: HTMLElement;
 let colStartEl!: HTMLElement;
 let colStartTop = 0;
 let familyBlock!: HTMLElement;
+let lifeBlock!: HTMLElement;
 let colBilhao!: HTMLElement;
 let colRichest!: HTMLElement;
 let colMusk!: HTMLElement;
@@ -571,11 +573,16 @@ function applyDynamic(): void {
     if (text !== undefined) el.textContent = text;
   });
 
-  // The family patrimônio block is shown in true CSS-pixel size (~12 × 10 px at
-  // minimum wage): 12px wide (one year per row) by one row per year of savings.
-  const rows = Math.max(1, Math.round(monthsOf(data.family, salary) / MONTHS_PER_YEAR));
-  familyBlock.style.width = '12px';
-  familyBlock.style.height = `${rows}px`;
+  // Family and life blocks in true pixel area: w × h px² = months of salary, the
+  // page's core proportion. squareishBlock renders each as its near-square integer
+  // rectangle (família ≈ 11×11 at min wage; vida ≈ 33×32, salary-invariant because
+  // both the patrimônio and the salary scale together).
+  const familySize = squareishBlock(monthsOf(data.family, salary));
+  familyBlock.style.width = `${familySize.w}px`;
+  familyBlock.style.height = `${familySize.h}px`;
+  const lifeSize = squareishBlock(lifeSavings(salary, data.realGrowth) / salary);
+  lifeBlock.style.width = `${lifeSize.w}px`;
+  lifeBlock.style.height = `${lifeSize.h}px`;
 }
 
 // --- Scroll-driven UI (readouts + progress bar + hidden ramps) ---
@@ -860,6 +867,7 @@ export async function boot(): Promise<void> {
   posShort = must<HTMLElement>('[data-pos-short]');
   colStartEl = must<HTMLElement>('#col-start');
   familyBlock = must<HTMLElement>('[data-family-block]');
+  lifeBlock = must<HTMLElement>('[data-life-block]');
   colBilhao = must<HTMLElement>('[data-column="bilhao"]');
   colRichest = must<HTMLElement>('[data-column="richest"]');
   colMusk = must<HTMLElement>('[data-column="musk"]');
