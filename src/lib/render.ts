@@ -979,7 +979,30 @@ function wireControls(): void {
   for (const select of selects) {
     select.addEventListener('change', () => onSelectChange(select));
   }
-  btnPlay.addEventListener('click', () => autoscroll.toggle());
+
+  // Capture the play/pause intent when the press begins, not when the click fires.
+  // Window-level listeners (touchmove pan, Space keydown) can pause between the
+  // press and the click; sampling autoscroll.isPlaying() in the click handler would
+  // then read the just-paused state and restart playback, so a pause tap could
+  // never pause on mobile (and Space on the focused button had the same race on
+  // desktop). Snapshot the state at press time and act on that. Ignore auto-repeat
+  // keydowns: holding Space re-fires keydown, and the repeats would overwrite the
+  // real press-time snapshot with the already-paused state.
+  let playIntent: { wasPlaying: boolean; at: number } | null = null;
+  const captureIntent = (): void => {
+    playIntent = { wasPlaying: autoscroll.isPlaying(), at: performance.now() };
+  };
+  btnPlay.addEventListener('pointerdown', captureIntent);
+  btnPlay.addEventListener('keydown', (e) => {
+    if (!e.repeat) captureIntent();
+  });
+  btnPlay.addEventListener('click', () => {
+    const fresh = playIntent && performance.now() - playIntent.at < 1000;
+    const wasPlaying = fresh ? playIntent!.wasPlaying : autoscroll.isPlaying();
+    playIntent = null;
+    if (wasPlaying) autoscroll.pause();
+    else autoscroll.play();
+  });
 }
 
 function wireStart(): void {

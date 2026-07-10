@@ -6,7 +6,6 @@ interface AutoscrollOptions {
 export interface Autoscroll {
   play(): void;
   pause(): void;
-  toggle(): void;
   isPlaying(): boolean;
   /** Reset the baseline the safety-net compares against, after a programmatic scroll. */
   sync(): void;
@@ -14,17 +13,23 @@ export interface Autoscroll {
 
 /**
  * Continuous downward autoscroll driven by requestAnimationFrame. Any real user
- * scroll interaction (wheel, touch, arrow/space/page keys, scrollbar drag)
- * pauses it; it resumes only through play(). Respects prefers-reduced-motion by
+ * scroll interaction (wheel, touch pan, arrow/space/page keys, scrollbar drag)
+ * pauses it; it resumes only through play(). A touch PAN (touchmove) is scroll
+ * intent and pauses, but a bare tap does not, so taps on the player controls
+ * never pre-empt their own click handlers. Respects prefers-reduced-motion by
  * never auto-starting the loop there.
  */
 export function createAutoscroll(opts: AutoscrollOptions): Autoscroll {
+  // Grace window after play() during which unexpected scrollY drift is absorbed
+  // (sync) rather than read as a user takeover (pause). See the scroll safety net.
+  const PLAY_GRACE_MS = 800;
+
   let playing = false;
   let rafId = 0;
   let lastTime = 0;
   let carry = 0; // sub-pixel accumulator so slow speeds still move
   let expectedY = 0; // scrollY the engine expects after its own scroll
-  let movedThisFrame = false;
+  let playStartedAt = 0; // performance.now() at the last play(), for the grace window
 
   function atBottom(): boolean {
     const max = document.documentElement.scrollHeight - window.innerHeight;
@@ -40,10 +45,8 @@ export function createAutoscroll(opts: AutoscrollOptions): Autoscroll {
     const step = Math.floor(carry);
     if (step > 0) {
       carry -= step;
-      movedThisFrame = true;
       window.scrollBy(0, step);
       expectedY = window.scrollY;
-      movedThisFrame = false;
       if (atBottom()) {
         pause();
         return;
@@ -58,6 +61,7 @@ export function createAutoscroll(opts: AutoscrollOptions): Autoscroll {
     playing = true;
     carry = 0;
     lastTime = performance.now();
+    playStartedAt = lastTime;
     expectedY = window.scrollY;
     rafId = requestAnimationFrame(frame);
     opts.onStateChange(true);
@@ -68,11 +72,6 @@ export function createAutoscroll(opts: AutoscrollOptions): Autoscroll {
     playing = false;
     cancelAnimationFrame(rafId);
     opts.onStateChange(false);
-  }
-
-  function toggle(): void {
-    if (playing) pause();
-    else play();
   }
 
   function sync(): void {
@@ -92,7 +91,10 @@ export function createAutoscroll(opts: AutoscrollOptions): Autoscroll {
   ]);
 
   window.addEventListener('wheel', () => pause(), { passive: true });
-  window.addEventListener('touchstart', () => pause(), { passive: true });
+  // A touch pan is scroll intent, a tap is not. Pause on touchmove, not
+  // touchstart, so a tap whose click is suppressed no longer kills the loop and
+  // taps on the player controls do not pre-empt their own click handlers.
+  window.addEventListener('touchmove', () => pause(), { passive: true });
   window.addEventListener(
     'keydown',
     (e) => {
@@ -103,7 +105,10 @@ export function createAutoscroll(opts: AutoscrollOptions): Autoscroll {
   window.addEventListener(
     'pointerdown',
     (e) => {
-      if (e.clientX > window.innerWidth - 24) pause();
+      // Right-edge gutter grab = scrollbar drag, but only on desktop. Gated to
+      // mouse so a touch/pen tap near a phone's right edge (e.g. the speed select
+      // in the bottom bar) never pauses.
+      if (e.pointerType === 'mouse' && e.clientX > window.innerWidth - 24) pause();
     },
     { passive: true },
   );
@@ -112,11 +117,18 @@ export function createAutoscroll(opts: AutoscrollOptions): Autoscroll {
   window.addEventListener(
     'scroll',
     () => {
-      if (!playing || movedThisFrame) return;
-      if (Math.abs(window.scrollY - expectedY) > 4) pause();
+      if (!playing) return;
+      if (Math.abs(window.scrollY - expectedY) > 4) {
+        // Right after a tap starts playback, leftover fling momentum, tap-slop
+        // micro-scrolls and mobile URL-bar adjustments move scrollY without the
+        // engine. Inside the grace window, absorb that drift instead of reading it
+        // as a user takeover; only past it does an off-baseline scroll mean pause.
+        if (performance.now() - playStartedAt < PLAY_GRACE_MS) sync();
+        else pause();
+      }
     },
     { passive: true },
   );
 
-  return { play, pause, toggle, isPlaying: () => playing, sync };
+  return { play, pause, isPlaying: () => playing, sync };
 }
