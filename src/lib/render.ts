@@ -830,8 +830,9 @@ function recompute(): void {
   const newMax = docEl.scrollHeight - window.innerHeight;
   const target = ratio * newMax;
   if (Math.abs(target - window.scrollY) > 2) window.scrollTo(0, target);
-  // Resync the autoscroll baseline so this programmatic scroll is not mistaken
-  // for a user interaction by the safety-net pause.
+  // This programmatic re-anchor can jump scrollY upward by a lot when the columns
+  // shrink (higher salary), so reset the engine's takeover baseline so it is not
+  // read as a user takeover.
   autoscroll.sync();
 
   cacheGeometry();

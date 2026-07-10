@@ -7,29 +7,44 @@ export interface Autoscroll {
   play(): void;
   pause(): void;
   isPlaying(): boolean;
-  /** Reset the baseline the safety-net compares against, after a programmatic scroll. */
+  // Reset the takeover baseline after a page-driven programmatic scroll.
   sync(): void;
 }
 
 /**
- * Continuous downward autoscroll driven by requestAnimationFrame. Any real user
- * scroll interaction (wheel, touch pan, arrow/space/page keys, scrollbar drag)
- * pauses it; it resumes only through play(). A touch PAN (touchmove) is scroll
- * intent and pauses, but a bare tap does not, so taps on the player controls
- * never pre-empt their own click handlers. Respects prefers-reduced-motion by
- * never auto-starting the loop there.
+ * Continuous downward autoscroll driven by requestAnimationFrame. Pausing is
+ * input-driven: wheel, touch pan, arrow/space/page keys, or grabbing the
+ * scrollbar gutter or middle-clicking with a mouse. It resumes only through
+ * play(). A touch PAN (touchmove) is scroll intent and pauses, but a bare tap
+ * does not, so taps on the player controls never pre-empt their own click
+ * handlers.
+ *
+ * On top of those inputs there is one position signal: a large upward scrollY
+ * jump between frames. That is safe because the engine only ever scrolls down,
+ * and mobile out-of-band drift is small and mostly downward, so a big upward
+ * move can only be a user or browser takeover (status-bar tap, find-in-page,
+ * scrollbar drag up).
+ *
+ * A small-tolerance position heuristic (pause when scrollY drifts off the
+ * engine's own expected value) was deliberately NOT used: mobile browsers move
+ * scrollY out-of-band all the time (async pan-zoom compositors, dynamic URL
+ * toolbars, visual-viewport shifts), so such a check false-positives forever and
+ * pauses playback within a second. Only a large, direction-gated jump is
+ * trusted, which those small drifts never trip.
+ *
+ * Respects prefers-reduced-motion by never auto-starting the loop there.
  */
 export function createAutoscroll(opts: AutoscrollOptions): Autoscroll {
-  // Grace window after play() during which unexpected scrollY drift is absorbed
-  // (sync) rather than read as a user takeover (pause). See the scroll safety net.
-  const PLAY_GRACE_MS = 800;
+  // Upward jumps larger than this between frames read as a user takeover; browser
+  // chrome adjustments (URL toolbar, visual viewport) stay well under it, and the
+  // engine itself never scrolls up.
+  const TAKEOVER_UP_PX = 200;
 
   let playing = false;
   let rafId = 0;
   let lastTime = 0;
   let carry = 0; // sub-pixel accumulator so slow speeds still move
-  let expectedY = 0; // scrollY the engine expects after its own scroll
-  let playStartedAt = 0; // performance.now() at the last play(), for the grace window
+  let prevY = 0; // scrollY where the engine last left the page
 
   function atBottom(): boolean {
     const max = document.documentElement.scrollHeight - window.innerHeight;
@@ -38,6 +53,12 @@ export function createAutoscroll(opts: AutoscrollOptions): Autoscroll {
 
   function frame(now: number): void {
     if (!playing) return;
+    // Engine only scrolls down; a big upward jump is a takeover: status-bar tap,
+    // find-in-page, scrollbar drag up.
+    if (window.scrollY < prevY - TAKEOVER_UP_PX) {
+      pause();
+      return;
+    }
     const dt = Math.min((now - lastTime) / 1000, 0.1);
     lastTime = now;
 
@@ -46,7 +67,7 @@ export function createAutoscroll(opts: AutoscrollOptions): Autoscroll {
     if (step > 0) {
       carry -= step;
       window.scrollBy(0, step);
-      expectedY = window.scrollY;
+      prevY = window.scrollY;
       if (atBottom()) {
         pause();
         return;
@@ -60,9 +81,8 @@ export function createAutoscroll(opts: AutoscrollOptions): Autoscroll {
     if (atBottom()) return;
     playing = true;
     carry = 0;
+    prevY = window.scrollY;
     lastTime = performance.now();
-    playStartedAt = lastTime;
-    expectedY = window.scrollY;
     rafId = requestAnimationFrame(frame);
     opts.onStateChange(true);
   }
@@ -75,7 +95,7 @@ export function createAutoscroll(opts: AutoscrollOptions): Autoscroll {
   }
 
   function sync(): void {
-    expectedY = window.scrollY;
+    prevY = window.scrollY;
   }
 
   // --- User-interaction pause triggers ---
@@ -107,25 +127,10 @@ export function createAutoscroll(opts: AutoscrollOptions): Autoscroll {
     (e) => {
       // Right-edge gutter grab = scrollbar drag, but only on desktop. Gated to
       // mouse so a touch/pen tap near a phone's right edge (e.g. the speed select
-      // in the bottom bar) never pauses.
-      if (e.pointerType === 'mouse' && e.clientX > window.innerWidth - 24) pause();
-    },
-    { passive: true },
-  );
-
-  // Safety net: a scroll we did not cause means the user grabbed the bar/keys.
-  window.addEventListener(
-    'scroll',
-    () => {
-      if (!playing) return;
-      if (Math.abs(window.scrollY - expectedY) > 4) {
-        // Right after a tap starts playback, leftover fling momentum, tap-slop
-        // micro-scrolls and mobile URL-bar adjustments move scrollY without the
-        // engine. Inside the grace window, absorb that drift instead of reading it
-        // as a user takeover; only past it does an off-baseline scroll mean pause.
-        if (performance.now() - playStartedAt < PLAY_GRACE_MS) sync();
-        else pause();
-      }
+      // in the bottom bar) never pauses. Middle-click starts the browser's own
+      // autoscroll pan, which would otherwise fight the engine; gated to mouse so
+      // touch never trips either branch.
+      if (e.pointerType === 'mouse' && (e.button === 1 || e.clientX > window.innerWidth - 24)) pause();
     },
     { passive: true },
   );
