@@ -69,7 +69,8 @@ import Footer from '../components/Footer.astro';
     <p class="col-start__line">Você sabe quanto os verdadeiros ricos são mais ricos do que você?</p>
     <div class="col-start__cta">
       <button class="hero__start col-start__btn" id="btn-start" type="button" disabled>
-        ▶ começar a descer
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M4.5 2.5v11L13 8z"/></svg>
+        começar a descer
       </button>
       <select
         class="speed-select"
@@ -82,6 +83,7 @@ import Footer from '../components/Footer.astro';
         <option value="2">2×</option>
         <option value="4">4×</option>
         <option value="8">8×</option>
+        <option value="16">16×</option>
       </select>
     </div>
   </section>
@@ -151,8 +153,10 @@ import Footer from '../components/Footer.astro';
   <script>
     import { boot, wireScaleInfo } from '../lib/render';
     import { initReveal } from '../lib/reveal';
+    import { initDebug } from '../lib/debug';
     wireScaleInfo();
     initReveal();
+    initDebug();
     boot().catch((err) => console.error('Falha ao carregar os dados:', err));
   </script>
 </Base>

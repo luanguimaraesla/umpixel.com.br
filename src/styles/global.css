@@ -301,6 +301,9 @@ strong {
 }
 .hero__start {
   align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   background: var(--amarelo);
   color: var(--preto);
   font-family: var(--font-display);
@@ -312,6 +315,11 @@ strong {
   padding: 0.8rem 1.8rem;
   cursor: pointer;
   transition: transform 0.12s ease, background 0.12s ease;
+}
+/* The play icon sits optically centered next to the label; sized to the button text. */
+.hero__start svg {
+  width: 0.8em;
+  height: 0.8em;
 }
 .hero__start:hover {
   transform: translateY(-2px);
@@ -927,6 +935,12 @@ strong {
   cursor: pointer;
   display: grid;
   place-items: center;
+}
+/* The play/pause icon is sized to the button font and centered by the grid above. */
+.pos-player__play svg {
+  display: block;
+  width: 0.85em;
+  height: 0.85em;
 }
 /* Shared speed select: dark pill with a hand-set amarelo chevron. Used by the
    cluster player and the col-start band; the two selects mirror each other (D-V3-3). */

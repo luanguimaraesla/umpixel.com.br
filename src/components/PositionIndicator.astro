@@ -46,7 +46,7 @@
       aria-pressed="false"
       disabled
     >
-      ▶
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M4.5 2.5v11L13 8z"/></svg>
     </button>
     <select class="speed-select" id="speed-select" aria-label="Velocidade da rolagem" disabled>
       <option value="0.5">0,5×</option>
@@ -54,9 +54,10 @@
       <option value="2">2×</option>
       <option value="4">4×</option>
       <option value="8">8×</option>
+      <option value="16">16×</option>
       <!-- Synthetic slot render.ts writes the effective (ramped) label into so the
         closed select can show it. hidden+disabled keeps it out of the open list
-        and unselectable; the user still picks only from the five real speeds. -->
+        and unselectable; the user still picks only from the six real speeds. -->
       <option value="__ramp" hidden disabled></option>
     </select>
   </div>

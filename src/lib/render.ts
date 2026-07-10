@@ -902,8 +902,16 @@ function wireSalaryMode(): void {
   });
 }
 
+// Play/pause glyphs as inline SVG so they render crisply at any size. Both are
+// static markup authored here, never user input, so assigning them via innerHTML
+// is safe.
+const ICON_PLAY =
+  '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M4.5 2.5v11L13 8z"/></svg>';
+const ICON_PAUSE =
+  '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M4 2.5h3v11H4zM9 2.5h3v11H9z"/></svg>';
+
 function updateControlsState(playing: boolean): void {
-  btnPlay.textContent = playing ? '⏸' : '▶';
+  btnPlay.innerHTML = playing ? ICON_PAUSE : ICON_PLAY;
   btnPlay.setAttribute('aria-pressed', String(playing));
   btnPlay.setAttribute('aria-label', playing ? 'pausar rolagem' : 'rolar automaticamente');
   updateSpeedDisplay();
