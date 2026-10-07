@@ -37,6 +37,15 @@ test('minimum wage is the current statutory value', () => {
   assert.equal(salario.valor_brl, 1621);
   assert.equal(salario.vigencia, '2026-01-01');
   assert.match(salario.instrumento_legal, /12\.797/);
+  assert.match(salario.contexto, /INPC de 4,18%.*ganho real limitado a 2,5%/);
+  assert.equal(Math.ceil(1518 * 1.0418 * 1.025), salario.valor_brl);
+});
+
+test('source metadata distinguishes event dates and document identifiers', () => {
+  const policeStation = checkpoints.custos.find(cost => cost.id === 'delegacias');
+  assert.match(policeStation.referencia, /inauguração 17\/03\/2026/);
+  const doctors = checkpoints.custos.find(cost => cost.id === 'medicos');
+  assert.match(doctors.fontes[0].nome, /Edital nº 24\/2026, Chamamento Público nº 3\/2026/);
 });
 
 test('the requested amount and reported transfers stay separate', () => {
@@ -373,6 +382,20 @@ test('card copy contains data and sources instead of disclaimers', async () => {
     assert.doesNotMatch(await read(path), /Equipamentos e funcionamento à parte|conclusão sobre a legalidade|na conversão publicada pelo Opera Mundi|garante vidas salvas|sem 13º/);
   }
   assert.doesNotMatch(await read('src/lib/render.ts'), /col-note__budget/);
+});
+
+test('references explain the funding and salary scope without changing card copy', async () => {
+  const references = (await read('src/pages/referencias.astro')).replace(/\s+/g, ' ');
+  assert.match(references, /creches.*aporte médio de R\$ 3,5 milhões.*contrapartida municipal/);
+  assert.match(references, /professores.*12 vencimentos mensais.*13º salário.*encargos patronais/);
+  assert.match(references, /programas anti-drogas.*pacote de R\$ 8,5 milhões.*não um programa isolado/);
+  const points = buildCheckpoints({ salario, filme, checkpoints });
+  assert.equal(points.find(point => point.id === 'dez-creches').heading, '25 creches');
+  assert.equal(points.find(point => point.id === 'professores').heading, '480 professores por um ano');
+  assert.equal(points.find(point => point.id === 'prevencao-drogas').heading, '9 programas anti-drogas');
+  for (const point of points) {
+    assert.doesNotMatch(point.text, /contrapartida municipal|encargos patronais|não um programa isolado/);
+  }
 });
 
 test('the opening leads directly to the column and preserves both controls', async () => {
