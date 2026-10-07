@@ -225,8 +225,7 @@ strong {
   font-size: 1rem;
   max-width: 32rem;
 }
-.hero__start {
-  align-self: center;
+.page-button {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -244,13 +243,37 @@ strong {
   transition: transform 0.12s ease, background 0.12s ease;
 }
 /* The play icon sits optically centered next to the label; sized to the button text. */
-.hero__start svg {
+.page-button svg {
   width: 0.8em;
   height: 0.8em;
 }
-.hero__start:hover {
+.page-button:hover {
   transform: translateY(-2px);
   background: #ffc844;
+}
+.page-button--secondary {
+  background: transparent;
+  color: var(--amarelo);
+  box-shadow: inset 0 0 0 1px var(--amarelo);
+}
+.page-button--secondary:hover {
+  background: rgba(251, 178, 22, 0.12);
+}
+.page-button:focus-visible {
+  outline: 2px solid var(--branco);
+  outline-offset: 3px;
+}
+.share-control {
+  max-width: 100%;
+}
+.share-status {
+  max-width: 20rem;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+.share-status:empty {
+  margin-top: 0;
 }
 .load-error {
   color: var(--amarelo);
@@ -260,7 +283,7 @@ strong {
 .load-error[hidden] {
   display: none;
 }
-.hero__start:disabled,
+.page-button:disabled,
 .pos-player__play:disabled,
 .speed-select:disabled {
   opacity: 0.55;
@@ -320,7 +343,10 @@ strong {
 }
 .col-start__cta {
   display: inline-flex;
-  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  max-width: 100%;
   gap: 0.5rem;
   margin-top: 1.25rem;
 }

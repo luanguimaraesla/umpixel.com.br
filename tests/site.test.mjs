@@ -77,18 +77,16 @@ test('autoscroll uses 480 pixels per second as its 1x base speed', () => {
   assert.deepEqual(SPEED_MULTIPLIERS.map(multiplier => SPEED_BASE * multiplier), [480, 960, 1440]);
 });
 
-for (const path of ['src/components/Hero.astro', 'src/components/PositionIndicator.astro']) {
-  test(`speed selector in ${path} offers only 1x, 2x and 3x, defaulting to 1x`, async () => {
-    const source = await read(path);
-    const options = [...source.matchAll(/<option value="([^"]+)"( selected)?>([^<]+)<\/option>/g)]
-      .map(([, value, selected, label]) => ({ value: Number(value), selected: Boolean(selected), label }));
-    assert.deepEqual(options, [
-      { value: 1, selected: true, label: '1×' },
-      { value: 2, selected: false, label: '2×' },
-      { value: 3, selected: false, label: '3×' },
-    ]);
-  });
-}
+test('the floating speed selector offers only 1x, 2x and 3x, defaulting to 1x', async () => {
+  const source = await read('src/components/PositionIndicator.astro');
+  const options = [...source.matchAll(/<option value="([^"]+)"( selected)?>([^<]+)<\/option>/g)]
+    .map(([, value, selected, label]) => ({ value: Number(value), selected: Boolean(selected), label }));
+  assert.deepEqual(options, [
+    { value: 1, selected: true, label: '1×' },
+    { value: 2, selected: false, label: '2×' },
+    { value: 3, selected: false, label: '3×' },
+  ]);
+});
 
 test('each pixel represents one 100-real banknote, independently of salary', () => {
   assert.equal(scale.pixelsOf(100), 1);
@@ -418,13 +416,20 @@ test('references explain the funding and salary scope without changing card copy
   }
 });
 
-test('the opening leads directly to the column and preserves both controls', async () => {
+test('the opening and ending offer navigation and sharing without an initial speed selector', async () => {
   const page = await read('src/pages/index.astro');
   const hero = await read('src/components/Hero.astro');
   assert.match(page, /<Hero \/>\s*<WealthColumn/);
   assert.doesNotMatch(page, /id="key"|id="col-start"|Primeiro, a chave/);
   assert.match(hero, /id="btn-start"/);
-  assert.match(hero, /id="speed-select-start"/);
+  assert.doesNotMatch(hero, /<select|speed-select-start/);
+  assert.match(hero, /<ShareButton \/>/);
+  assert.match(page, /<ShareButton \/>/);
+  assert.match(page, /id="btn-top"[^>]*>Voltar ao início<\/button>/);
+  const shareButton = await read('src/components/ShareButton.astro');
+  assert.match(shareButton, /data-share[^>]*>\s*compartilhe/);
+  assert.match(shareButton, /data-share-status role="status"/);
+  assert.doesNotMatch(await read('src/lib/render.ts'), /speedSelectStart|speed-select-start/);
   assert.match(hero, /<ScaleKey \/>/);
   assert.doesNotMatch(hero, /scale-info|ⓘ|Opera Mundi|para um filme sobre seu pai/);
   assert.doesNotMatch(page, /wireScaleInfo/);

@@ -32,8 +32,8 @@ let activeCard: HTMLElement | undefined;
 let column: HTMLElement;
 let btnStart: HTMLButtonElement;
 let btnPlay: HTMLButtonElement;
+let btnTop: HTMLButtonElement;
 let speedSelect: HTMLSelectElement;
-let speedSelectStart: HTMLSelectElement;
 let progressEl: HTMLElement;
 let controlsEl: HTMLElement;
 let measureLine: HTMLElement;
@@ -203,15 +203,11 @@ function updateControlsState(playing: boolean): void {
 }
 
 function wireControls(): void {
-  const selects = [speedSelect, speedSelectStart];
-  for (const select of selects) {
-    select.addEventListener('change', () => {
-      const multiplier = Number(select.value);
-      if (!SPEED_MULTIPLIERS.some((speed) => speed === multiplier)) return;
-      userMult = multiplier;
-      for (const other of selects) other.value = select.value;
-    });
-  }
+  speedSelect.addEventListener('change', () => {
+    const multiplier = Number(speedSelect.value);
+    if (!SPEED_MULTIPLIERS.some((speed) => speed === multiplier)) return;
+    userMult = multiplier;
+  });
 
   // A Space press can pause the engine before click fires. Preserve the original intent.
   let playIntent: { wasPlaying: boolean; at: number } | null = null;
@@ -230,6 +226,11 @@ function wireControls(): void {
     else autoscroll.play();
   });
   btnStart.addEventListener('click', () => autoscroll.play());
+  btnTop.addEventListener('click', () => {
+    autoscroll.pause();
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    btnStart.focus({ preventScroll: true });
+  });
 }
 
 export async function boot(): Promise<void> {
@@ -238,8 +239,8 @@ export async function boot(): Promise<void> {
     column = must<HTMLElement>('[data-column="filme"]');
     btnStart = must<HTMLButtonElement>('#btn-start');
     btnPlay = must<HTMLButtonElement>('#btn-play');
+    btnTop = must<HTMLButtonElement>('#btn-top');
     speedSelect = must<HTMLSelectElement>('#speed-select');
-    speedSelectStart = must<HTMLSelectElement>('#speed-select-start');
     progressEl = must<HTMLElement>('[data-progress]');
     controlsEl = must<HTMLElement>('[data-cluster]');
     measureLine = must<HTMLElement>('[data-measure-line]');
@@ -257,6 +258,10 @@ export async function boot(): Promise<void> {
       cacheGeometry();
       updateScrollUI();
     });
+    new ResizeObserver(() => {
+      cacheGeometry();
+      updateScrollUI();
+    }).observe(must<HTMLElement>('.hero'));
     window.addEventListener('scroll', () => {
       if (scrollTicking) return;
       scrollTicking = true;
@@ -270,7 +275,7 @@ export async function boot(): Promise<void> {
     await document.fonts.ready;
     cacheGeometry();
     updateScrollUI();
-    for (const control of [btnStart, btnPlay, speedSelect, speedSelectStart]) control.disabled = false;
+    for (const control of [btnStart, btnPlay, btnTop, speedSelect]) control.disabled = false;
   } catch (error) {
     console.error('Falha ao carregar os dados:', error);
     errorEl.hidden = false;

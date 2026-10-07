@@ -5,6 +5,7 @@ import Hero from '../components/Hero.astro';
 import WealthColumn from '../components/WealthColumn.astro';
 import PositionIndicator from '../components/PositionIndicator.astro';
 import Footer from '../components/Footer.astro';
+import ShareButton from '../components/ShareButton.astro';
 ---
 
 <Base>
@@ -16,6 +17,10 @@ import Footer from '../components/Footer.astro';
       Fim do pedido: <strong data-dyn="requested-brl">…</strong>.<br />
       Cerca de <strong data-dyn="movie-lives">…</strong> inteiras de renda bruta no salário mínimo.
       Um filme sobre o pai dele.
+      <div class="col-start__cta">
+        <button class="page-button" id="btn-top" type="button" disabled>Voltar ao início</button>
+        <ShareButton />
+      </div>
     </Fragment>
   </WealthColumn>
 

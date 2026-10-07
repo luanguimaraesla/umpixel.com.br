@@ -62,8 +62,10 @@ médio de setembro de 2026 e o gasto por aluno de 2024, arredondadas para baixo.
 Um só card fica ativo dentro da coluna. Ele muda quando a linha de medição cruza o valor
 do checkpoint, sem sobrepor os marcos menores nem alterar a área de dinheiro.
 
-A rolagem automática começa em **1× (480 pixels por segundo)**. Os dois controles oferecem
-apenas **1×, 2× e 3×**, equivalentes a 480, 960 e 1.440 pixels por segundo, e ficam sincronizados.
+A rolagem automática começa em **1× (480 pixels por segundo)**. O controle flutuante oferece
+**1×, 2× e 3×**, equivalentes a 480, 960 e 1.440 pixels por segundo. A abertura traz os botões
+de começar a descer e compartilhar. No final, é possível voltar ao início, pausando a rolagem,
+ou compartilhar. O compartilhamento usa o menu do dispositivo ou copia o link da página.
 
 ## Arquitetura e dados
 

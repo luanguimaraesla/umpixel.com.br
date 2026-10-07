@@ -1,0 +1,26 @@
+<div class="share-control">
+  <button class="page-button page-button--secondary" data-share type="button" disabled>
+    compartilhe
+  </button>
+  <p class="share-status" data-share-status role="status" aria-atomic="true"></p>
+</div>
+
+<script>
+  import { sharePage } from '../lib/share';
+
+  const url = new URL(import.meta.env.BASE_URL, window.location.origin).href;
+  for (const control of document.querySelectorAll<HTMLElement>('.share-control')) {
+    const button = control.querySelector<HTMLButtonElement>('[data-share]')!;
+    const status = control.querySelector<HTMLElement>('[data-share-status]')!;
+    button.addEventListener('click', async () => {
+      button.disabled = true;
+      status.textContent = '';
+      try {
+        status.textContent = await sharePage(url, document.title);
+      } finally {
+        button.disabled = false;
+      }
+    });
+    button.disabled = false;
+  }
+</script>

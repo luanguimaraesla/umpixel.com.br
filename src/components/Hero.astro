@@ -1,5 +1,6 @@
 ---
 import ScaleKey from './ScaleKey.astro';
+import ShareButton from './ShareButton.astro';
 ---
 
 <section class="section section--black hero">
@@ -10,15 +11,11 @@ import ScaleKey from './ScaleKey.astro';
   </p>
 
   <div class="col-start__cta hero__cta">
-    <button class="hero__start" id="btn-start" type="button" disabled>
+    <button class="page-button" id="btn-start" type="button" disabled>
       <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M4.5 2.5v11L13 8z"/></svg>
       começar a descer
     </button>
-    <select class="speed-select" id="speed-select-start" aria-label="Velocidade da rolagem automática" disabled>
-      <option value="1" selected>1×</option>
-      <option value="2">2×</option>
-      <option value="3">3×</option>
-    </select>
+    <ShareButton />
   </div>
 
   <ScaleKey />
