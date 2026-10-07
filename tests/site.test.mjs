@@ -278,7 +278,7 @@ test('the mensalão comparison identifies its scope and nominal values', () => {
   const point = buildCheckpoints({ salario, filme, checkpoints }).find((entry) => entry.id === 'mensalao');
   assert.equal(point.valueBRL, 55_000_000);
   assert.ok(point.atBRL > 0 && point.atBRL < filme.pedido_brl);
-  assert.match(point.text, /cooptação.*2012.*2,4 vezes/);
+  assert.equal(point.text, 'O acordo entre Flávio e Vorcaro é 2,4 vezes maior do que o Mensalão.');
   assert.match(point.reference, /AP 470.*2012.*R\$ 55 milhões/);
   assert.match(checkpoints.mensalao.fontes[0].url, /noticias\.stf\.jus\.br/);
 });

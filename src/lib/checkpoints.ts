@@ -142,7 +142,7 @@ export function buildCheckpoints(data: PageData): Checkpoint[] {
         ...point, valueBRL: mensalao.valor_brl,
         title: mensalao.nome, heading: fmtBRLCompact(mensalao.valor_brl),
         moneyHeading: fmtBRLCompact(mensalao.valor_brl),
-        text: `${mensalao.contexto} O pedido inteiro para o filme é ${ratio.format(amount / mensalao.valor_brl)} vezes esse montante.`,
+        text: `O acordo entre Flávio e Vorcaro é ${ratio.format(amount / mensalao.valor_brl)} vezes maior do que o Mensalão.`,
         reference: mensalao.referencia,
       });
     } else if (id === 'herdeiros') {
