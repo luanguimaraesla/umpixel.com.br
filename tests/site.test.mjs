@@ -15,6 +15,7 @@ function moduleUrl(source) {
 }
 
 const configUrl = moduleUrl(await read('src/config.ts'));
+const { SPEED_BASE, SPEED_MULTIPLIERS } = await import(configUrl);
 const scaleUrl = moduleUrl((await read('src/lib/scale.ts')).replace("'../config'", JSON.stringify(configUrl)));
 const scale = await import(scaleUrl);
 const { buildCheckpoints } = await import(moduleUrl((await read('src/lib/checkpoints.ts'))
@@ -69,6 +70,25 @@ test('money uses minimum-wage months, years, and gross lifetime earnings', () =>
   assert.equal(scale.fmtLives(scale.livesOf(filme.pedido_brl, 1621)), '147 vidas');
   assert.equal(scale.fmtBRLCompact(filme.pedido_brl), 'R$ 134 milhões');
 });
+
+test('autoscroll uses 480 pixels per second as its 1x base speed', () => {
+  assert.equal(SPEED_BASE, 480);
+  assert.deepEqual(SPEED_MULTIPLIERS, [1, 2, 3]);
+  assert.deepEqual(SPEED_MULTIPLIERS.map(multiplier => SPEED_BASE * multiplier), [480, 960, 1440]);
+});
+
+for (const path of ['src/components/Hero.astro', 'src/components/PositionIndicator.astro']) {
+  test(`speed selector in ${path} offers only 1x, 2x and 3x, defaulting to 1x`, async () => {
+    const source = await read(path);
+    const options = [...source.matchAll(/<option value="([^"]+)"( selected)?>([^<]+)<\/option>/g)]
+      .map(([, value, selected, label]) => ({ value: Number(value), selected: Boolean(selected), label }));
+    assert.deepEqual(options, [
+      { value: 1, selected: true, label: '1×' },
+      { value: 2, selected: false, label: '2×' },
+      { value: 3, selected: false, label: '3×' },
+    ]);
+  });
+}
 
 test('each pixel represents one 100-real banknote, independently of salary', () => {
   assert.equal(scale.pixelsOf(100), 1);

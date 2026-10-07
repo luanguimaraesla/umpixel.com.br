@@ -8,7 +8,7 @@ export const COLUMN_MIN_WIDTH = 12;
 export const COLUMN_USABLE_CAP = 720;
 export const COLUMN_SIDE_MARGIN = 48;
 
-export const SPEED_BASE = 120;
-export const SPEED_MULTIPLIERS = [0.5, 1, 2, 4, 8, 16] as const;
+export const SPEED_BASE = 480;
+export const SPEED_MULTIPLIERS = [1, 2, 3] as const;
 export const RULER_STEP = 100;
 export const MAX_COLUMN_HEIGHT_PX = 16_000_000;
