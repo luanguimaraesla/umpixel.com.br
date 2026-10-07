@@ -136,168 +136,94 @@ strong {
 
 /* ---- Hero ---- */
 .hero {
-  min-height: 100vh;
-  justify-content: center;
-  gap: 1.1rem;
+  min-height: 50svh;
+  padding: 2rem 1.5rem 1rem;
+  gap: 0.5rem;
+}
+.hero p {
+  margin-bottom: 0;
+}
+.hero .hero__cta {
+  margin: 0.5rem 0;
 }
 .hero__title {
   font-family: var(--font-title);
-  font-size: clamp(2.75rem, 13vw, 7rem);
+  font-size: clamp(2.75rem, 10vw, 5rem);
   letter-spacing: 0.01em;
   color: var(--amarelo);
 }
 .hero__subtitle {
-  font-size: clamp(1.05rem, 3.2vw, 1.7rem);
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
   max-width: 32rem;
 }
-/* Methodology tucked behind an info affordance so it doesn't fill the screen.
-   Shows on hover (pointer) and on focus (keyboard/tap). */
-.scale-info {
-  position: relative;
-  display: inline-block;
-}
-.scale-info__btn {
-  background: transparent;
-  color: var(--amarelo);
-  border: 1px solid var(--overlay-border);
-  border-radius: 999px;
-  padding: 0.35rem 0.9rem;
-  font-size: 0.9rem;
-  font-family: inherit;
-  cursor: pointer;
-}
-.scale-info__btn:hover,
-.scale-info__btn:focus-visible {
-  background: rgba(251, 178, 22, 0.12);
-}
-.scale-info__pop {
-  position: absolute;
-  top: calc(100% + 0.5rem);
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(90vw, 22rem);
-  z-index: 15;
-  display: none;
-  text-align: left;
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
-.scale-info__pop p {
-  margin-bottom: 0.6rem;
-}
-.scale-info__pop p:last-child {
-  margin-bottom: 0;
-}
-.scale-info:hover .scale-info__pop,
-.scale-info:focus-within .scale-info__pop,
-.scale-info.open .scale-info__pop {
-  display: block;
-}
-.hero__controls {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+.scale-key {
   width: 100%;
-  max-width: 30rem;
+  max-width: 36rem;
+  padding: 0.75rem 1rem;
   margin-top: 0.5rem;
 }
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  text-align: left;
-}
-.field__label {
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-.field__input-wrap {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--overlay-border);
-  border-radius: 10px;
-  padding: 0.65rem 0.85rem;
-}
-.field__prefix {
-  color: var(--amarelo);
-  font-weight: 700;
-}
-.field input {
-  flex: 1;
-  min-width: 0;
-  background: transparent;
-  border: none;
-  color: var(--branco);
-  font-size: 1.15rem;
-  font-family: inherit;
-}
-.field input:focus {
-  outline: 2px solid var(--amarelo);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-/* Salary commit confirmation: a brief amarelo glow on the input pill so a commit via
-   blur or Enter is visibly acknowledged. Reduced motion skips the glow; the
-   reformatted value is the feedback then. */
-@media (prefers-reduced-motion: no-preference) {
-  .field--saved {
-    animation: field-saved-flash 0.6s ease-out;
-  }
-  @keyframes field-saved-flash {
-    0% {
-      border-color: var(--amarelo);
-      box-shadow: 0 0 0 3px rgba(251, 178, 22, 0.45);
-    }
-    100% {
-      border-color: var(--overlay-border);
-      box-shadow: 0 0 0 0 rgba(251, 178, 22, 0);
-    }
-  }
-}
-/* Segmented salary control: default (salário mínimo) vs a custom value. */
-.seg {
-  display: flex;
-  gap: 0.25rem;
-  padding: 0.25rem;
-  border: 1px solid var(--overlay-border);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-}
-.seg__opt {
-  flex: 1;
-  cursor: pointer;
-}
-.seg__opt input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-  pointer-events: none;
-}
-.seg__opt > span {
+.scale-key__header {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.35rem;
-  padding: 0.55rem 0.9rem;
-  border-radius: 999px;
-  font-size: 0.9rem;
-  text-align: center;
-  white-space: nowrap;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  text-align: left;
 }
-.seg__opt input:checked + span {
+.scale-key__header .banknote-thumb {
+  width: 72px;
+  flex: none;
+}
+.scale-key__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+.scale-key__item {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  min-width: 0;
+  text-align: left;
+}
+.scale-key__swatch {
+  display: flex;
+  align-items: flex-end;
+  height: 24px;
+}
+.scale-key__pixel {
+  display: block;
+  width: 1px;
+  height: 1px;
   background: var(--amarelo);
-  color: var(--preto);
-  font-weight: 700;
 }
-.seg__opt input:focus-visible + span {
-  outline: 2px solid var(--amarelo);
-  outline-offset: 2px;
+.scale-key__value {
+  font-size: clamp(0.7rem, 2.6vw, 0.9rem);
+  color: var(--amarelo);
 }
-.field--custom-salary[hidden] {
-  display: none;
+.scale-key__caption {
+  min-height: 2.6em;
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+@media (max-width: 640px) {
+  .scale-key {
+    padding: 0.75rem;
+  }
+  .scale-key__grid {
+    gap: 0.5rem;
+  }
+}
+.banknote-thumb {
+  display: block;
+  width: 100px;
+  height: auto;
+}
+.hero__reference {
+  color: var(--amarelo);
+  font-size: 1rem;
+  max-width: 32rem;
 }
 .hero__start {
   align-self: center;
@@ -308,11 +234,12 @@ strong {
   color: var(--preto);
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   letter-spacing: 0.02em;
+  white-space: nowrap;
   border: none;
   border-radius: 999px;
-  padding: 0.8rem 1.8rem;
+  padding: 0.65rem 1.1rem;
   cursor: pointer;
   transition: transform 0.12s ease, background 0.12s ease;
 }
@@ -333,7 +260,6 @@ strong {
 .load-error[hidden] {
   display: none;
 }
-.field input:disabled,
 .hero__start:disabled,
 .pos-player__play:disabled,
 .speed-select:disabled {
@@ -341,7 +267,7 @@ strong {
   cursor: not-allowed;
 }
 
-/* ---- Hero scroll cue (invites the descent; the CTA lives at the fortunes) ---- */
+/* ---- Hero scroll cue ---- */
 .scroll-cue {
   display: flex;
   flex-direction: column;
@@ -377,7 +303,7 @@ strong {
   }
 }
 
-/* ---- Descent CTA band: one dry line + the play button where fortunes begin ---- */
+/* ---- Movie context and descent controls ---- */
 .col-start {
   gap: 0.25rem;
 }
@@ -386,7 +312,11 @@ strong {
   font-weight: 400;
   font-size: clamp(1.3rem, 4vw, 2rem);
   color: var(--branco);
-  max-width: 32rem;
+  max-width: 40rem;
+}
+.col-start .col__context,
+.col-start .col__source {
+  max-width: 40rem;
 }
 .col-start__cta {
   display: inline-flex;
@@ -429,10 +359,20 @@ strong {
 .key__swatch {
   display: flex;
   align-items: flex-end;
-  height: 60px;
+  height: 100px;
   margin-bottom: 0.6rem;
 }
 .key__block {
+  background: var(--amarelo);
+}
+.money-block {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+}
+.money-block__fill {
+  display: block;
+  flex: none;
   background: var(--amarelo);
 }
 .key .key__value {
@@ -500,6 +440,7 @@ strong {
 /* ---- Wealth columns ---- */
 .col {
   position: relative;
+  padding-top: 1rem;
   padding-bottom: 8rem;
 }
 .col__eyebrow {
@@ -543,18 +484,8 @@ strong {
 }
 
 /* ---- Metric-view columns (solid area + CSS ruler + bracket key; D6/D7) ---- */
-/* Per-column identity: warm to cold as the wealth leaves human scale (D-V2-7).
-   White-on-fill contrast stays well above 4.5:1 for all three (verified). */
 [data-col-section] {
   --col-fill: var(--vermelho);
-}
-[data-col-section='richest'] {
-  --col-fill: #5e2b8f; /* roxo */
-  background: #120518;
-}
-[data-col-section='musk'] {
-  --col-fill: #14507a; /* azul petróleo */
-  background: #050f18;
 }
 .wealth-column {
   position: relative;
@@ -568,47 +499,50 @@ strong {
    crispEdges keeps every mark sharp and nothing overlaps. */
 .wealth-column--metric {
   background-color: var(--col-fill);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='500' shape-rendering='crispEdges'%3E%3Cg fill='rgba(0,0,0,0.45)'%3E%3Crect x='0' y='0' width='20' height='2'/%3E%3Crect x='0' y='100' width='10' height='2'/%3E%3Crect x='0' y='200' width='10' height='2'/%3E%3Crect x='0' y='300' width='10' height='2'/%3E%3Crect x='0' y='400' width='10' height='2'/%3E%3C/g%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='500' shape-rendering='crispEdges'%3E%3Cg fill='%23000000'%3E%3Crect x='0' y='0' width='20' height='2' fill='%23fbb216'/%3E%3Crect x='0' y='100' width='10' height='2'/%3E%3Crect x='0' y='200' width='10' height='2'/%3E%3Crect x='0' y='300' width='10' height='2'/%3E%3Crect x='0' y='400' width='10' height='2'/%3E%3C/g%3E%3C/svg%3E");
   background-repeat: repeat-y;
   background-position: left top;
 }
-/* In-column cards: absolutely-positioned wrappers whose height IS the hold
-   duration; the child card sticks and hands off to the next (D9). Both the
-   staged intro cards and the milestone beats share this mechanism (D-V2-6).
-   No content-visibility here: its paint containment would clip the plaque's
-   left overhang to the wrapper box (only ~20 notes exist; the hint is not
-   worth losing the 3D overhang). */
+/* The active card shares one sticky track so nearby checkpoints cannot overlap. */
 .col-note {
   position: absolute;
   left: 0;
   width: 100%;
 }
-/* Modern pinned card: sits straight, keeps the panel's translucency and blur, and
-   overhangs the column's left edge. The accent lives in the type (amarelo eyebrow
-   and strong), not in a painted edge; a soft elevation shadow lifts it off the
-   fill (D-V3-4). */
+/* Center the cards over the narrow column on desktop and mobile. */
 .col-note__card {
+  background: rgba(0, 0, 0, 0.58);
   position: sticky;
   top: 4.5rem;
   z-index: 6;
   width: min(20rem, 78vw);
-  margin-left: clamp(-6rem, -12vw, -1rem);
+  margin-left: 50%;
+  transform: translateX(-50%);
   text-align: left;
   font-size: 0.95rem;
+  max-height: calc(100svh - 12rem);
+  overflow-y: auto;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 16px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
+.col-note__card[hidden] {
+  display: none;
+}
 .col-note__card--intro {
   width: min(23rem, 82vw);
+}
+.ref-checkpoint {
+  margin-top: 2rem;
+  scroll-margin-top: 2rem;
+}
+.ref-checkpoint h3 {
+  margin-bottom: 0.75rem;
 }
 .col-note__card strong {
   color: var(--amarelo);
 }
-/* Amount headline: cards whose point is reaching a value lead with that value big
-   and white, the body sitting below it (D-V4-5). Shared by the render.ts milestone
-   beats (.col-note__amount) and the bilhão intro authored in index.astro
-   (.col__amount), which renders through the same in-column card mechanism. */
+/* Shared headline for the requested amount and the in-column milestones. */
 .col-note__amount,
 .col__amount {
   display: block;
@@ -617,6 +551,12 @@ strong {
   font-weight: 700;
   color: var(--branco);
   margin-bottom: 0.5rem;
+}
+.col-note__quantity {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+  line-height: 1.25;
 }
 /* Phrase cards: shouted Anton display type on the same straight modern card as the
    informational beats, so they read like wall-writing without a tilt (D-V3-4). */
@@ -635,19 +575,11 @@ strong {
   font-size: 0.72rem;
   opacity: 0.75;
 }
-.col-note__fine a {
+.col-note__fine a,
+a.col-note__fine {
   color: var(--amarelo);
   text-decoration: underline;
   text-underline-offset: 2px;
-}
-
-/* On narrow viewports the column's side margin is too small to absorb the desktop
-   overhang, so the plaque would spill past the left edge. Clamp it to a small
-   inset there so no card ever clips against the viewport (D-V2-6). */
-@media (max-width: 760px) {
-  .col-note__card {
-    margin-left: 0.5rem;
-  }
 }
 
 /* ---- Footer ---- */
@@ -738,34 +670,6 @@ strong {
   margin-top: 2rem;
 }
 
-/* ---- Methodology bracket table ---- */
-.calc-table-wrap {
-  overflow-x: auto;
-  margin: 1.5rem 0;
-}
-.calc-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
-}
-.calc-table th,
-.calc-table td {
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid var(--overlay-border);
-  text-align: left;
-}
-.calc-table th {
-  color: var(--amarelo);
-  font-weight: 400;
-  font-family: var(--font-display);
-  letter-spacing: 0.02em;
-}
-.calc-table td.num,
-.calc-table th.num {
-  text-align: right;
-  white-space: nowrap;
-}
-
 /* ---- Top progress bar (custom, mobile-visible; D8) ---- */
 .progress {
   position: fixed;
@@ -811,12 +715,8 @@ strong {
 }
 
 /* ---- Left cluster: legend + counter + player (D-V3-2/3/10/14/15) ---- */
-/* Fixed on the left, vertically centered on the measuring line. render.ts toggles
-   data-idle from the same active-column condition as the line and counter, so the
-   whole cluster reveals and hides together with them. pointer-events pass through
-   everywhere except the player, so the empty cluster box never blocks the page.
-   render.ts sets --pos-accent (the active column's fill) so the counter keeps its
-   per-column identity. */
+/* Reveal the legend, counter and player together while the measuring line is
+   inside the column. Only the player captures pointer events. */
 .cluster {
   position: fixed;
   left: 0.5rem;
@@ -860,7 +760,7 @@ strong {
 }
 .pos-legend__swatch {
   flex: none;
-  width: 24px;
+  width: 14px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -1046,34 +946,6 @@ strong {
   }
 }
 
-/* ---- Speed-ramp toast (fired by the in-column ramps in step 7; D5b) ---- */
-.toast {
-  position: fixed;
-  left: 50%;
-  bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
-  transform: translateX(-50%);
-  z-index: 21;
-  max-width: calc(100vw - 2rem);
-  background: var(--overlay);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--overlay-border);
-  border-top: 2px solid var(--amarelo);
-  border-radius: 12px;
-  padding: 0.6rem 1rem;
-  font-size: 0.85rem;
-  color: var(--branco);
-  text-align: center;
-}
-.toast[hidden] {
-  display: none;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .toast {
-    transition: opacity 0.3s ease;
-  }
-}
-
 /* ---- Reduced motion ---- */
 @media (prefers-reduced-motion: reduce) {
   .hero__start:hover {
@@ -1087,11 +959,10 @@ strong {
     padding: 3.75rem 1.25rem;
   }
   .hero {
-    gap: 0.9rem;
+    padding: 1.5rem 1.25rem 0.5rem;
+    gap: 0.5rem;
   }
-  /* Lift the toast above the fixed cluster bottom bar so it is never hidden
-     behind it (D-V4-11). */
-  .toast {
-    bottom: calc(7.5rem + env(safe-area-inset-bottom, 0px));
+  .col {
+    padding-top: 1rem;
   }
 }

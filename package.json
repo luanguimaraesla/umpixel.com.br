@@ -4,12 +4,13 @@
   "private": true,
   "type": "module",
   "license": "AGPL-3.0-only",
-  "description": "1 pixel = 1 mês do seu salário. A riqueza dos mais ricos do Brasil em escala de tempo de trabalho.",
+  "description": "O pedido de Flávio Bolsonaro a Vorcaro para o filme sobre seu pai, em salários mínimos.",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "test": "node --test tests/*.test.mjs"
   },
   "dependencies": {
     "@fontsource/anton": "^5.2.7",

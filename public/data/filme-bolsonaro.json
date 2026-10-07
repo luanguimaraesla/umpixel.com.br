@@ -1,0 +1,15 @@
+{
+  "titulo": "Dark Horse",
+  "pedido_usd": 24000000,
+  "pedido_brl": 134000000,
+  "repassado_brl": 61000000,
+  "data_reportagem": "2026-05-13",
+  "nota_cambio": "US$ 24 milhões; R$ 134 milhões na reportagem do Opera Mundi de 13 de maio de 2026.",
+  "fontes": [
+    {
+      "nome": "Opera Mundi — Flávio Bolsonaro negociou com Daniel Vorcaro R$ 134 milhões para bancar filme sobre pai",
+      "url": "https://operamundi.uol.com.br/brasil/flavio-bolsonaro-negociou-com-daniel-vorcaro-r-134-milhoes-para-bancar-filme-sobre-pai/"
+    }
+  ],
+  "acessado_em": "2026-10-06"
+}

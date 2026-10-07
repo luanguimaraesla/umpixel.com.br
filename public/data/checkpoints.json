@@ -1,0 +1,471 @@
+{
+  "custos": [
+    {
+      "id": "carro-popular",
+      "nome": "Comprar carros populares",
+      "valor_brl": 78690,
+      "contexto": "Renault Kwid Zen 2026, preço de tabela publicado em janeiro de 2026.",
+      "referencia": "Renault Kwid Zen 2026: R$ 78.690 por unidade.",
+      "fontes": [
+        {
+          "nome": "AutoPapo — carros mais baratos do Brasil em 2026",
+          "url": "https://autopapo.com.br/noticia/carros-mais-baratos-brasil-2026/"
+        }
+      ],
+      "acessado_em": "2026-10-07",
+      "unidade_singular": "carro popular",
+      "unidade_plural": "carros populares"
+    },
+    {
+      "id": "casa",
+      "nome": "Construir casas",
+      "valor_brl": 199376,
+      "contexto": "Casas de 100 m² pelo custo de construção do SINAPI de agosto de 2026.",
+      "referencia": "100 m² ×R$ 1.993,76/m² =R$ 199.376 por casa.",
+      "componentes": {
+        "area_m2": 100,
+        "custo_m2_brl": 1993.76
+      },
+      "fontes": [
+        {
+          "nome": "CBIC / IBGE — SINAPI de agosto de 2026",
+          "url": "https://cbic.org.br/custo-nacional-da-construcao-varia-044-em-agosto-aponta-sinapi/"
+        }
+      ],
+      "acessado_em": "2026-10-07",
+      "unidade_singular": "casa",
+      "unidade_plural": "casas"
+    },
+    {
+      "id": "apartamento-capitais",
+      "nome": "Comprar apartamentos",
+      "valor_brl": 654713.18,
+      "contexto": "Apartamentos de 70 m², pela média anunciada nas 22 capitais do FipeZAP de setembro de 2026.",
+      "referencia": "70 m² ×média simples de R$ 9.353,04545/m² das 22 capitais =R$ 654.713,18 por apartamento.",
+      "componentes": {
+        "area_m2": 70,
+        "precos_m2_brl": {
+          "Vitória": 15905,
+          "Florianópolis": 13607,
+          "São Paulo": 12206,
+          "Curitiba": 11766,
+          "Rio de Janeiro": 11302,
+          "Belo Horizonte": 10686,
+          "Brasília": 10453,
+          "Maceió": 10061,
+          "Fortaleza": 9660,
+          "Recife": 9045,
+          "São Luís": 8951,
+          "Belém": 8830,
+          "Salvador": 8691,
+          "Goiânia": 8527,
+          "João Pessoa": 8431,
+          "Manaus": 7860,
+          "Porto Alegre": 7545,
+          "Cuiabá": 7102,
+          "Campo Grande": 6724,
+          "Natal": 6465,
+          "Teresina": 6075,
+          "Aracaju": 5875
+        }
+      },
+      "fontes": [
+        {
+          "nome": "FipeZAP — venda residencial, setembro de 2026",
+          "url": "https://downloads.fipe.org.br/indices/fipezap/fipezap-202609-residencial-venda-publico.pdf"
+        }
+      ],
+      "acessado_em": "2026-10-07",
+      "unidade_singular": "apartamento",
+      "unidade_plural": "apartamentos"
+    },
+    {
+      "id": "dez-creches",
+      "nome": "Construir creches",
+      "valor_brl": 3500000,
+      "contexto": "Creches padrão FNDE pelo aporte médio de R$ 3,5 milhões do Novo PAC 2025.",
+      "referencia": "R$ 3,5 milhões por unidade; capacidade do projeto:188 crianças em dois turnos ou 94 em período integral.",
+      "componentes": {
+        "valor_unidade_brl": 3500000
+      },
+      "fontes": [
+        {
+          "nome": "Secretaria de Educação da Bahia / MEC — Novo PAC Seleções Educação 2025",
+          "url": "https://www.ba.gov.br/educacao/noticias/2025-03/1752/novo-pac-selecoes-educacao-inscricoes-vao-ate-313"
+        }
+      ],
+      "acessado_em": "2026-10-07",
+      "unidade_singular": "creche",
+      "unidade_plural": "creches"
+    },
+    {
+      "id": "campus-universitario",
+      "nome": "Construir campi universitários",
+      "valor_brl": 50000000,
+      "contexto": "Construção de prédios do campus da UFS em Estância, pela verba anunciada em 2025.",
+      "referencia": "R$ 50 milhões para construir os prédios do campus; previsão de 2.800 vagas em seis cursos.",
+      "fontes": [
+        {
+          "nome": "Universidade Federal de Sergipe — lançamento do campus de Estância",
+          "url": "https://daas.ufs.br/conteudo/76127-lancado-campus-da-ufs-em-estancia"
+        }
+      ],
+      "acessado_em": "2026-10-07",
+      "unidade_singular": "campus",
+      "unidade_plural": "campi"
+    },
+    {
+      "id": "hospital",
+      "nome": "Construir hospitais",
+      "valor_brl": 60000000,
+      "contexto": "Construção do Hospital Regional do Médio Sertão,100 leitos clínicos e 30 deUTI, orçamento de 2021.",
+      "referencia": "R$ 60 milhões para construir o Hospital Regional do Médio Sertão, Palmeira dos Índios.",
+      "fontes": [
+        {
+          "nome": "Prefeitura de Palmeira dos Índios — ordem de serviço do Hospital Regional do Médio Sertão",
+          "url": "https://palmeiradosindios.al.gov.br/dia-historico-julio-cezar-renan-filho-e-alexandre-ayres-assinam-os-para-construcao-do-hospital-regional-do-medio-sertao/"
+        }
+      ],
+      "acessado_em": "2026-10-07",
+      "unidade_singular": "hospital",
+      "unidade_plural": "hospitais"
+    },
+    {
+      "id": "upa",
+      "nome": "Construir UPAs",
+      "valor_brl": 5691000,
+      "unidade_singular": "UPA",
+      "unidade_plural": "UPAs",
+      "contexto": "Construção de UPAs, pela tabela do FNS para o Sudeste em 2025.",
+      "referencia": "Custo de construção por UPA PorteI: R$ 5.691.000, tabelaFNS 2025/Sudeste.",
+      "fontes": [
+        {
+          "nome": "Ministério da Saúde / FNS — valores de construção para 2025",
+          "url": "https://portalfns.saude.gov.br/idg_download/24670/"
+        }
+      ],
+      "acessado_em": "2026-10-07"
+    },
+    {
+      "id": "ambulancias",
+      "nome": "Comprar ambulâncias",
+      "valor_brl": 324000,
+      "unidade_singular": "ambulância do SAMU",
+      "unidade_plural": "ambulâncias do SAMU",
+      "contexto": "Ambulâncias de suporte básico do SAMU, aquisição de Campo Grande em 2025.",
+      "referencia": "R$ 324.000 por ambulância de suporte básico; seis unidades adquiridas em 2025.",
+      "fontes": [
+        {
+          "nome": "Prefeitura de Campo Grande — ambulâncias do SAMU, 2025",
+          "url": "https://www.campogrande.ms.gov.br/cgnoticias/noticia/com-20-anos-de-historia-samu-recebe-sete-ambulancias-como-reforco-no-atendimento-de-urgencia-e-emergencia/"
+        }
+      ],
+      "acessado_em": "2026-10-07"
+    },
+    {
+      "id": "medicos",
+      "nome": "Pagar médicos por um ano",
+      "valor_brl": 169459.56,
+      "unidade_singular": "médico por um ano",
+      "unidade_plural": "médicos por um ano",
+      "contexto": "Doze bolsas mensais do Mais Médicos de 2026, R$ 14.121,63 por médico.",
+      "referencia": "12 ×R$ 14.121,63 =R$ 169.459,56 por médico.",
+      "componentes": {
+        "meses": 12,
+        "valor_mensal_brl": 14121.63
+      },
+      "fontes": [
+        {
+          "nome": "Ministério da Saúde — edital Mais Médicos nº3/2026",
+          "url": "https://www.gov.br/saude/pt-br/acesso-a-informacao/participacao-social/chamamentos-publicos/2026/chamamento-publico-sgtes-ms-no-3-2026-pmmb/edital"
+        }
+      ],
+      "acessado_em": "2026-10-07"
+    },
+    {
+      "id": "professores",
+      "nome": "Pagar professores por um ano",
+      "valor_brl": 61567.56,
+      "unidade_singular": "professor por um ano",
+      "unidade_plural": "professores por um ano",
+      "contexto": "Doze vencimentos mensais no piso do magistério de 2026, R$ 5.130,63 por professor.",
+      "referencia": "12 ×R$ 5.130,63 =R$ 61.567,56 por professor.",
+      "componentes": {
+        "meses": 12,
+        "valor_mensal_brl": 5130.63
+      },
+      "fontes": [
+        {
+          "nome": "Presidência da República — Lei nº15.437/2026, piso do magistério",
+          "url": "https://planalto.gov.br/ccivil_03/_ato2023-2026/2026/lei/l15437.htm"
+        }
+      ],
+      "acessado_em": "2026-10-07"
+    },
+    {
+      "id": "livros",
+      "nome": "Comprar livros didáticos",
+      "valor_brl": 13.35,
+      "unidade_singular": "livro didático",
+      "unidade_plural": "livros didáticos",
+      "contexto": "Livros didáticos impressos dos anos iniciais, aquisição do FNDE para 2026.",
+      "referencia": "R$ 764.883.814,60 ÷ 57.287.565 exemplares do PNLD 2023/Objeto 1, adquiridos em 2025 para 2026. Média:R$ 13,35.",
+      "componentes": {
+        "investimento_brl": 764883814.6,
+        "exemplares": 57287565
+      },
+      "fontes": [
+        {
+          "nome": "FNDE — dados estatísticos do PNLD para 2026",
+          "url": "https://www.gov.br/fnde/pt-br/acesso-a-informacao/transparencia-e-prestacao-de-contas/relatorio-de-gestao-1/acoes-e-programas/programas/programas-do-livro/pnld/dados-estatisticos"
+        }
+      ],
+      "acessado_em": "2026-10-07"
+    },
+    {
+      "id": "escola-primaria",
+      "nome": "Construir escolas de ensino fundamental",
+      "valor_brl": 10700000,
+      "unidade_singular": "escola",
+      "unidade_plural": "escolas",
+      "contexto": "Construção de escolas térreas FNDE, nove salas, referência de 2023.",
+      "referencia": "ProjetoFNDE de nove salas para o 1ºao 9ºano, até 316 estudantes em tempo integral. Valor de 2023:R$ 10,7 milhões.",
+      "fontes": [
+        {
+          "nome": "FNDE — manual Novo PAC Obras2023, escola de nove salas",
+          "url": "https://www.gov.br/fnde/pt-br/acesso-a-informacao/acoes-e-programas/acoes/novo-pac/media-1/MANUALNOVOPACOBRASFNDE2023PROVISORIOv21.pdf"
+        }
+      ],
+      "acessado_em": "2026-10-07"
+    },
+    {
+      "id": "asfalto",
+      "nome": "Asfaltar ruas",
+      "valor_brl": 1361502.35,
+      "unidade_singular": "km de ruas",
+      "unidade_plural": "km de ruas",
+      "contexto": "Pavimentação urbana pelo programa Asfalto Novo, Vida Nova, Paraná,2025.",
+      "referencia": "R$ 580 milhões ÷ 426 km =R$ 1.361.502,35 por km.",
+      "componentes": {
+        "investimento_brl": 580000000,
+        "extensao_km": 426
+      },
+      "fontes": [
+        {
+          "nome": "Agência Estadual de Notícias do Paraná — Asfalto Novo, Vida Nova, junho2025",
+          "url": "https://www.aen.pr.gov.br/Noticia/Estado-anuncia-R-493-milhoes-para-mais-10-municipios-dentro-do-Asfalto-Novo-Vida-Nova"
+        }
+      ],
+      "acessado_em": "2026-10-07"
+    },
+    {
+      "id": "acolhimento",
+      "nome": "Proteger crianças em situação de rua",
+      "valor_brl": 34916.76,
+      "unidade_singular": "vaga de acolhimento por um ano",
+      "unidade_plural": "vagas de acolhimento por um ano",
+      "contexto": "Doze meses de acolhimento de crianças e adolescentes em abrigo institucional, referência do DF de 2025.",
+      "referencia": "12 ×R$ 2.909,73 por vaga/mês =R$ 34.916,76 por vaga/ano. Tabela Sedes/DF de 11/02/2025.",
+      "componentes": {
+        "meses": 12,
+        "valor_mensal_brl": 2909.73
+      },
+      "fontes": [
+        {
+          "nome": "Governo do Distrito Federal — DODF de11/02/2025, valores socioassistenciais",
+          "url": "https://www.sinj.df.gov.br/sinj/TextoArquivoDiario.aspx?id_file=2b72a7f1-b633-3238-9f56-6f5d88b3199d"
+        }
+      ],
+      "acessado_em": "2026-10-07"
+    },
+    {
+      "id": "delegacias",
+      "nome": "Construir delegacias de polícia",
+      "valor_brl": 10500000,
+      "unidade_singular": "delegacia de polícia",
+      "unidade_plural": "delegacias de polícia",
+      "contexto": "Delegacias de polícia pelo investimento de R$ 10,5 milhões na Delegacia Cidadã de Maringá, inaugurada em 2026.",
+      "referencia": "Delegacia Cidadã de Maringá: investimento de R$ 10.500.000, inauguração 18/03/2026.",
+      "fontes": [
+        {
+          "nome": "Secretaria de Segurança Pública do Paraná — Delegacia Cidadã de Maringá2026",
+          "url": "https://www.seguranca.pr.gov.br/Noticia/PCPR-inaugura-Delegacia-Cidada-em-Maringa-e-amplia-atendimento-populacao"
+        }
+      ],
+      "acessado_em": "2026-10-07"
+    },
+    {
+      "id": "onibus-publicos",
+      "nome": "Comprar ônibus públicos",
+      "valor_brl": 885416.67,
+      "unidade_singular": "ônibus urbano",
+      "unidade_plural": "ônibus urbanos",
+      "contexto": "Ônibus do transporte coletivo, pela aquisição de 96 veículos por R$ 85 milhões em Londrina, em 2025.",
+      "referencia": "R$ 85.000.000 ÷ 96 ônibus =R$ 885.416,67 por veículo.",
+      "fontes": [
+        {
+          "nome": "CMTU / Prefeitura de Londrina — renovação do transporte coletivo2025",
+          "url": "https://cmtu.londrina.pr.gov.br/index.php/ult-noticias/2231-prefeitura-conclui-investimentos-no-transporte-coletivo-em-2025.html"
+        }
+      ],
+      "acessado_em": "2026-10-07",
+      "componentes": {
+        "investimento_brl": 85000000,
+        "veiculos": 96
+      }
+    },
+    {
+      "id": "covid",
+      "nome": "Atendimento hospitalar na Covid",
+      "valor_brl": 4864.26,
+      "unidade_singular": "internação",
+      "unidade_plural": "internações",
+      "contexto": "R$ 4.864,26 por internação de Covid, valor médio aprovado pelo SUS em 2020. A CPI da Pandemia apontou ações e omissões do governo Bolsonaro e mortes evitáveis.",
+      "referencia": "R$ 2.248.011.968,40 ÷ 462.149 internações, fevereiro–dezembro 2020. Média aprovada pelo SUS:R$ 4.864,26.",
+      "componentes": {
+        "investimento_brl": 2248011968.4,
+        "internacoes": 462149
+      },
+      "fontes": [
+        {
+          "nome": "Revista de Saúde Pública — gasto público com internações por Covid em2020",
+          "url": "https://new.scielo.br/j/rsp/a/sG4k3BcHvnXvYZznzpfT69p/?ilang=pt_BR&lang=pt"
+        },
+        {
+          "nome": "Senado — relatório da CPI da Pandemia2021",
+          "url": "https://www2.senado.leg.br/jspui/handle/id/607974?mode=full"
+        }
+      ],
+      "acessado_em": "2026-10-07"
+    },
+    {
+      "id": "viaturas",
+      "nome": "Comprar viaturas policiais",
+      "valor_brl": 152899,
+      "unidade_singular": "viatura policial",
+      "unidade_plural": "viaturas policiais",
+      "contexto": "Viaturas Renault Kardian Evo, pelo contrato de Itatiba de 2025.",
+      "referencia": "Pregão 41/2025 de Itatiba: Renault Kardian Evo convertido em viatura policial, R$ 152.899 por unidade.",
+      "fontes": [
+        {
+          "nome": "Prefeitura de Itatiba — aquisição de viatura policial2025",
+          "url": "https://itatiba.sp.gov.br/2025-pregao-eletronico-412025-aquisicao-de-veiculo-do-tipo-suv-devidamente-modificado-como-viatura-policial-entrega-imediata"
+        }
+      ],
+      "acessado_em": "2026-10-07"
+    },
+    {
+      "id": "prevencao-drogas",
+      "nome": "Prevenção à violência e drogas",
+      "valor_brl": 8500000,
+      "unidade_singular": "programa anti-drogas",
+      "unidade_plural": "programas anti-drogas",
+      "contexto": "Programas de prevenção à violência e drogas, pelo investimento de R$ 8,5 milhões anunciado por Fortaleza em 2025.",
+      "referencia": "Política Municipal de Prevenção à Violência e Drogas de Fortaleza: R$ 8,5 milhões para Casa Fortaleza, Pronasci Juventude, observatório e diagnóstico.",
+      "fontes": [
+        {
+          "nome": "Prefeitura de Fortaleza — Política Municipal de Prevenção à Violência e Drogas2025",
+          "url": "https://www.fortaleza.ce.gov.br/noticias/prefeitura-de-fortaleza-anuncia-investimento-de-cerca-de-r-8-5-milhoes-na-politica-municipal-de-prevencao-a-violencia-e-drogas"
+        }
+      ],
+      "acessado_em": "2026-10-07"
+    }
+  ],
+  "bolsa_familia": {
+    "id": "bolsa-familia",
+    "nome": "Bolsa Família",
+    "valor_brl": 678.18,
+    "contexto": "Benefício médio mensal por família em setembro de 2026.",
+    "referencia": "Benefício mensal médio por família: R$ 678,18, MDS, setembro de 2026.",
+    "fontes": [
+      {
+        "nome": "MDS — pagamentos do Bolsa Família de setembro de 2026",
+        "url": "https://www.gov.br/mds/pt-br/noticias/bolsa-familia-pagamentos-de-setembro-comecam-nesta-quinta-feira-17-09"
+      }
+    ],
+    "acessado_em": "2026-10-07"
+  },
+  "educacao": {
+    "id": "educacao",
+    "nome": "Um ano de educação básica",
+    "valor_brl": 14300,
+    "contexto": "Gasto anual médio por aluno das redes municipais e estaduais em 2024, segundo o Todos Pela Educação.",
+    "referencia": "Gasto anual médio por aluno das redes municipais e estaduais em 2024:R$ 14.300, Anuário Brasileiro da Educação Básica 2025, capítulo 9.",
+    "fontes": [
+      {
+        "nome": "Todos Pela Educação — Anuário 2025, financiamento e gasto anual por aluno",
+        "url": "https://anuario.todospelaeducacao.org.br/2025/capitulo-9-financiamento.html"
+      }
+    ],
+    "acessado_em": "2026-10-07"
+  },
+  "mensalao": {
+    "id": "mensalao",
+    "nome": "Você achou o mensalão muito?",
+    "valor_brl": 55000000,
+    "contexto": "Cerca de R$ 55 milhões destinados à cooptação de parlamentares, segundo o relator da AP 470 em 2012.",
+    "referencia": "Voto do relator da AP 470, STF,17/09/2012: cerca de R$ 55 milhões destinados à cooptação de parlamentares.",
+    "fontes": [
+      {
+        "nome": "STF — voto do relator da AP 470 sobre cooptação de parlamentares, 2012",
+        "url": "https://noticias.stf.jus.br/postsnoticias/relator-da-ap-470-analisa-imputacao-de-corrupcao-passiva-a-parlamentares-do-pp/"
+      }
+    ],
+    "acessado_em": "2026-10-07"
+  },
+  "familia": {
+    "primeira_geracao": 2,
+    "filhos_por_descendente": 2
+  },
+  "ordem": [
+    "escala",
+    "carro-popular",
+    "livros",
+    "casa",
+    "viaturas",
+    "professores",
+    "apartamento-capitais",
+    "medicos",
+    "cinquenta-anos",
+    "upa",
+    "ambulancias",
+    "escola-primaria",
+    "mensalao",
+    "acolhimento",
+    "asfalto",
+    "delegacias",
+    "prevencao-drogas",
+    "dez-creches",
+    "onibus-publicos",
+    "campus-universitario",
+    "moeda",
+    "covid",
+    "hospital",
+    "a-cada-cem",
+    "herdeiros",
+    "bolsa-familia",
+    "educacao"
+  ],
+  "estudos_herdeiros": {
+    "id": "estudos-herdeiros",
+    "nome": "Graduação dos herdeiros",
+    "valor_brl": 2101760,
+    "unidade_singular": "graduação de quatro anos",
+    "unidade_plural": "graduações de quatro anos",
+    "contexto": "Graduação de quatro anos em Harvard; orçamento 2026–2027 e seguro-saúde. Câmbio adotado: R$ 5 por dólar.",
+    "referencia": "4 ×(US$ 100.134 +US$ 4.954) ×R$ 5 =R$ 2.101.760 por estudante.",
+    "componentes": {
+      "anos": 4,
+      "orcamento_anual_usd": 100134,
+      "seguro_anual_usd": 4954,
+      "cambio_cenario_brl_usd": 5
+    },
+    "fontes": [
+      {
+        "nome": "Harvard College — Cost of Attendance2026–2027",
+        "url": "https://college.harvard.edu/financial-aid/how-aid-works"
+      }
+    ],
+    "acessado_em": "2026-10-07"
+  }
+}

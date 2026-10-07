@@ -8,13 +8,6 @@ const { id, endId } = Astro.props;
 ---
 
 <section class="section section--dark col" data-col-section={id}>
-  <!-- Intro copy is authored here but rendered as staged in-column cards by
-       render.ts. The template lives outside [data-column], so it survives the
-       column rebuild that fires on every salary change (D-V2-6). -->
-  <template data-col-intro>
-    <slot name="intro" />
-  </template>
-
   <div class="wealth-column wealth-column--metric" data-column={id}></div>
 
   <div class="wrap">

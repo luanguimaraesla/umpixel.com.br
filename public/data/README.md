@@ -1,119 +1,72 @@
 # Dados
 
-Esta pasta é a **fonte única de verdade** do site e fica em `public/data/`, então cada arquivo
-é servido em `https://umpixel.com.br/data/<arquivo>.json`. O site **não** embute esses números
-no HTML: o JavaScript busca (`fetch`) esses JSON em tempo de execução e monta as views
-dinamicamente. Para atualizar o site, basta um script de ingestão sobrescrever estes arquivos.
+As páginas carregam três arquivos desta pasta, servidos em `/data/<arquivo>.json`:
+`salario-minimo.json`, `filme-bolsonaro.json` e `checkpoints.json`.
+Os demais JSON são o histórico da versão anterior.
 
-Toda a pesquisa inicial foi feita em **08/07/2026**, sempre priorizando fontes oficiais. Cada
-arquivo guarda os links e a data de acesso.
+## `salario-minimo.json`
 
-## Arquivos
+Salário mínimo nacional de 2026: **R$ 1.621,00**, Decreto nº 12.797/2025, vigente desde
+1º de janeiro de 2026. É a referência salarial das duas páginas.
 
-### `salario-minimo.json`
-Salário mínimo nacional de 2026: **R$ 1.621,00**, fixado pelo Decreto nº 12.797/2025 (Planalto),
-com vigência a partir de 1º de janeiro de 2026. É o valor padrão da calculadora do site.
+- `valor_brl`: valor mensal positivo e finito, em reais.
+- `vigencia`: data no formato `AAAA-MM-DD`.
+- `instrumento_legal`: decreto que fixa o valor.
+- `fontes[].{nome,url}` e `acessado_em`: fontes e data de consulta.
 
-**Como atualizar:** um novo decreto é publicado todo mês de dezembro. Atualize `valor_brl`,
-`instrumento_legal`, `vigencia`, `contexto` e `acessado_em`.
+## `filme-bolsonaro.json`
 
-### `cambio-usd-brl.json`
-Cotação PTAX de fechamento do dólar (Banco Central do Brasil), usada para converter as fortunas
-em dólar para reais. Valor de referência: **R$ 5,1458** por US$ 1,00 em 07/07/2026.
+O Opera Mundi informa **US$ 24 milhões pedidos**, cerca de **R$ 134 milhões**, para
+*Dark Horse*, filme sobre Jair Bolsonaro.
 
-**Como atualizar:** consulte a PTAX mais recente na API Olinda do BCB (a URL está no arquivo) e
-atualize `taxa_venda`, `taxa_compra`, `data_cotacao` e `serie_recente`.
+- `titulo`: nome do filme.
+- `pedido_usd` e `pedido_brl`: valores em dólares e reais publicados na cobertura.
+- `nota_cambio`: origem do equivalente em reais.
+- `data_reportagem`: data da matéria.
+- `repassado_brl`: registro histórico validado no carregamento.
+- `fontes[].{nome,url}` e `acessado_em`: fontes e data de consulta.
 
-### `bilionarios-brasil.json`
-Os cinco brasileiros mais ricos segundo a lista anual **Forbes World's Billionaires 2026**
-(divulgada em 10/03/2026, valores de 01/03/2026). Usamos a lista anual, e não a de tempo real,
-porque ela é estável e citável. As observações registram por que Vicky Safra não entra no
-ranking brasileiro e a variação de tempo real de André Esteves.
+## `checkpoints.json`
 
-**Como atualizar:** a lista anual da Forbes sai todo ano em março/abril. Substitua o `top5`, o
-`total_top5_usd_bilhoes` e as datas. O primeiro item de `top5` é tratado como a pessoa mais rica;
-mantenha a ordem por `posicao`.
+- `custos[]`: valores por veículo, imóvel, obra, livro, internação ou programa.
+  Médicos, professores e vagas de acolhimento usam unidades anuais.
+- `mensalao`: R$ 55 milhões destinados à cooptação de parlamentares, relator da AP 470,
+  STF, 2012.
+- `bolsa_familia`: parcela mensal média por família.
+- `educacao`: gasto anual médio por aluno.
+- `estudos_herdeiros`: graduação de quatro anos em Harvard para calcular as gerações.
+- `ordem[]`: IDs dos custos e dos marcos `escala`, `cinquenta-anos`, `mensalao`,
+  `a-cada-cem`, `moeda`, `herdeiros`, `bolsa-familia` e `educacao`.
+- `familia`: duas pessoas na primeira geração, dois filhos por descendente.
 
-O primeiro colocado carrega ainda `fonte_riqueza_desde` (ano em que a fonte de riqueza começou;
-2004 para Eduardo Saverin, ano da fundação do Facebook). O site usa esse ano para estimar em quanto
-tempo a pessoa mais rica juntaria o que você guarda numa vida inteira (ver `/referencias`). Só o 1º
-colocado precisa do campo; preencha os demais apenas quando o ano de origem for inequívoco.
+Cada referência tem `id`, `nome`, `valor_brl`, `contexto`, `referencia`, `fontes` e
+`acessado_em`. Os custos e estudos têm `unidade_singular` e `unidade_plural`.
+Os IDs são únicos. `contexto` aparece no card; `referencia` detalha o cálculo,
+o período e a unidade na metodologia. Os valores são nominais.
 
-### `renda-brasil.json`
-Indicadores de renda e desigualdade do Brasil (IBGE PNAD Contínua e OCDE): rendimento médio,
-percentual de trabalhadores que ganham até um salário mínimo e coeficientes de Gini. Hoje só
-alimenta a lista de fontes do rodapé; está reservado para a fase futura dos "fatos
-intermediários".
+`componentes` registra contas reproduzíveis, como área × custo por metro quadrado,
+média dos preços nas 22 capitais do FipeZAP e investimento de R$ 85 milhões ÷ 96 ônibus.
 
-**Como atualizar:** a PNAD Contínua é trimestral (IBGE); a OECD Income Distribution Database é
-atualizada de forma irregular.
+`src/lib/checkpoints.ts` gera os mesmos cards nas duas páginas:
 
-### `patrimonio-familia.json`
-Estimativa do patrimônio líquido mediano de uma família brasileira ao fim da vida de trabalho
-(~65 anos): **R$ 200 mil**, dentro de uma faixa de R$ 150 mil a R$ 250 mil. Não existe estatística
-oficial, então o valor é sintetizado a partir de blocos verificáveis (mediana UBS, casa própria dos
-60+, benefícios do INSS no piso) e sempre apresentado como estimativa. A metodologia completa fica
-em `/referencias`.
+- Café: R$ 1, antes dos marcos da lista.
+- Escala: segundo card, com largura, valor por linha e régua.
+- Compras: capacidade e custo em centavos; quantidades arredondadas para baixo.
+- Trabalho: salário mínimo × 12 × 45, por pessoa.
+- Para cada R$ 100 e moeda: proporção entre um salário mensal e o pedido inteiro.
+- Herdeiros: soma de gerações completas que cabem no pedido.
+- Bolsa Família e educação: parte inteira de pedido ÷ custo por unidade, dentro do percurso.
+  A quantidade usa o pedido completo; a posição define quando o card aparece.
 
-**Como atualizar:** este número é revisado manualmente, sem automação, quando a UBS ou a Anbima
-publicam novas edições dos relatórios citados. Atualize `valor_brl`, `faixa_brl`, `metodologia`, as
-`fontes` e `acessado_em`.
+Os marcos distribuem a leitura em valores monetários redondos. O percurso atual tem
+28 cards: café e 27 marcos internos. Um único card fica ativo
+na coluna, selecionado pelo valor cruzado pela linha de medição.
 
-### `poupanca-familias.json`
-Taxa média de poupança por faixa de renda familiar per capita, medida em salários mínimos, do
-**Estudo Especial 107 do Banco Central** com dados da POF 2017-2018 do IBGE. Alimenta o modelo
-realista de patrimônio: quanto uma família de cada faixa consegue guardar e capitalizar ao longo da
-vida de trabalho. O campo `horizonte_anos` é **47** (dos 18 aos 65 anos) e o `retorno_real_anual` é
-**0,03** (3% ao ano, real). Cada item de `faixas` traz `ate_sm` (o teto da faixa em salários mínimos,
-`null` na faixa mais alta) e `taxa` (a fração da renda poupada). Consumido por `src/lib/render.ts` e
-`src/lib/referencias.ts`.
+## Atualização e validação
 
-**Como atualizar:** revise as `faixas` e o `retorno_real_anual` quando o Banco Central publicar uma
-nova edição do estudo ou quando sair uma nova POF. Atualize `faixas`, `horizonte_anos`,
-`retorno_real_anual`, `fontes` e `acessado_em`.
+Confira cada valor na fonte, revise componentes, unidade, período e data de consulta.
+Atualize `contexto` e `referencia` junto com os números.
 
-### `bilionarios-mundo.json`
-A pessoa mais rica do mundo, agora pelo valor de **tempo real** da Forbes (não mais a lista anual):
-Elon Musk, **US$ 1.053 bilhões** (US$ 1,05 trilhão) em 01/07/2026. Em 12/06/2026 ele se tornou o
-primeiro trilionário da história, no IPO da SpaceX, quando a Forbes calculou seu patrimônio em
-~US$ 1,1 tri. O site passou a usar o tempo real (e não mais a lista anual de março de 2026, US$ 839
-bi) justamente para registrar o marco do trilhão. O Brasil segue na lista anual estável
-(`bilionarios-brasil.json`), porque o tempo real do ranking brasileiro é volátil; as duas fontes são
-independentes.
-
-**Como atualizar:** consulte o valor de tempo real no perfil da Forbes (a URL está no arquivo) e
-atualize `pessoa_mais_rica.patrimonio_usd_bilhoes`, `data_referencia_valores` (a data do valor) e
-`acessado_em`. O front lê `pessoa_mais_rica.{nome,patrimonio_usd_bilhoes,ranking_mundial,fonte_riqueza}`,
-`data_referencia_valores`, `fontes[].{nome,url}` e `acessado_em`.
-
-### `comparacoes-publicas.json`
-Referências de escala pública para as frases que aparecem no meio das colunas: o PIB de alguns
-países (em dólar, convertido pela PTAX em tempo de execução, como as fortunas) e o custo de algumas
-políticas públicas em reais (hospital, creche, educar todos os alunos por um ano, erradicar o
-analfabetismo, casa média). O front usa esses números para dizer coisas como "você acabou de passar
-o PIB de Portugal" ou "isso construiria N hospitais". Cada `país` traz `pib_usd_bilhoes`,
-`ano_referencia` e a `preposicao` correta da frase ("de", "do" ou "da"). Cada `custo` traz
-`valor_brl` ou, no caso de educar todos os alunos, os dois componentes
-`componentes.{valor_aluno_ano_brl,matriculas}`, multiplicados no site. As estimativas guardam uma
-`nota` explicando a composição. Cada `país` e cada `custo` traz ainda sua própria `fonte`
-(`nome`, `url`), citada direto no card.
-
-Este arquivo é **opcional**: o site o busca com um `.catch` e, se ele faltar, as frases que dependem
-dele simplesmente não aparecem, sem quebrar a página.
-
-**Como atualizar:** o PIB vem do Banco Mundial (PIB nominal corrente); reveja quando sair um novo
-ano-base. Os custos vêm de fontes setoriais (Novo PAC, FNDE, Todos Pela Educação, FipeZAP);
-atualize `valor_brl` ou os `componentes`, revise as `notas` das estimativas e a `acessado_em`.
-
-## Contrato
-
-O front-end lê estes campos; mantenha os nomes ao atualizar:
-
-- `salario-minimo.json`: `valor_brl`, `vigencia`, `instrumento_legal`, `fontes[].{nome,url}`, `acessado_em`
-- `cambio-usd-brl.json`: `taxa_venda`, `data_cotacao`, `fontes[].{nome,url}`, `acessado_em`
-- `bilionarios-brasil.json`: `top5[].{posicao,nome,patrimonio_usd_bilhoes,fonte_riqueza}`, `top5[0].fonte_riqueza_desde`, `total_top5_usd_bilhoes`, `data_referencia_valores`, `fontes[].{nome,url}`, `acessado_em`
-- `renda-brasil.json`: `fontes[].{nome,url}`, `acessado_em`
-- `patrimonio-familia.json`: `valor_brl`, `faixa_brl.{min,max}`, `fontes[].{nome,url}`, `acessado_em`
-- `poupanca-familias.json`: `horizonte_anos`, `retorno_real_anual`, `faixas[].{ate_sm,taxa}`, `fontes[].{nome,url}`, `acessado_em`
-- `bilionarios-mundo.json`: `pessoa_mais_rica.{nome,patrimonio_usd_bilhoes,ranking_mundial,fonte_riqueza}`, `data_referencia_valores`, `fontes[].{nome,url}`, `acessado_em`
-- `comparacoes-publicas.json` (opcional): `paises[].{nome,preposicao,pib_usd_bilhoes,ano_referencia,fonte.{nome,url}}`, `custos[].{id,valor_brl,fonte.{nome,url}}` ou `custos[].componentes.{valor_aluno_ano_brl,matriculas}`, `custos[].nota` nas estimativas, `fontes[].{nome,url}`, `acessado_em`
+`src/lib/state.ts` valida valores positivos, fontes completas, IDs únicos, a ordem dos
+marcos e os parâmetros familiares. Uma falha de carregamento exibe um aviso e mantém
+os controles desabilitados.

@@ -9,154 +9,25 @@ import Footer from '../components/Footer.astro';
 
 <Base>
   <ProgressBar />
-
   <Hero />
 
-  <!-- Compact scale key: the whole metaphor in one static panel, no sticky beats. -->
-  <section class="section section--black key" id="key">
-    <div class="panel key__card" data-reveal>
-      <p class="key__eyebrow">pixels preenchidos, em escala real</p>
-      <h2 class="key__title">Primeiro, a chave: cada pixel é um mês do seu salário.</h2>
-
-      <div class="key__grid">
-        <div class="key__item">
-          <div class="key__swatch">
-            <div class="key__block" style="width:1px;height:1px" aria-hidden="true"></div>
-          </div>
-          <p class="key__value"><strong data-dyn="salary">…</strong></p>
-          <p class="key__caption">um mês</p>
-        </div>
-
-        <div class="key__item">
-          <div class="key__swatch">
-            <div class="key__block" style="width:4px;height:3px" aria-hidden="true"></div>
-          </div>
-          <p class="key__value"><strong data-dyn="year-value">…</strong></p>
-          <p class="key__caption">um ano</p>
-        </div>
-
-        <div class="key__item">
-          <div class="key__swatch">
-            <div class="key__block" data-earnings-block aria-hidden="true"></div>
-          </div>
-          <p class="key__value"><strong data-dyn="earnings-value">…</strong></p>
-          <p class="key__caption">tudo o que você ganha trabalhando dos 18 aos 65</p>
-        </div>
-
-        <div class="key__item">
-          <div class="key__swatch">
-            <div class="key__block" data-life-block aria-hidden="true"></div>
-          </div>
-          <p class="key__value"><strong data-dyn="life-value">…</strong></p>
-          <p class="key__caption">o que disso vira patrimônio, poupando como a média da sua faixa de renda</p>
-        </div>
-
-        <div class="key__item">
-          <div class="key__swatch">
-            <div class="key__block" data-family-block aria-hidden="true"></div>
-          </div>
-          <p class="key__value"><strong data-dyn="family-worth">…</strong></p>
-          <p class="key__caption">o que uma família típica junta de patrimônio na vida, casa incluída</p>
-        </div>
-      </div>
-
-      <p class="key__note">estimativas e fontes → <a href="/referencias">/referencias</a></p>
-    </div>
-  </section>
-
-  <!-- The descent starts here: the CTA lives where the fortunes begin, not in the hero. -->
-  <section class="section section--dark col-start" id="col-start">
-    <p class="col-start__line">Você sabe quanto os verdadeiros ricos são mais ricos do que você?</p>
-    <div class="col-start__cta">
-      <button class="hero__start col-start__btn" id="btn-start" type="button" disabled>
-        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M4.5 2.5v11L13 8z"/></svg>
-        começar a descer
-      </button>
-      <select
-        class="speed-select"
-        id="speed-select-start"
-        aria-label="Velocidade da rolagem automática"
-        disabled
-      >
-        <option value="0.5">0,5×</option>
-        <option value="1" selected>1×</option>
-        <option value="2">2×</option>
-        <option value="4">4×</option>
-        <option value="8">8×</option>
-        <option value="16">16×</option>
-      </select>
-    </div>
-  </section>
-
-  <WealthColumn id="bilhao" endId="fim-bilhao">
-    <Fragment slot="intro">
-      <div data-intro-step>
-        <p class="col__amount">R$ 1 bilhão</p>
-        <p class="col__context">
-          São <strong data-dyn="billion-years">…</strong> de trabalho. A coluna aí embaixo está em
-          escala real.
-        </p>
-      </div>
-    </Fragment>
+  <WealthColumn id="filme" endId="fim-filme">
     <Fragment slot="end">
-      Isso foi só 1 bilhão. Tá só aquecendo.
-    </Fragment>
-  </WealthColumn>
-
-  <WealthColumn id="richest" endId="fim-mais-rico">
-    <Fragment slot="intro">
-      <div data-intro-step>
-        <p class="col__eyebrow">a pessoa mais rica do Brasil</p>
-        <p class="col__name" data-dyn="richest-name">…</p>
-        <p class="col__figure">
-          <span data-dyn="richest-usd">…</span> (<span data-dyn="richest-brl">…</span>)
-        </p>
-        <p class="col__source" data-dyn="richest-wealth-source">…</p>
-        <p class="col__source" data-dyn="forbes-source">…</p>
-        <p class="col__context">
-          Para juntar isso você teria de trabalhar <strong data-dyn="richest-years">…</strong>.
-          Antes dos primeiros hominídeos.
-        </p>
-      </div>
-    </Fragment>
-    <Fragment slot="end">
-      Fim da fortuna de <strong data-dyn="richest-name">…</strong>:
-      <strong data-dyn="richest-lives">…</strong> inteiras de trabalho.
-    </Fragment>
-  </WealthColumn>
-
-  <WealthColumn id="musk" endId="fim-musk">
-    <Fragment slot="intro">
-      <div data-intro-step>
-        <p class="col__eyebrow">a pessoa mais rica do mundo</p>
-        <p class="col__name" data-dyn="musk-name">…</p>
-        <p class="col__figure">
-          <span data-dyn="musk-usd">…</span> (<span data-dyn="musk-brl">…</span>)
-        </p>
-        <p class="col__source" data-dyn="musk-wealth-source">…</p>
-        <p class="col__source" data-dyn="world-forbes-source">…</p>
-        <p class="col__context">
-          São <strong data-dyn="musk-years">…</strong> de trabalho. Boa sorte.
-        </p>
-      </div>
-    </Fragment>
-    <Fragment slot="end">
-      Fim. <strong data-dyn="musk-lives">…</strong> inteiras de trabalho. Agora você sabe o
-      tamanho da distância.
+      Fim do pedido: <strong data-dyn="requested-brl">…</strong>.<br />
+      Cerca de <strong data-dyn="movie-lives">…</strong> inteiras de renda bruta no salário mínimo.
+      Um filme sobre o pai dele.
     </Fragment>
   </WealthColumn>
 
   <Footer />
-
   <PositionIndicator />
 
   <script>
-    import { boot, wireScaleInfo } from '../lib/render';
+    import { boot } from '../lib/render';
     import { initReveal } from '../lib/reveal';
     import { initDebug } from '../lib/debug';
-    wireScaleInfo();
     initReveal();
     initDebug();
-    boot().catch((err) => console.error('Falha ao carregar os dados:', err));
+    boot().catch((error) => console.error('Falha ao carregar os dados:', error));
   </script>
 </Base>

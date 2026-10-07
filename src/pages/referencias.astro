@@ -4,7 +4,7 @@ import Base from '../layouts/Base.astro';
 
 <Base
   title="Referências e metodologia · UM PIXEL"
-  description="Como o um pixel calcula a escala, de onde vêm os números e o que inspirou o site."
+  description="As fontes do pedido de Flávio Bolsonaro a Vorcaro e a comparação com o salário mínimo brasileiro."
 >
   <main class="ref-page">
     <h1>Referências e metodologia</h1>
@@ -15,158 +15,86 @@ import Base from '../layouts/Base.astro';
     </p>
 
     <section class="ref">
-      <h2>A escala</h2>
+      <h2>O pedido para o filme</h2>
       <p>
-        Aqui, <strong>1 pixel = 1 mês</strong> do seu salário. 12 pixels formam 1 ano.
-        564 pixels são uma vida inteira de trabalho, dos 18 aos 65 anos. Tudo está em escala
-        real, sem ampliações, medido em pixels CSS.
+        Segundo reportagem do Opera Mundi de 13 de maio de 2026, baseada em áudios, documentos
+        e mensagens divulgados pelo Intercept, Flávio Bolsonaro pediu a Daniel Vorcaro <strong data-dyn="requested-usd">…</strong>
+        para financiar <strong data-dyn="movie-title">…</strong>, filme sobre Jair Bolsonaro.
+        A imprensa informou o equivalente aproximado de <strong data-dyn="requested-brl">…</strong>.
       </p>
+      <p data-dyn="exchange-note">…</p>
+    </section>
+
+    <section class="ref">
+      <h2>Uma referência só: o salário mínimo</h2>
       <p>
-        Usamos 12 salários por ano para manter a metáfora dos 12 pixels. Sim, existe o 13º; ele
-        só reforçaria o argumento.
-      </p>
-      <p>
-        As fortunas em dólar viram reais pela PTAX do Banco Central de
-        <span data-dyn="fx-date">…</span> (R$ <span data-dyn="fx-rate">…</span> por dólar), com
-        os valores da lista anual da Forbes de <span data-dyn="forbes-date">…</span>. O salário
-        mínimo de <span data-dyn="min-wage">…</span> segue o
+        Usamos o salário mínimo nacional de <strong data-dyn="min-wage">…</strong> por mês,
+        vigente desde <span data-dyn="min-wage-since">…</span>, conforme o
         <span data-dyn="min-wage-law">…</span>.
       </p>
+    </section>
+
+    <section class="ref">
+      <h2>A escala e as contas</h2>
       <p>
-        Tudo aqui usa o seu salário de hoje, sem nenhuma projeção. As contagens de "vidas
-        inteiras de trabalho" dividem a fortuna por 564 salários (47 anos × 12 meses),
-        exatamente o que uma linha de 564 pixels representa na coluna. O patrimônio acumulado
-        numa vida segue outro modelo, explicado logo abaixo.
+        <strong>1 pixel de área = uma nota de R$ 100.</strong> São pixels CSS.
+        O pedido ocupa <strong data-dyn="movie-area">…</strong> pixels, o equivalente ao mesmo
+        número de notas de cem reais.
+      </p>
+      <p>
+        Um salário mínimo ocupa <span data-dyn="min-wage-area">…</span> pixels de área.
+        Um ano de renda ocupa <span data-dyn="year-area">…</span> pixels; 47 anos de trabalho,
+        dos 18 aos 65, ocupam <span data-dyn="earnings-area">…</span> pixels. Nos blocos menores,
+        uma última linha parcial preserva a área.
+      </p>
+      <p>
+        A coluna tem 12 pixels de largura: cada linha de 1 pixel de altura vale R$ 1.200.
+        Cada traço da régua, a cada 100 pixels de altura, marca R$ 120 mil. A última linha da
+        coluna é arredondada para cima até completar um pixel de altura.
+      </p>
+      <p>
+        <strong>Área em pixels = valor pedido ÷ 100.</strong><br />
+        <strong>Meses = valor pedido ÷ salário mínimo.</strong><br />
+        <strong>Anos = meses ÷ 12.</strong><br />
+        <strong>Vidas de trabalho = meses ÷ 564.</strong>
+      </p>
+      <p>
+        O pedido equivale a cerca de <strong data-dyn="movie-months">…</strong> salários mínimos
+        mensais, <strong data-dyn="movie-years">…</strong>, ou
+        <strong data-dyn="movie-lives">…</strong> de trabalho. Um ano soma
+        <span data-dyn="year-value">…</span>; uma carreira de 47 anos soma
+        <span data-dyn="earnings-value">…</span> de renda bruta.
+      </p>
+      <p>
+        A conta usa o salário mínimo vigente, 12 pagamentos por ano e renda bruta.
+        Os totais de meses, anos e vidas exibidos são arredondados.
       </p>
     </section>
 
     <section class="ref">
-      <h2>O patrimônio de uma vida</h2>
+      <h2>Os checkpoints</h2>
       <p>
-        O patrimônio acumulado numa vida não supõe que você guardaria 100% do salário, e sim a
-        parte da renda que sobra e é poupada, mês após mês, durante décadas. A conta é:
+        Cada compra ou obra é uma comparação independente. Começamos com R$ 1 e um cafezinho
+        na rodoviária. O segundo card explica a escala. Os demais marcos ficam próximos de
+        intervalos de R$ 4 milhões a R$ 6 milhões. O título mostra o dinheiro e a quantidade
+        aparece abaixo. As quantidades são arredondadas para baixo; custo das unidades e saldo
+        ficam nas contas abaixo.
       </p>
       <p>
-        <strong>patrimônio estimado = renda mensal × taxa de poupança × fator de acumulação</strong>
+        Os preços, orçamentos e gastos usam os valores nominais e períodos das fontes abaixo.
       </p>
       <p>
-        A taxa vem do Estudo Especial 107 do Banco Central (dados da POF 2017-2018), que define
-        poupança como aplicações financeiras líquidas mais compra líquida de imóveis sobre a
-        renda disponível. Ela cresce com a renda, de 0,6% até meio salário mínimo per capita a
-        8,3% acima de 6. Só 20,2% das famílias pouparam em 2018: 7,8% na faixa mais baixa contra
-        54,4% na mais alta. As famílias acima de 6 salários mínimos per capita eram 3,7% do total
-        e faziam 46% da poupança nacional. Para dar escala, o rendimento domiciliar per capita do
-        Brasil em 2025 foi de R$ 2.316 por mês segundo o IBGE, de R$ 1.219 no Maranhão a R$ 4.538
-        no Distrito Federal.
-      </p>
-      <div class="calc-table-wrap">
-        <table class="calc-table">
-          <thead>
-            <tr>
-              <th>Faixa</th>
-              <th class="num">Renda mensal aproximada</th>
-              <th class="num">Taxa média</th>
-              <th class="num">Patrimônio estimado</th>
-            </tr>
-          </thead>
-          <tbody data-faixas></tbody>
-        </table>
-      </div>
-      <p>
-        Os extremos de 0,6% e 8,3% estão explícitos no estudo; as faixas intermediárias são
-        aproximações do gráfico; as faixas em reais usam o salário mínimo vigente de
-        <span data-dyn="min-wage">…</span>.
+        Os cards do mensalão, da proporção salarial, da moeda e das gerações comparam o pedido
+        inteiro. Suas posições são pontos de leitura.
+        Bolsa Família e educação também usam o orçamento completo e aparecem no percurso.
       </p>
       <p>
-        O fator supõe <span data-dyn="horizon-years">…</span> de aportes mensais constantes, o
-        mesmo período da vida de trabalho do site, com retorno real de
-        <span data-dyn="real-return-pct">…</span> ao ano acima da inflação, em reais de hoje. Dá
-        um fator de aproximadamente <strong data-dyn="factor">…</strong>: cada R$ 1 por mês vira
-        cerca de R$ 1.221 de patrimônio.
+        Os herdeiros usam quatro anos do orçamento de Harvard de 2026–2027 e seguro-saúde,
+        no câmbio adotado de R$ 5 por dólar. A primeira geração tem duas pessoas;
+        cada descendente tem dois filhos. Na Covid, contamos internações pelo valor aprovado
+        no SUS. No acolhimento, contamos vagas por ano.
       </p>
-      <p>
-        Com o salário informado na página inicial, <span data-dyn="your-salary">…</span>, você cai
-        na faixa <span data-dyn="your-bracket">…</span>, taxa <span data-dyn="your-rate">…</span>,
-        aporte de <span data-dyn="your-monthly">…</span> por mês, e patrimônio de cerca de
-        <strong data-dyn="your-wealth">…</strong>.
-      </p>
-      <p>
-        A faixa acima de 6 salários mínimos é larga demais e a média de 8,3% subestima rendas
-        muito altas, onde o decisivo é o gasto recorrente: ali o patrimônio vira (renda líquida -
-        gasto mensal) × fator, uma extrapolação comportamental, não do Banco Central. As taxas são
-        por renda familiar per capita, aplicadas ao salário individual como aproximação. A POF
-        2024-2025 ainda não tem recorte equivalente, então a conta segue a POF 2017-2018. O modelo
-        ignora herança, FGTS, INSS e valorização da casa própria, e assume aportes constantes.
-      </p>
-    </section>
-
-    <section class="ref">
-      <h2>O patrimônio de uma família</h2>
-      <p>
-        Não existe estatística oficial do patrimônio de uma família brasileira no fim da vida. O
-        número que usamos, cerca de <strong data-dyn="family-worth">…</strong>, é uma
-        <strong>estimativa</strong> montada a partir de blocos verificáveis.
-      </p>
-      <p>
-        A mediana de riqueza por adulto medida pela UBS subestima o fim da vida. Cerca de 84% das
-        pessoas com 60 anos ou mais moram em casa própria, e a casa costuma ser quase todo o
-        patrimônio da família. A mediana dos benefícios do INSS é exatamente 1 salário mínimo, e
-        só uma pequena parte dos aposentados tem previdência privada.
-      </p>
-      <p>
-        Juntando essas peças, chegamos a uma faixa provável entre R$ 150 mil e R$ 250 mil por
-        família, com 80% a 90% imobilizado na casa própria, e adotamos o ponto central de
-        <span data-dyn="family-worth">…</span>. Trate sempre como estimativa, não como dado
-        oficial.
-      </p>
-    </section>
-
-    <section class="ref">
-      <h2>Os 5 mais ricos do Brasil</h2>
-      <p>
-        Somados, os cinco brasileiros mais ricos têm <span data-dyn="top5-usd">…</span>. No fluxo
-        principal do site mostramos só o 1º colocado; a soma dos cinco aparece como um marco
-        dentro da coluna de Elon Musk.
-      </p>
-    </section>
-
-    <section class="ref">
-      <h2>As frases das colunas</h2>
-      <p>
-        No meio das colunas aparecem comparações de escala pública. Todas usam os números do arquivo
-        <code>comparacoes-publicas.json</code>, convertidos pela mesma PTAX das fortunas, e são
-        recalculadas quando você muda o salário. Vale registrar como cada uma é montada.
-      </p>
-      <p>
-        <strong>PIB de um país é fluxo; a fortuna é estoque.</strong> Quando o site diz que você
-        passou o PIB de um país, está comparando um patrimônio acumulado com tudo o que aquele país
-        produz em um ano. São grandezas diferentes; a comparação serve só para dar escala visual, não
-        para dizer que uma pessoa "vale" um país.
-      </p>
-      <p>
-        <strong>Os 5 centavos.</strong> Pegamos a proporção que 5 centavos (R$ 0,05) representam
-        diante do patrimônio de uma família típica, cerca de <span data-dyn="family-worth">…</span>,
-        e aplicamos essa mesma proporção à fortuna da pessoa mais rica do mundo. O resultado é quanto
-        ela deixaria passar no chão para sentir o mesmo que você sente ao ignorar 5 centavos.
-      </p>
-      <p>
-        <strong>O tempo da pessoa mais rica do Brasil.</strong> Dividimos a fortuna de
-        <span data-dyn="richest-name">…</span> pelo tempo desde que sua fonte de riqueza começou
-        (<span data-dyn="richest-since">…</span>), o que dá uma taxa média de acúmulo por segundo.
-        Depois calculamos quanto tempo, nessa taxa, ela levaria para juntar o patrimônio que você
-        acumularia na vida pelo modelo de poupança descrito acima. É uma média grosseira, não um
-        retrato do ritmo real, que oscila muito.
-      </p>
-      <p>
-        <strong>Educação e analfabetismo são estimativas compostas.</strong> "Educar todos os alunos
-        por um ano" multiplica o investimento público por aluno ao ano
-        (<span data-dyn="edu-aluno-ano">…</span>) pelas matrículas da educação básica
-        (<span data-dyn="edu-matriculas">…</span>), chegando a <span data-dyn="edu-total">…</span> ao
-        ano. "Erradicar o analfabetismo" (<span data-dyn="analf-cost">…</span>) multiplica o número de
-        pessoas analfabetas pelo custo por vaga do programa Brasil Alfabetizado. As duas misturam anos
-        de referência e usam custo de programa, não custo integral, então são ordens de grandeza.
-        Trate-as como estimativa; os componentes e as ressalvas estão nas notas das fontes abaixo.
-      </p>
+      <div data-checkpoints></div>
     </section>
 
     <section class="ref">
@@ -175,42 +103,31 @@ import Base from '../layouts/Base.astro';
     </section>
 
     <section class="ref">
-      <h2>Inspirações</h2>
-      <ul>
-        <li>
-          <a
-            href="https://stanford.edu/~bonica/wealth-to-scale/musk-wealth-to-scale-2026.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Wealth, shown to scale (Adam Bonica, Stanford): o scroll longo em escala real.
-          </a>
-        </li>
-        <li>
-          <a
-            href="https://eattherichtextformat.github.io/1-pixel-wealth/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            1 Pixel Wealth (Matt Korostoff): a ideia de 1 pixel como unidade de dinheiro.
-          </a>
-        </li>
-        <li>
-          <a href="https://howpoorami.org/pt" target="_blank" rel="noopener noreferrer">
-            How Poor Am I?: a calculadora pessoal e a comparação justa entre patrimônios.
-          </a>
-        </li>
-      </ul>
-      <p>Nenhum código foi copiado das referências; este site foi escrito do zero.</p>
+      <h2>A imagem da nota</h2>
+      <p>
+        A miniatura da nota de R$ 100 vem da
+        <a href="https://www.bcb.gov.br/pre/asimp/imagens/cedulas2familiareal.asp?frame=1" target="_blank" rel="noopener noreferrer">
+          galeria da Segunda Família do Real, do Banco Central do Brasil.
+        </a>
+        Usamos apenas a frente, recortada e reduzida, com fundo transparente.
+      </p>
+    </section>
+
+    <section class="ref">
+      <h2>Inspiração</h2>
+      <p>
+        <a href="https://eattherichtextformat.github.io/1-pixel-wealth/" target="_blank" rel="noopener noreferrer">
+          1 Pixel Wealth (Matt Korostoff): a ideia de usar pixels para mostrar dinheiro em escala.
+        </a>
+      </p>
+      <p>Nenhum código foi copiado da referência; este site foi escrito do zero.</p>
     </section>
 
     <p class="ref__license">
       Código livre sob AGPL-3.0 ·
-      <a
-        href="https://github.com/luanguimaraesla/umpixel.com.br"
-        target="_blank"
-        rel="noopener noreferrer">código-fonte no GitHub</a
-      >
+      <a href="https://github.com/luanguimaraesla/umpixel.com.br" target="_blank" rel="noopener noreferrer">
+        código-fonte no GitHub
+      </a>
     </p>
   </main>
 
